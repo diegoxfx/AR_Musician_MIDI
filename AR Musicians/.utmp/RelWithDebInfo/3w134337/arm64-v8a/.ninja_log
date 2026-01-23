@@ -1,0 +1,10 @@
+# ninja log v5
+24	2716	7824119480847252	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	fbe89d25f643d8b2
+43	2731	7824119480812005	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	5adc51f2fddecd95
+9	2777	7824119481503723	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	4dcf428ab78ed1cd
+53	2807	7824119481769758	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	65a2d5fef76a85cc
+16	2956	7824119482918004	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	366fecdf526b2307
+65	3537	7824119488886227	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	19fbdc8c55f3f64e
+34	3775	7824119490175959	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	66d8b98a608758f0
+1	4216	7824119495704107	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	f8b6a6a7f78f019c
+4217	4946	7824119501383737	F:/Personal_Projects/Unity_Projects/mr-piano/AR Musicians/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/3w134337/obj/arm64-v8a/libgame.so	1188eeaa2637f86c

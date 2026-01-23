@@ -1,0 +1,61 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build]
+include = ["src/**/*.py", "perception/**/*.py"]
+
+[tool.black]
+line-length = 120
+
+[project]
+name = "synthesiaset"
+version = "0.0.1"
+requires-python = ">=3.12"
+dependencies = [
+    # Utils + Config
+    "black==25.9.0",
+    "tyro==0.9.35",
+    "matplotlib==3.10.7",
+    "pillow==12.0.0",
+    "tqdm==4.67.1",
+    # Core
+    "numpy==2.3.4",
+    "scipy==1.16.3",
+    "mitsuba==3.7.1",
+    "drjit==1.2.0",
+    "trimesh==4.9.0",
+    "manifold3d==3.2.1",
+    "fast_simplification==0.1.12",
+    "kornia==0.8.2",
+    # Core Perception
+#    "torch", # Install Manually
+#    "torchvision", # Install Manually
+#    "lightning", # Install Manually
+    "transformers==5.0.0rc2",
+    "datasets==4.5.0",
+    "einops==0.8.1",
+    "torchinfo==1.8.0",
+    "tensorboard==2.20.0",
+    "onnxruntime==1.23.2",
+    "onnxscript==0.5.7",
+]
+authors = [
+    {name = "Matan Davidi"},
+    {name = "Cyril Moser"},
+    {name = "Gent Serifi"},
+    {name = "Nicola Studer"},
+]
+description = "Synthetic Dataset Generator and Piano+Bongo Perception Models"
+readme = "README.md"
+
+[project.scripts]
+synthesia = "main:entrypoint"
+piano-perception = "piano_perception.train:entrypoint"
+piano-export = "piano_perception.onnx_export:entrypoint"
+bongo-preprocess = "bongo_perception.preprocess:entrypoint"
+bongo-detect = "bongo_perception.detector:entrypoint"
+bongo-export = "bongo_perception.onnx_export:entrypoint"

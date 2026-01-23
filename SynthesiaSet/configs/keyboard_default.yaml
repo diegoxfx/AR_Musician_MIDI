@@ -1,0 +1,13 @@
+white_length_total: 10.0
+white_height: 0.5
+white_thick_bottom: 2.0
+white_thin_bottom: 1.8
+
+black_length_ratio: 0.7      # note that this gets reduced by spacing
+black_height: 1.0
+black_width: 1.0             # note that this gets reduced by spacing
+
+space: 0.1                   # how much spacing between everything
+
+group_3_ratio: 0.7           # where to put the black key, must be in interval [0, 1]
+group_4_ratio: 0.5

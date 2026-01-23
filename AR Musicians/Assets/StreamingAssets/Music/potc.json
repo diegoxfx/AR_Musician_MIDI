@@ -1,0 +1,7532 @@
+[
+  {
+    "key": "D5",
+    "time": 0.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 0.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 0.45,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 0.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 0.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 1.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 1.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 1.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 1.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 1.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 2.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 2.25,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 2.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 2.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 3.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 3.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 3.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 3.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 3.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D2",
+    "time": 3.6,
+    "duration": 0.825,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 3.6,
+    "duration": 0.825,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 3.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 4.05,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 4.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 4.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D2",
+    "time": 4.5,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 4.5,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 4.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 4.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D2",
+    "time": 4.95,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 4.95,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 5.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 5.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 5.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 5.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 5.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 5.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 5.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 5.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 5.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 5.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 5.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 5.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 5.85,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 5.85,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 6.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 6.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 6.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 6.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 6.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 6.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 6.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 6.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#4",
+    "time": 6.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 6.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 6.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 6.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 6.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#4",
+    "time": 6.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 6.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 6.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 6.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 6.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 6.75,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 6.75,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#4",
+    "time": 6.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 6.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 6.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 7.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 7.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 7.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 7.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 7.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 7.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 7.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 7.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 7.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 7.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 7.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 7.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 7.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 7.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 7.65,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 7.65,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 7.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 7.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G4",
+    "time": 7.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 7.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 7.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 7.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 8.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 8.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 8.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 8.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 8.25,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 8.25,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 8.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 8.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 8.55,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 8.55,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 8.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 8.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 8.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 8.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 9.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#4",
+    "time": 9.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 9.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 9.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 9.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 9.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#4",
+    "time": 9.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 9.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 9.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 9.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 9.45,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 9.45,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#4",
+    "time": 9.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 9.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#4",
+    "time": 9.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 9.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 9.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 9.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 9.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 9.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 9.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F2",
+    "time": 9.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 9.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 10.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 10.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 10.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F2",
+    "time": 10.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 10.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F2",
+    "time": 10.35,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 10.35,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 10.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 10.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 10.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 10.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F2",
+    "time": 10.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 10.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 10.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 10.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 10.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 10.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 11.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 11.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 11.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 11.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 11.25,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 11.25,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 11.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 11.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 11.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 11.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 11.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 11.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 11.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 11.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 11.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 11.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 12.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 12.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 12.15,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 12.15,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 12.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 12.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 12.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 12.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 12.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 12.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 12.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 12.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 12.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 12.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 12.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 12.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 12.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 12.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 13.05,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 13.05,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 13.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 13.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 13.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 13.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 13.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 13.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#4",
+    "time": 13.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 13.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 13.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 13.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 13.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#4",
+    "time": 13.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 13.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 13.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 13.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 13.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 13.95,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 13.95,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 14.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 14.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 14.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 14.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 14.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 14.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 14.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 14.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 14.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 14.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 14.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 14.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 14.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 14.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 14.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 14.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 14.85,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 14.85,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 15.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 15.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 15.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 15.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 15.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 15.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 15.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 15.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 15.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 15.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 15.45,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 15.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 15.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 15.75,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 15.75,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 15.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 16.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 16.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 16.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#4",
+    "time": 16.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 16.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 16.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 16.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 16.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#4",
+    "time": 16.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 16.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 16.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 16.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 16.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 16.65,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 16.65,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#4",
+    "time": 16.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 16.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 16.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 16.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 16.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 17.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 17.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 17.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 17.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 17.25,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 17.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 17.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 17.55,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 17.55,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 17.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 17.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 17.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 17.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 18.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#5",
+    "time": 18.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 18.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 18.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 18.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 18.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#5",
+    "time": 18.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 18.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 18.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 18.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 18.45,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 18.45,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 18.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 18.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "B4",
+    "time": 18.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 18.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 18.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 18.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 18.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#5",
+    "time": 18.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 18.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 18.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 18.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 19.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 19.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 19.35,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 19.35,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 19.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 19.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 19.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 19.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 19.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 19.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 19.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 19.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 19.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 20.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 20.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 20.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 20.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 20.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 20.25,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 20.25,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 20.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 20.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 20.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 20.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 20.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 20.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 20.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 20.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 20.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 20.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 20.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 20.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 20.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 21.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 21.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 21.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 21.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 21.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 21.15,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 21.15,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 21.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 21.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 21.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 21.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 21.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 21.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 21.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 21.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 21.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 21.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 21.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 21.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 21.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 21.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 21.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 21.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 21.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 22.05,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 22.05,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 22.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 22.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 22.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 22.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 22.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 22.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 22.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 22.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 22.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 22.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 22.65,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 22.65,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 22.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 22.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 22.95,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 22.95,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 23.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 23.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 23.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 23.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 23.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 23.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 23.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 23.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 23.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 23.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 23.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 23.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 23.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 23.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 23.85,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 23.85,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 24.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 24.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 24.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 24.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 24.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 24.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 24.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 24.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 24.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F2",
+    "time": 24.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 24.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 24.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 24.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 24.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F2",
+    "time": 24.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 24.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F2",
+    "time": 24.75,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 24.75,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 24.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 24.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 25.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 25.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F2",
+    "time": 25.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 25.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 25.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 25.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 25.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 25.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 25.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 25.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 25.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 25.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 25.65,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 25.65,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 25.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 25.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 25.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 25.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 25.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 26.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 26.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 26.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 26.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 26.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 26.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 26.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 26.55,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 26.55,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 26.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 26.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 26.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 26.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 27.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 27.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 27.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 27.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 27.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 27.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 27.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 27.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 27.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 27.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 27.45,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 27.45,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 27.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 27.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 27.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 27.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 27.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 27.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 27.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 27.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 27.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 27.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 27.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 28.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 28.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 28.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 28.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 28.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 28.35,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 28.35,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 28.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 28.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 28.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 28.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 28.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 28.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 28.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 28.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#6",
+    "time": 28.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 28.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 28.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 29.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 29.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#6",
+    "time": 29.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 29.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 29.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 29.25,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 29.25,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 29.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 29.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 29.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 29.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 29.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 29.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 29.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 29.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 29.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 29.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 29.85,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 30.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 30.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 30.15,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 30.15,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 30.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 30.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 30.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 30.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 30.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 30.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 30.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 30.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 30.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 30.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 30.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 30.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 30.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 30.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 31.05,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 31.05,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 31.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 31.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 31.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 31.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 31.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 31.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 31.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 31.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 31.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 31.65,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 31.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 31.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 31.95,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 31.95,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 32.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 32.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 32.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 32.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 32.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#6",
+    "time": 32.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 32.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 32.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 32.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 32.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#6",
+    "time": 32.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 32.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 32.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 32.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 32.85,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 32.85,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 33.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#6",
+    "time": 33.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 33.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 33.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 33.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 33.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 33.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 33.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 33.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 33.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 33.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 33.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 33.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 33.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 33.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 33.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 33.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 34.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 34.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 34.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 34.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 34.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 34.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 34.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 34.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 34.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 34.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 34.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 34.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 34.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 34.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 35.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 35.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 35.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 35.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 35.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 35.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 35.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 35.55,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 35.55,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 35.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 35.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 35.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 35.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 35.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 35.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 36.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 36.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 36.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 36.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 36.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 36.45,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 36.45,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 36.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 36.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 36.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 36.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#6",
+    "time": 36.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 36.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 36.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 37.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 37.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 37.35,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 37.35,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 37.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 37.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 37.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 37.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 37.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 37.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 37.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 37.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 37.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 38.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 38.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 38.25,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 38.25,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 38.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 38.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#5",
+    "time": 38.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 38.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 38.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 38.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#5",
+    "time": 38.85,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 38.85,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 39.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 39.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G4",
+    "time": 39.15,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 39.15,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 39.15,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 39.15,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 39.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 39.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 39.6,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#5",
+    "time": 39.6,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 39.6,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 39.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 39.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 39.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 39.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 40.05,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 40.05,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 40.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 40.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 40.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 40.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 40.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 40.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 40.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 40.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 40.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 40.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 40.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 40.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 40.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 40.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 40.95,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 40.95,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 41.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 41.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 41.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 41.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 41.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 41.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 41.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 41.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 41.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 41.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 41.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 41.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 41.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 41.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 41.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 41.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 41.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 42.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 42.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 42.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 42.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 42.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 42.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 42.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 42.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 42.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 42.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 42.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 42.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 42.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 42.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 42.75,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 42.75,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 42.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 42.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 42.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 43.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 43.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 43.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 43.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 43.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 43.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 43.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 43.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 43.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 43.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 43.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 43.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 43.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 43.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 43.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 43.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 43.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 43.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 44.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 44.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 44.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 44.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 44.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 44.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 44.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 44.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 44.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 44.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 44.55,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 44.55,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 44.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 44.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 44.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 44.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 44.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 45.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 45.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 45.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 45.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 45.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 45.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 45.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 45.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 45.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 45.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 45.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 45.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 45.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 45.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 45.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 45.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#5",
+    "time": 45.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 45.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 45.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 45.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 45.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#5",
+    "time": 46.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 46.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 46.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 46.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 46.35,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 46.35,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 46.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 46.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 46.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 46.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 46.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 46.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 46.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 46.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 46.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 47.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 47.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 47.25,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 47.25,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 47.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 47.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 47.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 47.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 47.7,
+    "duration": 0.525,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 47.7,
+    "duration": 0.525,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 47.7,
+    "duration": 0.525,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 47.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 47.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 48.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 48.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 48.15,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 48.15,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 48.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 48.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 48.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 48.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 48.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 48.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 48.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 48.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 48.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 48.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 48.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 48.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 49.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 49.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 49.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 49.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 49.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 49.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 49.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 49.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 49.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 49.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 49.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 49.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 49.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 49.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 49.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 49.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 49.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 49.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 49.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 49.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 50.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 50.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 50.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 50.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 50.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 50.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 50.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 50.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 50.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 50.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 50.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 50.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 50.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 50.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 50.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 50.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 51.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 51.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 51.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 51.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 51.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 51.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 51.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 51.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 51.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 51.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 51.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 51.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 51.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 51.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 51.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G5",
+    "time": 51.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 51.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 51.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 52.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 52.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 52.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#5",
+    "time": 52.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 52.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 52.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 52.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#5",
+    "time": 52.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 52.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 52.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 52.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 52.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 52.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#5",
+    "time": 52.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 52.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 52.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 52.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 52.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 52.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 53.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 53.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 53.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 53.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 53.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 53.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 53.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 53.55,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 53.55,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E5",
+    "time": 53.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C5",
+    "time": 53.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 53.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 53.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 54.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A4",
+    "time": 54.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 54.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 54.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 54.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 54.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 54.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 54.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 54.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 54.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 54.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 54.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 54.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 54.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 54.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 54.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 54.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 54.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 54.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 54.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 55.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 55.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 55.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 55.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 55.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 55.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 55.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 55.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 55.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 55.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 55.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 55.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 55.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 55.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 56.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 56.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 56.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 56.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 56.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 56.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 56.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 56.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 56.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 56.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 56.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 56.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 56.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 56.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 56.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 56.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 57.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 57.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 57.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 57.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 57.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 57.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 57.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 57.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 57.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 57.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 57.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 57.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 57.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 57.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 57.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 57.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 57.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 57.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 57.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 58.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 58.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 58.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 58.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 58.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 58.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 58.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 58.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 58.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 58.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 58.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 58.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 58.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 58.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 58.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 58.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 58.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 58.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 58.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 58.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 59.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 59.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 59.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 59.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 59.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 59.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 59.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 59.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#6",
+    "time": 59.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 59.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 59.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 59.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 59.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 59.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 59.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 59.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 59.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 60.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 60.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 60.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 60.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 60.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 60.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 60.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 60.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 60.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 60.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 60.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 60.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 60.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 60.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 60.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 60.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 60.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 61.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 61.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 61.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 61.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 61.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 61.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 61.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 61.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 61.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 61.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 61.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 61.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 61.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 61.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C#6",
+    "time": 61.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 61.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 61.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 62.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 62.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 62.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 62.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 62.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 62.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 62.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 62.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 62.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 62.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 62.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 62.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 62.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 63.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 63.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#6",
+    "time": 63.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 63.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 63.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 63.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 63.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 63.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 63.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 63.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 63.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 63.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 63.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 63.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 63.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 63.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 63.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 63.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 64.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 64.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 64.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 64.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 64.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 64.35,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 64.35,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 64.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 64.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 64.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 64.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 64.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 64.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 64.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 64.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 64.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 64.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 64.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 65.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 65.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 65.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 65.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 65.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 65.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 65.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 65.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 65.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 65.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 65.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 65.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 65.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 66.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 66.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 66.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 66.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 66.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 66.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 66.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 66.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 66.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 66.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 66.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 66.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 66.6,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 66.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 66.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 67.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 67.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 67.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 67.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 67.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 67.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 67.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 67.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 67.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 67.5,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 67.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 67.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 67.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 67.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 67.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 67.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 68.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 68.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 68.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 68.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 68.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 68.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 68.4,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 68.4,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 68.4,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 68.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 68.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 68.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 68.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 68.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 68.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 68.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 69.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 69.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 69.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 69.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 69.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 69.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 69.3,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 69.3,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 69.3,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 69.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 69.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 69.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 69.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 69.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 69.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 69.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 69.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 69.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 69.9,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 70.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 70.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 70.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 70.2,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 70.2,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#6",
+    "time": 70.2,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 70.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 70.2,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 70.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 70.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 70.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 70.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 70.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 70.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 70.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 70.8,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 70.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#2",
+    "time": 70.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#3",
+    "time": 70.95,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 71.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 71.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 71.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 71.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 71.1,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 71.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 71.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 71.4,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 71.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 71.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 71.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 71.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 71.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C7",
+    "time": 71.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 71.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 71.7,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F3",
+    "time": 71.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F4",
+    "time": 71.85,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C6",
+    "time": 72.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 72.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A6",
+    "time": 72.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 72.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 72.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 72.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 72.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 72.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 72.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 72.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 72.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 72.6,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C3",
+    "time": 72.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "C4",
+    "time": 72.75,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A#5",
+    "time": 72.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 72.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 72.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 72.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 72.9,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 73.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 73.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 73.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 73.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 73.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 73.5,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G2",
+    "time": 73.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "G3",
+    "time": 73.65,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 73.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 73.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 73.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 73.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 73.8,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 74.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 74.1,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 74.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 74.25,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 74.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 74.4,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 74.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 74.55,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 74.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "F6",
+    "time": 74.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 74.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 74.7,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 75.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "G6",
+    "time": 75.0,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 75.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 75.0,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 75.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 75.15,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 75.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "E6",
+    "time": 75.3,
+    "duration": 0.25,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 75.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 75.3,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A2",
+    "time": 75.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "A3",
+    "time": 75.45,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "F5",
+    "time": 75.6,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "A5",
+    "time": 75.6,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "D6",
+    "time": 75.6,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 75.6,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 75.6,
+    "duration": 0.4,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 76.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 76.05,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 76.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 76.2,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 76.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D4",
+    "time": 76.35,
+    "duration": 0.146875,
+    "keyIndex": 0
+  },
+  {
+    "key": "D5",
+    "time": 76.5,
+    "duration": 1.125,
+    "keyIndex": 0
+  },
+  {
+    "key": "D2",
+    "time": 76.5,
+    "duration": 1.125,
+    "keyIndex": 0
+  },
+  {
+    "key": "D3",
+    "time": 76.5,
+    "duration": 1.125,
+    "keyIndex": 0
+  }
+]

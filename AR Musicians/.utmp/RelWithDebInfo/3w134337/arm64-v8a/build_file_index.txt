@@ -1,0 +1,2 @@
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\CMakeLists.txt
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\CMakeLists.txt

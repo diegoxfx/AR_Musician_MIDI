@@ -1,0 +1,17 @@
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\GAToUnityCallbacks.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\MacroEnd.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\MacroHeaderBegin.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\MacroSourceBegin.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGAApplication.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGAConfiguration.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGADebug.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGAEvents.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGAInput.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGASoftKeyboard.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGASoftKeyboardCallbacks.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGATypes.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGAVersion.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UnityToGACallbacks.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UnityToGAConfigurationCallbacks.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UnityToGAKeyEventCallbacks.h
+F:\Personal_Projects\Unity_Projects\mr-piano\AR Musicians\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UnityToGAMotionEventCallbacks.h
