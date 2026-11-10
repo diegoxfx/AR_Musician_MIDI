@@ -94,6 +94,50 @@ loss gates MIDI input but does not pause only that peer's running song clock.
 Pending countdowns still cancel when interrupted. Networked recovery remains
 outside this extension's tested scope.
 
+## Automated test APK build
+
+The editor entry point `QuestApkBuild.Build` builds `MainScene` as one ARM64/IL2CPP
+development APK with Android debug signing. It sets package `com.armusician.midi`,
+version 1.0.1 / code 2, minimum API 32 and target API 35. Install Unity 6000.2.8f1
+with Android Build Support, SDK/NDK tools and OpenJDK, and activate a Unity license.
+
+Download these files from the upstream README's public Polybox share into
+`AR Musicians/Assets/Models/Quest/` (do not commit the large model binaries):
+
+- `conv_shuffle-vits16_240x320_merged.onnx` (101,972,607 bytes), SHA-256
+  `aac14d75ca2be301aa2c4eddc6fe3d47905d888995f9908ab6bdd63363d414ad`.
+- `bongo_detector_240x320_384d_bilinear_kpts_merged.onnx` (195,404,132 bytes), SHA-256
+  `8a39c40551c1485ffeefd219aa8a95ab0291bddeca3310c65f11347cd6d0c220`.
+
+Run the editor from PowerShell, replacing the three absolute paths below:
+
+```powershell
+& '<Unity editor>/Unity.exe' -batchmode -quit `
+  -projectPath '<checkout>/AR Musicians' -buildTarget Android `
+  -executeMethod QuestApkBuild.Build -androidTargetApi 35 `
+  -apkOutput '<output>/AR-Musician-MIDI.apk' -logFile '<output>/unity-build.log'
+```
+
+Use a local build checkout outside synced folders and an output directory outside
+Assets/Packages. The method validates the Android OpenXR loader, imports and assigns
+both models through Unity's asset API, saves the scene and applies the test-build
+settings. It reopens the saved scene and verifies live model references and scene
+dependencies, then requires model weights in Unity's packed-assets report. This
+guards against an apparently successful APK that omits vision models. It changes
+that checkout's scene/player settings. It also writes
+`<apk>.build-report.json` and exits nonzero on failure. This creates an APK without
+installing it on a headset or generating a separate OBB file.
+
+With a Quest connected and USB debugging authorized, install the resulting file
+using the Android SDK's `platform-tools/adb`:
+
+```powershell
+adb install -r '<output>/AR-Musician-MIDI.apk'
+```
+
+Disconnect the computer after installation and connect the CT-S200 directly to
+the headset. The APK is a development build for local testing, not a store release.
+
 ## Feedback and songs
 
 - Held keys light green. An unmatched press flashes red during a scored song.
@@ -192,12 +236,27 @@ Unity engine lifecycle; callbacks and coroutine advancement are simulated.
 
 Verified in development: 365 core assertions, 134 integration assertions, 33
 scene-wiring assertions, the bundled Sandstorm scoring regression, Java decoder and simulated-device
-regressions, and bridge compilation against Android API 35. These checks are not
-a Unity player build, headset test, or timing/visual assessment.
+regressions, and bridge compilation against Android API 35. These source-level
+checks do not validate headset behavior, timing or visual alignment.
+
+On 2026-11-10, Unity 6000.2.8f1 produced the standalone ARM64/IL2CPP development
+APK (version 1.0.1, package `com.armusician.midi`, 341,800,066 bytes). Unity returned
+exit code 0 and `BuildResult.Succeeded`. Reopened scene references/dependencies
+were verified; the packed-assets report contains 100,765,836 bytes for the piano
+model and 89,208,460 bytes for the optimized bongo model. Android `apksigner`
+verified the debug signature; `aapt2` confirmed ARM64, minimum API 32, target API
+35 and the VR launch activity. APK SHA-256:
+`f82bb9c610f2d4f860c2564b1bf707b240accc110bff369d5b6aec8e9ed8a5bb`.
+
+The successful build was not error-log-free: its report contains 358 warnings and
+one caught Meta Voice/Conduit editor preprocessing exception (duplicate
+`Assembly-CSharp` key). The app's piano/MIDI scripts do not use Conduit voice
+commands. Preserve the report and log when investigating headset issues; a
+successful build and package inspection do not establish runtime compatibility.
 
 Before treating the feature as ready to use, complete this device check:
 
-- Build/install MainScene with the models; confirm an error-free Unity build.
+- Install the generated MainScene APK and check launch, controller input and camera access.
 - Connect CT-S200 directly to Quest and confirm the connected status and events.
 - Calibrate endpoints and check alignment for low/middle/high white and black keys.
 - Play a short melody and a chord; verify hits, misses, extra presses and release.
@@ -206,4 +265,9 @@ Before treating the feature as ready to use, complete this device check:
   cleared markers, a reachable pause menu, and the recalibration/restart workflow.
 - Disable MIDI feedback and verify ordinary visual playback and bongo selection.
 
-No APK or claim of Quest/CT-S200 hardware validation accompanies these source changes.
+Quest/CT-S200 hardware validation remains pending. The build preserves upstream
+dependencies and input settings: Unity warns about Android input handling `Both`
+and 16 KB alignment in `libUnityARFoundationMeta.so` and `libhaptics_sdk.so`.
+The upstream bongo model has a two-dimensional keypoint output while the common
+parser indexes three dimensions; bongo inference is outside this piano/MIDI test
+and is not validated by a successful APK build.
