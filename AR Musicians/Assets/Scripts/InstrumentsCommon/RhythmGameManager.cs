@@ -19,6 +19,12 @@ public class RhythmGameManager : MonoBehaviour
     public float gameSpeed = 1f;
 
     private List<NoteEvent> notes = new List<NoteEvent>();
+    private List<NoteEvent> loadedNotes = new List<NoteEvent>();
+    private int loadGeneration;
+    public bool IsPiano { get { return currentStrategy is PianoStrategy; } }
+    public bool HasSession { get; private set; }
+    private float lastNoteTime;
+    public double SongTime { get { return Time.time - songStartTime - totalPauseTime; } }
     private float songStartTime;
     public bool playing = false;
     public bool quit = false;
@@ -58,6 +64,7 @@ public class RhythmGameManager : MonoBehaviour
 
     public void Play()
     {
+        if (HasSession || loadedNotes.Count == 0 || gameSpeed <= 0) return;
         if (currentStrategy == null || !currentStrategy.IsInstrumentReady())
         {
             Debug.LogError("Cannot play: Instrument not defined or Strategy missing.");
@@ -70,12 +77,22 @@ public class RhythmGameManager : MonoBehaviour
         ProjectConfig.Settings.playing = true;
         totalPauseTime = 0;
         quit = false;
+        HasSession = true;
+        notes = loadedNotes.ConvertAll(n => new NoteEvent { key = n.key, midiNumber = n.midiNumber,
+            time = n.time, duration = n.duration, keyIndex = n.keyIndex });
+        foreach (var n in notes) currentStrategy.PreprocessNote(n);
+        lastNoteTime = 0;
+        foreach (var n in notes) lastNoteTime = Mathf.Max(lastNoteTime, n.time / gameSpeed);
+        activeNoteCount = 0;
+        if (currentStrategy is PianoStrategy piano && piano.MidiFeedback != null)
+            piano.MidiFeedback.BeginSong(notes, gameSpeed);
 
         //StartCoroutine(PlayAudioWithDelay(currentStrategy.ApproachTime));
     }
 
     public void Pause()
     {
+        if (!HasSession || !playing) return;
         ProjectConfig.Settings.playing = false;
         playing = false;
         pauseBegin = Time.time;
@@ -84,6 +101,7 @@ public class RhythmGameManager : MonoBehaviour
 
     public void Resume()
     {
+        if (!HasSession || playing) return;
         ProjectConfig.Settings.playing = true;
         playing = true;
         float curPauseTime = Time.time - pauseBegin;
@@ -114,6 +132,9 @@ public class RhythmGameManager : MonoBehaviour
 
     public IEnumerator updateSongRoutine(SongData songdata)
     {
+        int generation = ++loadGeneration;
+        if (HasSession) Quit();
+        loadedNotes.Clear();
         Debug.Log("Processing song: " + songdata.PartialSongData.JsonPath);
         string fullPath = Path.Combine(Application.streamingAssetsPath, songdata.PartialSongData.JsonPath);
         string jsonContent = null;
@@ -130,9 +151,13 @@ public class RhythmGameManager : MonoBehaviour
         yield return null;
 #endif
 
+        if (generation != loadGeneration) yield break;
         if (!string.IsNullOrEmpty(jsonContent))
         {
             notes = JsonConvert.DeserializeObject<List<NoteEvent>>(jsonContent);
+            if (notes == null) yield break;
+            loadedNotes = notes.ConvertAll(n => new NoteEvent { key = n.key, midiNumber = n.midiNumber,
+                time = n.time, duration = n.duration });
 
             // DELEGATE: Ask the strategy to interpret the notes (Piano keys vs Bongo sides)
             foreach (var n in notes)
@@ -140,7 +165,7 @@ public class RhythmGameManager : MonoBehaviour
                 if (currentStrategy != null)
                     currentStrategy.PreprocessNote(n);
             }
-            if (currentStrategy is BongoStrategy)
+            if (currentStrategy is BongoStrategy && notes.Count > 0)
             {
                 int average_key = 0;
                 foreach (var n in notes)
@@ -159,7 +184,7 @@ public class RhythmGameManager : MonoBehaviour
         if (!playing) return;
 
         // Check if song is over
-        if (notes.Count == 0 && activeNoteCount <= 0)
+        if (notes.Count == 0 && activeNoteCount <= 0 && SongTime >= lastNoteTime + 0.30)
         {
             OnFinished();
             return;
@@ -185,7 +210,10 @@ public class RhythmGameManager : MonoBehaviour
 
     public void OnFinished()
     {
+        if (currentStrategy is PianoStrategy piano && piano.MidiFeedback != null)
+            piano.MidiFeedback.EndSong(!quit);
         playing = false;
+        HasSession = false;
         ProjectConfig.Settings.playing = false;
         totalPauseTime = 0;
         menucontroller.ShowSongMenu();

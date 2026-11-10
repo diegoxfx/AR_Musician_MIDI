@@ -8,6 +8,11 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
     public GameObject noteCubePrefab;
     public float fallTime = 2f;
     public float blockDepth = 0.001f;
+    [Tooltip("Original bundled JSON used C0 = MIDI 0. New exports carry midiNumber and ignore this offset.")]
+    public int legacySongOctaveOffset = -12;
+    public bool HasCalibration { get; private set; }
+    public PianoMidiFeedback MidiFeedback { get; private set; }
+    private RhythmGameManager game;
 
     public event Action OnNoteFinished;
 
@@ -15,6 +20,9 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
     {
         // Listen for plane definition (moved from Manager)
         PianoManagerInstrumentDefiner.OnPlaneDefined += UpdatePlaneVisuals;
+        game = FindFirstObjectByType<RhythmGameManager>();
+        MidiFeedback = gameObject.AddComponent<PianoMidiFeedback>();
+        MidiFeedback.Initialize(this);
     }
 
     private void OnDestroy()
@@ -28,12 +36,13 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
     public bool IsInstrumentReady()
     {
         // Basic check: has the plane been resized/positioned?
-        return plane != null && plane.width > 0;
+        return plane != null && plane.width > 0 && HasCalibration;
     }
 
     public void PreprocessNote(NoteEvent note)
     {
-        note.keyIndex = plane.NoteNameToKeyIndex(note.key);
+        note.keyIndex = note.midiNumber >= 0 && note.midiNumber <= 127
+            ? note.midiNumber : plane.NoteNameToKeyIndex(note.key) + legacySongOctaveOffset;
     }
 
     public void SpawnNote(NoteEvent note, float gameSpeed)
@@ -67,7 +76,7 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
 
         // Behavior
         var fall = cube.AddComponent<CubeFallBehavior>(); // Renamed from CubeFall to be generic
-        fall.Configure(this, plane, note, fallTime, blockHeight, blockDepth, note.keyIndex, rend);
+        fall.Configure(this, plane, note, fallTime, blockHeight, blockDepth, note.keyIndex, rend, gameSpeed, game);
         RhythmGameManager.OnPause += fall.OnPause;
         RhythmGameManager.OnResume += fall.OnResume;
         RhythmGameManager.OnQuit += fall.OnQuit;
@@ -140,5 +149,6 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
         plane.height = planeHeight;
         plane.transform.SetPositionAndRotation(position, rotation);
         plane.reInit();
+        HasCalibration = true;
     }
 }

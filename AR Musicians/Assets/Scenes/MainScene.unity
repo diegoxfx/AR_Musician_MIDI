@@ -19029,8 +19029,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlaneController
   width: 10
   height: 1
-  totalKeys: 32
-  leftmostKey: F4
+  totalKeys: 61
+  leftmostKey: C2
   whiteToBlackRatio: 1.66
 --- !u!1 &1111381226
 GameObject:

@@ -14,13 +14,15 @@ public class CubeFallBehavior : MonoBehaviour
     public float origBlockHeight, blockDepth;
     private float spawnTime;
     private float keyWidth;
+    private RhythmGameManager game;
+    private double dueTime;
     public float pauseTime = 0;
 
     private bool done = false;
     private bool paused = false;
 
     private Renderer rend;
-    public void Configure(PianoStrategy strat, PlaneController p, NoteEvent note, float fall, float height, float depth, int keyIndex, Renderer rend)
+    public void Configure(PianoStrategy strat, PlaneController p, NoteEvent note, float fall, float height, float depth, int keyIndex, Renderer rend, float gameSpeed, RhythmGameManager game)
     {
         this.strategy = strat;
         this.plane = p;
@@ -31,6 +33,8 @@ public class CubeFallBehavior : MonoBehaviour
         this.blockDepth = depth;
         this.keyIndex = keyIndex;
         this.rend = rend;
+        this.game = game;
+        dueTime = note.time / gameSpeed;
     }
 
     void Start()
@@ -67,7 +71,7 @@ public class CubeFallBehavior : MonoBehaviour
     {
         if (paused)
             return;
-        float timeSinceSpawn = Time.time - spawnTime - pauseTime;
+        float timeSinceSpawn = ElapsedApproachTime();
         if (timeSinceSpawn >= fallTime)
         {
             Stretch();  // we already reached the bottom, we have to handle this differently now
@@ -96,9 +100,9 @@ public class CubeFallBehavior : MonoBehaviour
         else if (rend.material.color == Color.black)
             rend.material.color = Color.darkCyan;
 
-        float timeSinceSpawn = Time.time - spawnTime - pauseTime;
+        float timeSinceSpawn = ElapsedApproachTime();
         float timeSinceBottom = timeSinceSpawn - fallTime;
-        float t = Mathf.Clamp01(timeSinceBottom / duration);
+        float t = duration <= 0 ? 1f : Mathf.Clamp01(timeSinceBottom / duration);
 
         Vector3 localKeyPos = plane.GetLocalKeyPosition(keyIndex);
         // The blockheight should not be scaled by the plane height, therefore we divide by the plane height to cancel it out 
@@ -125,5 +129,12 @@ public class CubeFallBehavior : MonoBehaviour
             done = true;
         }
 
+    }
+
+    // Share the MIDI matcher's scheduled clock, even if a frame spawns a cube late.
+    private float ElapsedApproachTime()
+    {
+        return game != null ? (float)(game.SongTime - dueTime + fallTime)
+            : Time.time - spawnTime - pauseTime;
     }
 }

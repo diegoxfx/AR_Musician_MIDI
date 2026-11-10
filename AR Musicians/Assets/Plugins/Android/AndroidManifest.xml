@@ -28,4 +28,6 @@
   <uses-permission android:name="com.oculus.permission.USE_SCENE" />
   <uses-permission android:name="horizonos.permission.HEADSET_CAMERA" />
   <uses-permission android:name="android.permission.VIBRATE" />
+  <uses-feature android:name="android.software.midi" android:required="false" />
+  <uses-feature android:name="android.hardware.usb.host" android:required="false" />
 </manifest>

@@ -29,6 +29,11 @@ ETH Zürich, Switzerland
 Below are instructions to setup and run the [Unity App](#unity-app), as well as the [Synthetic Dataset + Perception Pipelines](#synthetic-dataset--perception-pipelines).
 This project was done as part of the [Mixed Reality](https://cvg.ethz.ch/lectures/Mixed-Reality/) course at ETH Zürich.
 
+This branch adds optional **standalone Quest USB-MIDI practice feedback**, targeting
+the Casio CT-S200. It extends the original Unity app; its vision models and piano
+workflow are retained. See [connection, calibration, build and verification notes](docs/quest-usb-midi.md).
+Hardware compatibility is pending a real Quest 3 + CT-S200 test.
+
 # Table of Contents
 
 - [Unity App](#unity-app)

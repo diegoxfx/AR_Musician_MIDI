@@ -35,6 +35,7 @@ namespace Assets.Scripts.Songs
                 noteList.Add(new NoteEvent
                 {
                     key = noteName,
+                    midiNumber = note.NoteNumber,
                     time = (float)startSec,
                     duration = (float)durSec
                 });
@@ -49,7 +50,7 @@ namespace Assets.Scripts.Songs
 
         public static string GetNoteName(int midiNumber)
         {
-            int octave = midiNumber / 12;
+            int octave = midiNumber / 12 - 1;
             string note = noteNames[midiNumber % 12];
             return note + octave;
         }
