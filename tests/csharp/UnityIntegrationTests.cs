@@ -158,7 +158,7 @@ public class RayCastInputProvider : MonoBehaviour { public void SetListener(IPoi
 public class PianoManagerInstrumentDefiner : MonoBehaviour, IPointInputListener { public static event Action<DefinedPlane> OnPlaneDefined; public static void Define(DefinedPlane plane) { OnPlaneDefined?.Invoke(plane); } public void Activate(bool cv) {} public void Deactivate() {} }
 public class BongosManager : MonoBehaviour, IPointInputListener { public static event Action OnBothBongosDefined; public void Activate(bool cv) {} public void Deactivate() {} }
 public static class ProjectConfig { public static readonly SettingsData Settings = new SettingsData(); public class SettingsData { public bool playing, master, useMultiplayer, enableMultiplayer; public string instrument; public List<string> configured_instruments = new List<string>(); } }
-public class PartialSongData { public string JsonPath; }
+public class PartialSongData { public string JsonPath, InlineJson; public bool IsExternal { get { return InlineJson != null; } } }
 public class SongData { public PartialSongData PartialSongData; }
 public class BongoStrategy : MonoBehaviour, IGameplayStrategy
 {

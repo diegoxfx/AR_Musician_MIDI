@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -6,101 +6,120 @@ using UnityEngine;
 
 public class SongsUIHandlerGeneric : MonoBehaviour
 {
-    #region Serialized fields
-    [SerializeField]
-    private TMP_Text songTitleTMP;
-    [SerializeField]
-    private TMP_Text songArtistTMP;
-    [SerializeField]
-    private TMP_Text songReleaseYearTMP;
-    [SerializeField]
-    private TMP_Text songDurationTMP;
-    [SerializeField]
-    private TMP_Text songDifficultyTMP;
-    #endregion
-
+    [SerializeField] private TMP_Text songTitleTMP;
+    [SerializeField] private TMP_Text songArtistTMP;
+    [SerializeField] private TMP_Text songReleaseYearTMP;
+    [SerializeField] private TMP_Text songDurationTMP;
+    [SerializeField] private TMP_Text songDifficultyTMP;
     public RhythmGameManager manager;
 
-    #region Private members
-    private List<SongData> songsData;
-    private int nSongs;
-    private int localPos = 0;
-    #endregion
-
-    #region Events
-
+    private List<SongData> allSongs = new List<SongData>();
+    private List<SongData> songsData = new List<SongData>();
+    private int localPos;
+    private bool? shownMultiplayer;
+    private bool catalogLoaded;
+    private SongData selectedSong;
     public static event Action<int> OnNewPosition;
     public static event Action OnSelectSong;
-    #endregion
 
-
-    #region Properties
-    private SongData selectedSong;
+    private static bool IsMultiplayer
+    {
+        get { return ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer; }
+    }
 
     internal SongData SelectedSong
     {
-        get { return selectedSong; }
+        get { RefreshVisibleSongs(); return selectedSong; }
         set
         {
-            Debug.Log($"Selected new song: {value}. Updating song selection UI");
+            RefreshVisibleSongs();
+            if (value != null && !songsData.Contains(value)) return;
             selectedSong = value;
+            if (value != null) localPos = songsData.IndexOf(value);
             UpdateUI();
         }
     }
 
-    #endregion
-    private void Awake()
+    private void OnEnable()
     {
         SongLoader.OnSongsLoaded += OnSongsLoaded;
+        if (SongLoader.CurrentSongs != null) OnSongsLoaded(SongLoader.CurrentSongs);
+        else UpdateUI();
     }
 
-    #region Event handlers
-    private void OnSongsLoaded(LinkedList<SongData> songsData)
+    private void OnDisable() { SongLoader.OnSongsLoaded -= OnSongsLoaded; }
+    private void Update() { RefreshVisibleSongs(); }
+
+    private void OnSongsLoaded(LinkedList<SongData> songs)
     {
-        this.songsData = songsData.ToList();
-        SelectedSong = this.songsData[0];
-        this.nSongs = songsData.Count;
+        allSongs = songs == null ? new List<SongData>() : songs.ToList();
+        catalogLoaded = true;
+        RefreshVisibleSongs(true);
+    }
+
+    private void RefreshVisibleSongs(bool force = false)
+    {
+        bool multiplayer = IsMultiplayer;
+        if (!force && shownMultiplayer == multiplayer) return;
+        shownMultiplayer = multiplayer;
+        // Peers only synchronize numeric indices. Local files cannot join that list.
+        songsData = allSongs.Where(song => !multiplayer || !song.IsExternal).ToList();
+        localPos = 0;
+        selectedSong = songsData.Count == 0 ? null : songsData[0];
+        UpdateUI();
     }
 
     public void OnSongSelected()
     {
-        StartCoroutine(manager.updateSongRoutine(SelectedSong));
+        SongData song = SelectedSong;
+        if (song == null || manager == null || !manager.CanSelectInstrument) return;
+        StartCoroutine(manager.updateSongRoutine(song));
+        // Navigation belongs to this guarded action, not an unconditional button listener.
+        manager.menucontroller?.postSongChoiceMenu();
         OnSelectSong?.Invoke();
     }
 
-    public void OnNextSongSelected()
-    {
-        localPos = (localPos + 1) % nSongs;
-        SelectedSong = songsData[localPos];
-        OnNewPosition?.Invoke(localPos);
-    }
+    public void OnNextSongSelected() { MoveSelection(1); }
+    public void OnPreviousSongSelected() { MoveSelection(-1); }
 
-    public void OnPreviousSongSelected()
+    private void MoveSelection(int direction)
     {
-        localPos = (localPos - 1 + nSongs) % nSongs;
-        SelectedSong = songsData[localPos];
+        RefreshVisibleSongs();
+        if (songsData.Count == 0) return;
+        localPos = (localPos + direction + songsData.Count) % songsData.Count;
+        selectedSong = songsData[localPos];
+        UpdateUI();
         OnNewPosition?.Invoke(localPos);
     }
 
     public SongData getSongData(int pos)
     {
-        return songsData[pos];
+        RefreshVisibleSongs();
+        return pos >= 0 && pos < songsData.Count ? songsData[pos] : null;
     }
 
     private void UpdateUI()
     {
-        SongData currentSongData = selectedSong;
-        if (currentSongData == null)
+        if (selectedSong == null)
         {
-            Debug.LogWarning("Expected selected song data. Got null");
-            OnNextSongSelected();
+            SetText(songTitleTMP, catalogLoaded ? "No songs available" : "Loading songs...");
+            SetText(songArtistTMP, "");
+            SetText(songReleaseYearTMP, "");
+            SetText(songDurationTMP, "");
+            SetText(songDifficultyTMP, "");
             return;
         }
-        songTitleTMP.text = currentSongData.title;
-        songArtistTMP.text = string.Join(", ", currentSongData.artists);
-        songReleaseYearTMP.text = Convert.ToString(currentSongData.releaseYear);
-        songDurationTMP.text = Convert.ToString(currentSongData.duration);
-        songDifficultyTMP.text = currentSongData.difficulty.ToString();
+        SetText(songTitleTMP, selectedSong.title);
+        SetText(songArtistTMP, string.Join(", ", selectedSong.artists) + (selectedSong.IsExternal ? " (Personal MIDI)" : ""));
+        SetText(songReleaseYearTMP, selectedSong.releaseYear < 0 ? "" : Convert.ToString(selectedSong.releaseYear));
+        SetText(songDurationTMP, Convert.ToString(selectedSong.duration));
+        SetText(songDifficultyTMP, selectedSong.difficulty.ToString());
     }
-    #endregion
+
+    private static void SetText(TMP_Text label, string text)
+    {
+        if (label == null) return;
+        label.richText = false;
+        label.text = text;
+    }
 }

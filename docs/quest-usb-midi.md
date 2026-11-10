@@ -98,7 +98,7 @@ outside this extension's tested scope.
 
 The editor entry point `QuestApkBuild.Build` builds `MainScene` as one ARM64/IL2CPP
 development APK with Android debug signing. It sets package `com.armusician.midi`,
-version 1.0.1 / code 2, minimum API 32 and target API 35. Install Unity 6000.2.8f1
+version 1.1.0 / code 3, minimum API 32 and target API 35. Install Unity 6000.2.8f1
 with Android Build Support, SDK/NDK tools and OpenJDK, and activate a Unity license.
 
 Download these files from the upstream README's public Polybox share into
@@ -137,6 +137,91 @@ adb install -r '<output>/AR-Musician-MIDI.apk'
 
 Disconnect the computer after installation and connect the CT-S200 directly to
 the headset. The APK is a development build for local testing, not a store release.
+
+## Personal MIDI songs on Quest (1.1.0)
+
+The app scans `Application.persistentDataPath/Music` once on startup, in addition
+to its bundled songs. For package `com.armusician.midi`, the primary Quest user's
+folder is:
+
+```text
+/sdcard/Android/data/com.armusician.midi/files/Music/
+```
+
+Install the updated APK with `adb install -r`, open it once to create the folder,
+then copy standard MIDI files (`.mid` or `.midi`, case-insensitive) there. No Unity
+build, JSON conversion or catalog editing is needed. Only files directly inside
+Music are scanned, not nested folders. Fully close and reopen the app after
+adding, replacing or removing songs; resuming from the Quest menu does not rescan.
+
+In PowerShell with Android's `adb` on PATH:
+
+```powershell
+adb push 'C:\Music\my-song.mid' '/sdcard/Android/data/com.armusician.midi/files/Music/'
+```
+
+Alternatively, from the repository root, the helper copies one or more MIDIs and
+any accompanying metadata files. Supply the actual `adb.exe` path if not on PATH:
+
+```powershell
+./tools/copy-quest-songs.ps1 -MidiFiles 'C:\Music\one.mid','C:\Music\two.midi' -Adb '<Android SDK>/platform-tools/adb.exe'
+```
+
+Use `-Serial '<device serial>'` when more than one ADB device is connected. The
+helper does not terminate the running app. To restart it explicitly after copying:
+
+```powershell
+adb shell am force-stop com.armusician.midi
+adb shell am start -n com.armusician.midi/com.unity3d.player.appui.AppUIGameActivity
+```
+
+Choose **single-player**. Personal songs appear after the bundled songs in filename
+order, labelled `Personal MIDI`. Their default title is the filename and their
+duration is calculated from actual note ends and MIDI tempo changes. The importer
+reads all tracks, including percussion if present; use a piano arrangement suited
+to the keyboard. Existing calibrated-range rules skip notes outside the 61 keys.
+
+Optional metadata belongs beside the MIDI as `my-song_metadata.json`:
+
+```json
+{
+  "title": "My song",
+  "artists": ["Composer"],
+  "releaseYear": 2026,
+  "difficulty": "Easy"
+}
+```
+
+Difficulty may be `Beginner`, `Easy`, `Medium`, `Hard`, `VeryHard` or `Professional`.
+Missing or invalid metadata falls back to the filename, calculated duration and
+`Unknown` difficulty. Duration in a sidecar never overrides the MIDI duration.
+External song JSON caches are neither required nor read: replacing a MIDI is
+reflected at the next startup even if an old same-name JSON is present. The app
+never rewrites the source MIDI or metadata. Songs are immutable in-memory
+snapshots for the running session, so copying or deleting a file cannot alter a
+song during playback.
+
+A malformed or unsupported MIDI is skipped without blocking valid songs or the
+bundled catalog. Import diagnostics are saved as `Music/import-report.txt`:
+
+```powershell
+adb pull '/sdcard/Android/data/com.armusician.midi/files/Music/import-report.txt' .
+```
+
+To bound startup parsing and memory, the importer accepts at most 1 MiB per MIDI,
+64 KiB per metadata file, 256 MIDI candidates, 100,000 notes per song, 250,000 notes
+and 32 MiB of MIDI input per scan, and 24 hours per song. A directory exceeding
+4,096 entries is rejected. Limits and per-file errors appear in the report.
+
+Personal songs are excluded from multiplayer because the original network code
+synchronizes catalog indices rather than transferring song content. Mode changes
+also block starting/resuming an already loaded personal song in multiplayer.
+
+The folder uses app-specific storage and needs no additional storage permission.
+It is preserved by an in-place APK update with the same package/signature;
+uninstalling the app or clearing its storage removes it. Keep source MIDIs on
+your computer. File-manager access to Android/data varies by Horizon OS version;
+the documented transfer method is ADB, not an unrestricted Downloads-folder scan.
 
 ## Feedback and songs
 
@@ -216,6 +301,8 @@ Run from the repository root:
 ```powershell
 ./tests/run-core-tests.ps1
 pwsh -File ./tests/run-integration-tests.ps1
+pwsh -File ./tests/run-song-import-tests.ps1 -NewtonsoftDll '<Unity Newtonsoft package>/Runtime/Newtonsoft.Json.dll'
+pwsh -File ./tests/run-song-loading-tests.ps1 -NewtonsoftDll '<Unity Newtonsoft package>/Runtime/Newtonsoft.Json.dll'
 ./tests/java/test.ps1 -JdkBin '<JDK bin directory>' -AndroidJar '<Android SDK platform>/android.jar'
 ```
 
@@ -234,12 +321,21 @@ in bundled Sandstorm once (999 duplicate track events must not become misses).
 It does not exercise real rendering, Android calls, JSON/network loading or the
 Unity engine lifecycle; callbacks and coroutine advancement are simulated.
 
-Verified in development: 365 core assertions, 134 integration assertions, 33
+Verified in development: 365 core assertions, 134 integration assertions, 40
 scene-wiring assertions, the bundled Sandstorm scoring regression, Java decoder and simulated-device
 regressions, and bridge compilation against Android API 35. These source-level
 checks do not validate headset behavior, timing or visual alignment.
 
-On 2026-11-10, Unity 6000.2.8f1 produced the standalone ARM64/IL2CPP development
+External-song tests add 28 import assertions using the shipped DryWetMidi parser
+and Newtonsoft, plus 57 loading/selector assertions against actual production
+sources with Unity stubs. They cover tempo changes, chords, overwritten/deleted
+files, bounds and corrupt inputs, metadata fallback, startup publication, copied
+snapshots, empty/loading menus, stale song-load completion and multiplayer mode
+changes before loading, countdown, playback or resume. The scene Select button
+now invokes only the guarded selection handler: loading/empty states cannot
+navigate prematurely into the play lobby.
+
+The initial 2026-11-10 Unity 6000.2.8f1 build produced the standalone ARM64/IL2CPP development
 APK (version 1.0.1, package `com.armusician.midi`, 341,800,066 bytes). Unity returned
 exit code 0 and `BuildResult.Succeeded`. Reopened scene references/dependencies
 were verified; the packed-assets report contains 100,765,836 bytes for the piano
@@ -253,6 +349,16 @@ one caught Meta Voice/Conduit editor preprocessing exception (duplicate
 `Assembly-CSharp` key). The app's piano/MIDI scripts do not use Conduit voice
 commands. Preserve the report and log when investigating headset issues; a
 successful build and package inspection do not establish runtime compatibility.
+
+The external-song update was built on the same date as version 1.1.0 / code 3,
+with the same application ID and signing certificate for in-place updates. The
+final APK is 342,001,458 bytes, SHA-256
+`05c80a2e5db3b93ec9ed33570aea4c351095daefa404b37cbb4619a5f812d1f9`.
+Unity exited 0 with `Succeeded`; both model references and packed model weights
+were verified. This build reports 361 warnings and the same one caught Conduit
+exception. Android tools verified the signature, ARM64 ABI and version. The new
+folder scan has source-level integration coverage, but transferring and importing
+a MIDI on the physical Quest remains a device acceptance test.
 
 Before treating the feature as ready to use, complete this device check:
 

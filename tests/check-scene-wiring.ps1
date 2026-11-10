@@ -57,6 +57,23 @@ foreach ($button in @(
 }
 $countdownGuid = Read-ScriptGuid 'Scripts\InstrumentsCommon\CountdownUIGeneric.cs'
 $menuGuid = Read-ScriptGuid 'Scripts\UI\MenuControllerGeneric.cs'
+$songSelectionPattern = '(?m)^        m_MethodName: OnSongSelected\r?$'
+$songButtonIds = @($blocks.Keys | Where-Object { $blocks[$_] -match $songSelectionPattern })
+Assert-Scene ($songButtonIds.Count -eq 1) 'Expected exactly one song selection button listener'
+$songButton = $blocks[$songButtonIds[0]]
+$songButtonObjectId = Read-Reference $songButton 'm_GameObject'
+Assert-Scene ($blocks[$songButtonObjectId] -match '(?m)^  m_Name: SelectButton\r?$') 'Song selection listener must belong to SelectButton'
+$songCalls = @([regex]::Matches($songButton, '(?ms)^      - m_Target: \{fileID: (?<target>\d+)\}\r?\n(?<body>.*?)(?=^      - m_Target:|\z)'))
+Assert-Scene ($songCalls.Count -eq 1) 'SelectButton must have only its guarded song selection listener, with no unconditional menu callback'
+$songCall = $songCalls[0]
+Assert-Scene ($songCall.Groups['body'].Value -match $songSelectionPattern -and $songCall.Groups['body'].Value -match '(?m)^        m_CallState: [12]\r?$') 'SelectButton must invoke enabled OnSongSelected'
+$songSelectorId = $songCall.Groups['target'].Value
+$songsGuid = Read-ScriptGuid 'Scripts\Songs\SongsUIHandlerGeneric.cs'
+Assert-Scene ($blocks.ContainsKey($songSelectorId) -and $blocks[$songSelectorId] -match "m_Script: \{fileID: 11500000, guid: $songsGuid,") 'SelectButton must target the scene SongsUIHandlerGeneric component'
+$songManagerId = Read-Reference $blocks[$songSelectorId] 'manager'
+Assert-Scene ($songManagerId -eq (Read-Reference $selector 'rhythmGameManager')) 'Song selector and instrument selector must use the same game manager'
+$songMenuId = Read-Reference $blocks[$songManagerId] 'menucontroller'
+Assert-Scene ($blocks.ContainsKey($songMenuId) -and $blocks[$songMenuId] -match "m_Script: \{fileID: 11500000, guid: $menuGuid,") 'Guarded song navigation must resolve to the game manager menu controller'
 foreach ($button in @(
     @{ Name = 'StartButton'; Method = 'StartCountdown' },
     @{ Name = 'ResumeButton'; Method = 'ResumeCountdown' }

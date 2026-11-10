@@ -20,6 +20,9 @@ public class RhythmGameManager : MonoBehaviour
 
     private List<NoteEvent> notes = new List<NoteEvent>();
     private List<NoteEvent> loadedNotes = new List<NoteEvent>();
+    private bool loadedSongIsExternal;
+    private bool LoadedSongAllowed { get { return !loadedSongIsExternal ||
+        !ProjectConfig.Settings.enableMultiplayer || !ProjectConfig.Settings.useMultiplayer; } }
     private int loadGeneration;
     private int playbackGeneration;
     private bool applicationPaused;
@@ -76,7 +79,7 @@ public class RhythmGameManager : MonoBehaviour
 
     public void Play()
     {
-        if (State != PlaybackState.Idle || !InputAllowed || loadedNotes.Count == 0 || gameSpeed <= 0) return;
+        if (State != PlaybackState.Idle || !InputAllowed || !LoadedSongAllowed || loadedNotes.Count == 0 || gameSpeed <= 0) return;
         if (currentStrategy == null || !currentStrategy.IsInstrumentReady())
         {
             Debug.LogError("Cannot play: Instrument not defined or Strategy missing.");
@@ -119,7 +122,7 @@ public class RhythmGameManager : MonoBehaviour
 
     public void Resume()
     {
-        if (State != PlaybackState.Paused || !InputAllowed) return;
+        if (State != PlaybackState.Paused || !InputAllowed || !LoadedSongAllowed) return;
         ProjectConfig.Settings.playing = true;
         State = PlaybackState.Playing;
         float curPauseTime = Time.time - pauseBegin;
@@ -137,7 +140,7 @@ public class RhythmGameManager : MonoBehaviour
 
     public int BeginCountdown(bool resume)
     {
-        if (!InputAllowed) return -1;
+        if (!InputAllowed || !LoadedSongAllowed) return -1;
         if (resume)
         {
             if (State != PlaybackState.Paused) return -1;
@@ -255,33 +258,53 @@ public class RhythmGameManager : MonoBehaviour
 
     public IEnumerator updateSongRoutine(SongData songdata)
     {
+        if (songdata == null || songdata.PartialSongData == null) yield break;
+        if (songdata.PartialSongData.IsExternal && ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer)
+        {
+            Debug.LogWarning("Personal MIDI songs are only available in single-player.");
+            yield break;
+        }
         int generation = ++loadGeneration;
         CancelCountdown();
         if (HasSession) Quit();
         loadedNotes.Clear();
+        loadedSongIsExternal = false;
         Debug.Log("Processing song: " + songdata.PartialSongData.JsonPath);
-        string fullPath = Path.Combine(Application.streamingAssetsPath, songdata.PartialSongData.JsonPath);
-        string jsonContent = null;
+        string jsonContent = songdata.PartialSongData.InlineJson;
 
-        // Android/Desktop compatible loading
-#if UNITY_ANDROID && !UNITY_EDITOR
-        using (UnityWebRequest www = UnityWebRequest.Get(fullPath))
+        if (!songdata.PartialSongData.IsExternal)
         {
-            yield return www.SendWebRequest();
-            if (www.result == UnityWebRequest.Result.Success) jsonContent = www.downloadHandler.text;
-        }
+            string fullPath = Path.Combine(Application.streamingAssetsPath, songdata.PartialSongData.JsonPath);
+            // Android/Desktop compatible bundled loading. External data is a startup snapshot.
+#if UNITY_ANDROID && !UNITY_EDITOR
+            using (UnityWebRequest www = UnityWebRequest.Get(fullPath))
+            {
+                yield return www.SendWebRequest();
+                if (www.result == UnityWebRequest.Result.Success) jsonContent = www.downloadHandler.text;
+            }
 #else
-        if (File.Exists(fullPath)) jsonContent = File.ReadAllText(fullPath);
-        yield return null;
+            try { if (File.Exists(fullPath)) jsonContent = File.ReadAllText(fullPath); }
+            catch (Exception e) { Debug.LogWarning("Could not read song: " + e.Message); }
 #endif
+        }
+        yield return null;
 
         if (generation != loadGeneration) yield break;
+        if (songdata.PartialSongData.IsExternal && ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer)
+            yield break;
         if (!string.IsNullOrEmpty(jsonContent))
         {
-            notes = JsonConvert.DeserializeObject<List<NoteEvent>>(jsonContent);
-            if (notes == null) yield break;
-            loadedNotes = notes.ConvertAll(n => new NoteEvent { key = n.key, midiNumber = n.midiNumber,
-                time = n.time, duration = n.duration });
+            try
+            {
+                var parsed = JsonConvert.DeserializeObject<List<NoteEvent>>(jsonContent);
+                if (parsed == null || parsed.Exists(n => n == null || float.IsNaN(n.time) || float.IsInfinity(n.time) ||
+                    float.IsNaN(n.duration) || float.IsInfinity(n.duration) || n.time < 0 || n.duration < 0))
+                    throw new FormatException("Invalid note data.");
+                loadedNotes = parsed.ConvertAll(n => new NoteEvent { key = n.key, midiNumber = n.midiNumber,
+                    time = n.time, duration = n.duration });
+                loadedSongIsExternal = songdata.PartialSongData.IsExternal;
+            }
+            catch (Exception e) { Debug.LogWarning("Could not load song: " + e.Message); }
         }
     }
 
