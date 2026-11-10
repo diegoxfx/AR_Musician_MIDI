@@ -89,7 +89,10 @@ and cancel incomplete calibration. Actual app suspension resets the USB connecti
 and requires the recalibration/restart workflow above. App pause, Unity focus and
 Meta input focus are independent gates: all must be restored before accepting input.
 See Meta's [lifecycle events](https://developers.meta.com/vr/documentation/unity/unity-lifecycle/).
-Multiplayer feedback/recovery is outside this extension's tested scope.
+Multiplayer keeps its existing RPC-coordinated pause/resume policy: local focus
+loss gates MIDI input but does not pause only that peer's running song clock.
+Pending countdowns still cancel when interrupted. Networked recovery remains
+outside this extension's tested scope.
 
 ## Feedback and songs
 
@@ -131,7 +134,8 @@ converter, or explicitly set the legacy offset to 0.
 - `PlaneController`, `PianoStrategy`, `RhythmGameManager`, `CubeFallBehavior` and
   `MidiUtils`: shared layout/pitch/timing integration into the existing application.
 
-Playback has one authoritative state in `RhythmGameManager`:
+Playback has one authoritative state in `RhythmGameManager`. Single-player
+transitions and recovery follow this table:
 
 | State | Transition | Interruption recovery |
 | --- | --- | --- |
@@ -147,6 +151,9 @@ resume a later session. The song clock stays frozen throughout pause and resume
 countdown. Instrument selection is accepted only while idle with input available;
 the manager updates both the strategy and shared instrument setting together.
 Song preprocessing happens when playback starts, using that accepted strategy.
+The scene's Start/Resume buttons hide menus before requesting their countdown.
+If loading, readiness or focus prevents the request, the countdown controller can
+restore the appropriate lobby/pause menu without a later button listener hiding it.
 
 Input is scored when Unity drains the native queue. Transport latency and frame
 stalls can therefore affect scores; this is learning feedback rather than a
@@ -183,7 +190,7 @@ in bundled Sandstorm once (999 duplicate track events must not become misses).
 It does not exercise real rendering, Android calls, JSON/network loading or the
 Unity engine lifecycle; callbacks and coroutine advancement are simulated.
 
-Verified in development: 365 core assertions, 109 integration assertions, 17
+Verified in development: 365 core assertions, 134 integration assertions, 33
 scene-wiring assertions, the bundled Sandstorm scoring regression, Java decoder and simulated-device
 regressions, and bridge compilation against Android API 35. These checks are not
 a Unity player build, headset test, or timing/visual assessment.

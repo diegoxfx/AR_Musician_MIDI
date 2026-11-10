@@ -11652,9 +11652,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1460171759}
-        m_TargetAssemblyTypeName: CountdownUIGeneric, Assembly-CSharp
-        m_MethodName: ResumeCountdown
+      - m_Target: {fileID: 1637867630}
+        m_TargetAssemblyTypeName: MenuControllerGeneric, Assembly-CSharp
+        m_MethodName: HideAllMenus
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -11664,9 +11664,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1637867630}
-        m_TargetAssemblyTypeName: MenuControllerGeneric, Assembly-CSharp
-        m_MethodName: HideAllMenus
+      - m_Target: {fileID: 1460171759}
+        m_TargetAssemblyTypeName: CountdownUIGeneric, Assembly-CSharp
+        m_MethodName: ResumeCountdown
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16249,9 +16249,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1460171759}
-        m_TargetAssemblyTypeName: CountdownUIGeneric, Assembly-CSharp
-        m_MethodName: StartCountdown
+      - m_Target: {fileID: 1637867630}
+        m_TargetAssemblyTypeName: MenuControllerGeneric, Assembly-CSharp
+        m_MethodName: HideAllMenus
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16261,9 +16261,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1637867630}
-        m_TargetAssemblyTypeName: MenuControllerGeneric, Assembly-CSharp
-        m_MethodName: HideAllMenus
+      - m_Target: {fileID: 1460171759}
+        m_TargetAssemblyTypeName: CountdownUIGeneric, Assembly-CSharp
+        m_MethodName: StartCountdown
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

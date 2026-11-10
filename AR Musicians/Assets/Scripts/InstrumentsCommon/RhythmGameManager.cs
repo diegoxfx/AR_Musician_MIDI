@@ -213,8 +213,12 @@ public class RhythmGameManager : MonoBehaviour
     {
         bool hadPlayback = State != PlaybackState.Idle;
         CancelCountdown();
-        Pause();
         InputInterrupted?.Invoke();
+        // Multiplayer pause/resume is coordinated through RPCs. A local focus
+        // callback must not freeze only this peer's song clock.
+        bool multiplayer = ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer;
+        if (multiplayer) return;
+        Pause();
         if (hadPlayback) RestorePlaybackMenu();
     }
 

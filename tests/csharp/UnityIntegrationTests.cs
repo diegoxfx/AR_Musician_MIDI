@@ -522,6 +522,81 @@ public static class UnityIntegrationTests
         f.Game.Quit();
     }
 
+    private static void StartButtonFlow(Fixture f)
+    {
+        // This is the serialized UnityEvent order, checked independently in MainScene.
+        f.Menu.HideAllMenus(); f.Countdown.StartCountdown();
+    }
+    private static void ResumeButtonFlow(Fixture f)
+    {
+        f.Menu.HideAllMenus(); f.Countdown.ResumeCountdown();
+    }
+    private static void RejectedCountdownButtonFlows()
+    {
+        var f=new Fixture(); f.Menu.ShowSinglePlayerLobbyMenu(); StartButtonFlow(f);
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Idle && !f.Countdown.countdown.activeSelf && f.Countdown.StartedCoroutines.Count==0,"Actual ordered Start-button flow cannot launch with missing notes");
+        Check(f.Menu.singlePlayerLobbyMenu.activeSelf,"Rejected Start button restores reachable lobby after HideAllMenus listener");
+
+        f=new Fixture(); f.Load(new NoteEvent {midiNumber=60,time=0,duration=1});
+        f.Game.updateSong(new SongData {PartialSongData=new PartialSongData {JsonPath="missing-loading-regression-fixture.json"}});
+        StartButtonFlow(f);
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Idle && !f.Countdown.countdown.activeSelf && f.Countdown.StartedCoroutines.Count==0,"Actual ordered Start-button flow cannot launch while asynchronous song loading has cleared notes");
+        Check(f.Menu.singlePlayerLobbyMenu.activeSelf,"Rejected Start during loading keeps start/retry lobby reachable");
+
+        f=new Fixture(); f.Load(new NoteEvent {midiNumber=60,time=0,duration=1}); f.Plane.width=0; StartButtonFlow(f);
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Idle && !f.Countdown.countdown.activeSelf && f.Countdown.StartedCoroutines.Count==0,"Actual ordered Start-button flow rejects an instrument that is not ready");
+        Check(f.Menu.singlePlayerLobbyMenu.activeSelf,"Instrument-readiness rejection restores lobby after hiding menus");
+
+        f=new Fixture(); f.Load(new NoteEvent {midiNumber=60,time=0,duration=1}); f.Game.SetApplicationPaused(true); StartButtonFlow(f);
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Idle && !f.Countdown.countdown.activeSelf && f.Countdown.StartedCoroutines.Count==0,"Actual ordered Start-button flow rejects blocked input");
+        Check(f.Menu.singlePlayerLobbyMenu.activeSelf,"Blocked Start restores lobby instead of leaving all menus hidden");
+
+        f=new Fixture(); ResumeButtonFlow(f);
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Idle && !f.Countdown.countdown.activeSelf && f.Countdown.StartedCoroutines.Count==0,"Actual ordered Resume-button flow rejects an absent session");
+        Check(f.Menu.singlePlayerLobbyMenu.activeSelf,"Invalid Resume restores a reachable start lobby after hiding menus");
+
+        f=new Fixture(); f.Load(new NoteEvent {midiNumber=60,time=0,duration=1}); f.Game.Play(); f.Game.Pause(); f.Game.SetApplicationFocused(false); ResumeButtonFlow(f);
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Paused && !f.Countdown.countdown.activeSelf && f.Countdown.StartedCoroutines.Count==0,"Actual ordered Resume-button flow rejects input blocked on a paused session");
+        Check(f.Menu.singleplayerPauseMenu.activeSelf,"Blocked Resume restores reachable pause controls after hiding menus");
+        f.Game.Quit();
+    }
+
+    private static void MultiplayerLifecyclePolicy()
+    {
+        // Local policy regression only. No network transport or RPC delivery is simulated.
+        var f=new Fixture(); f.Calibrate(); f.Load(new NoteEvent {midiNumber=60,time=0,duration=1});
+        ProjectConfig.Settings.enableMultiplayer=ProjectConfig.Settings.useMultiplayer=true;
+        int pauses=0, resumes=0; RhythmGameManager.OnPause+=()=>pauses++; RhythmGameManager.OnResume+=seconds=>resumes++;
+        Send(f.Feedback,"note",60); Time.time=10; f.Game.Play(); Time.time=11;
+        Call(f.Game,"OnApplicationFocus",false); Call(f.Feedback,"OnApplicationFocus",false);
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Playing && pauses==0 && !f.Game.InputAllowed,"Multiplayer local focus loss blocks input without pausing one peer or emitting OnPause");
+        Time.time=13; Send(f.Feedback,"note",60); Call(f.Feedback,"Update");
+        Near(1,f.Game.SongTime,"Multiplayer clock continues advancing through local focus loss");
+        Check(!((HeldNotes)Field(f.Feedback,"held")).IsHeld(60) && f.Matcher.Hits==0 && f.Matcher.Wrong==0 && f.Matcher.Misses==0,"Unfocused multiplayer MIDI cannot hold keys, score, or advance local scoring");
+        Call(f.Feedback,"OnApplicationPause",true); Call(f.Game,"OnApplicationPause",true);
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Playing && pauses==0 && !f.Game.InputAllowed,"Multiplayer local app suspension also preserves RPC-coordinated playback state");
+        Time.time=14; Call(f.Feedback,"OnApplicationFocus",true); Call(f.Game,"OnApplicationFocus",true);
+        Check(!f.Game.InputAllowed && f.Game.playing,"Multiplayer focus return cannot override an outstanding app pause gate");
+        Time.time=15; Call(f.Game,"OnApplicationPause",false); Call(f.Feedback,"OnApplicationPause",false);
+        Near(3,f.Game.SongTime,"Multiplayer recovery does not introduce a local pause-time clock shift");
+        Check(f.Game.InputAllowed && f.Game.playing && pauses==0 && resumes==0,"Multiplayer local recovery needs no Resume and emits no pause/resume events");
+        f.Game.Pause(); Time.time=20;
+        Near(3,f.Game.SongTime,"Explicit multiplayer Pause still freezes the clock for the existing RPC route");
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Paused && pauses==1,"Explicit multiplayer Pause still emits the shared pause event");
+        f.Game.Resume();
+        Check(f.Game.playing && resumes==1,"Explicit multiplayer Resume still restores playback and emits the shared resume event");
+        Time.time=21; Near(4,f.Game.SongTime,"Explicit multiplayer Resume removes only the explicitly paused interval"); f.Game.Quit();
+
+        f=new Fixture(); f.Load(new NoteEvent {midiNumber=60,time=0,duration=1});
+        ProjectConfig.Settings.enableMultiplayer=ProjectConfig.Settings.useMultiplayer=true;
+        f.Menu.HideAllMenus(); f.Countdown.StartCountdown(); var pending=Latest(f.Countdown); OVRManager.LoseFocus(); DrainEvenIfCancelled(pending);
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Idle && !f.Countdown.countdown.activeSelf && f.Menu.multiplayerLobbyMenu.activeSelf,"Multiplayer local lifecycle interruption still cancels a pending initial countdown and recovers lobby");
+        OVRManager.AcquireFocus(); f.Game.Play(); f.Game.Pause(); f.Menu.HideAllMenus();
+        f.Countdown.ResumeCountdown(); pending=Latest(f.Countdown); OVRManager.LoseFocus(); DrainEvenIfCancelled(pending);
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Paused && !f.Countdown.countdown.activeSelf && f.Menu.multiplayerPauseMenu.activeSelf,"Multiplayer local lifecycle interruption still cancels a pending resume countdown and preserves explicit pause");
+        f.Game.Quit();
+    }
+
     private static void UnisonScoringIntegration()
     {
         var f=new Fixture(); f.Calibrate();
@@ -553,6 +628,8 @@ public static class UnityIntegrationTests
         assertions=0; Application.streamingAssetsPath=System.IO.Path.GetTempPath();
         CalibrationAndHotplug(); PauseReplayAndTiming(); ZeroDurationCompletion(); LifecycleAndCanonicalPitch();
         InitialAndResumeCountdownSuspension(); CountdownInvalidation(); FocusAndInputGates(); RealSelectorAndMenu(); HeadsetFocusRecovery(); UnisonScoringIntegration();
+        RejectedCountdownButtonFlows();
+        MultiplayerLifecyclePolicy();
         return "PASS: " + assertions + " Unity integration assertions with stubs (not a real Unity build)";
     }
 }

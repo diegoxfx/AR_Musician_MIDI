@@ -55,4 +55,27 @@ foreach ($button in @(
     $navigation = @($calls | Where-Object { $_.Groups['body'].Value -match '(?m)^        m_MethodName: postInstrumentSelectedMenu\r?$' })
     Assert-Scene ($navigation.Count -eq 1) "$($button.Name) must retain its post-selection menu callback"
 }
+$countdownGuid = Read-ScriptGuid 'Scripts\InstrumentsCommon\CountdownUIGeneric.cs'
+$menuGuid = Read-ScriptGuid 'Scripts\UI\MenuControllerGeneric.cs'
+foreach ($button in @(
+    @{ Name = 'StartButton'; Method = 'StartCountdown' },
+    @{ Name = 'ResumeButton'; Method = 'ResumeCountdown' }
+)) {
+    $methodPattern = '(?m)^        m_MethodName: ' + $button.Method + '\r?$'
+    $buttonIds = @($blocks.Keys | Where-Object { $blocks[$_] -match $methodPattern })
+    Assert-Scene ($buttonIds.Count -eq 1) "Expected one actual $($button.Method) button listener"
+    $body = $blocks[$buttonIds[0]]
+    $objectId = Read-Reference $body 'm_GameObject'
+    Assert-Scene ($blocks[$objectId] -match ('(?m)^  m_Name: ' + $button.Name + '\r?$')) "$($button.Method) must belong to the matching named button"
+    $calls = @([regex]::Matches($body, '(?ms)^      - m_Target: \{fileID: (?<target>\d+)\}\r?\n(?<body>.*?)(?=^      - m_Target:|\z)'))
+    Assert-Scene ($calls.Count -eq 2) "$($button.Name) must have exactly the hide and countdown listeners"
+    Assert-Scene ($calls[0].Groups['body'].Value -match '(?m)^        m_MethodName: HideAllMenus\r?$' -and $calls[1].Groups['body'].Value -match $methodPattern -and $calls[0].Groups['body'].Value -match '(?m)^        m_CallState: [12]\r?$' -and $calls[1].Groups['body'].Value -match '(?m)^        m_CallState: [12]\r?$') "$($button.Name) must invoke enabled HideAllMenus FIRST, then $($button.Method), so rejection recovery stays visible"
+    $countdownId = $calls[1].Groups['target'].Value
+    $menuId = $calls[0].Groups['target'].Value
+    Assert-Scene ($blocks.ContainsKey($countdownId) -and $blocks[$countdownId] -match "m_Script: \{fileID: 11500000, guid: $countdownGuid,") "$($button.Name) countdown target must resolve to CountdownUIGeneric"
+    Assert-Scene ($blocks.ContainsKey($menuId) -and $blocks[$menuId] -match "m_Script: \{fileID: 11500000, guid: $menuGuid,") "$($button.Name) hide target must resolve to MenuControllerGeneric"
+    $managerId = Read-Reference $blocks[$countdownId] 'rhythmGameManager'
+    Assert-Scene ($managerId -eq (Read-Reference $selector 'rhythmGameManager')) "$($button.Name) countdown must use the same game manager as the selector"
+    Assert-Scene ((Read-Reference $blocks[$managerId] 'menucontroller') -eq $menuId) "$($button.Name) must hide the same menu controller used by countdown recovery"
+}
 "PASS: $script:checks MainScene serialized wiring assertions (structural checks, not Unity scene execution)"
