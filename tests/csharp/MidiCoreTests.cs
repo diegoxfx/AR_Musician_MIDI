@@ -173,6 +173,58 @@ internal static class MidiCoreTests
         Reject(delegate { matcher.Advance(1, -1); }, "Reject negative tolerance");
     }
 
+    private static void UnisonMatching()
+    {
+        PracticeMatcher matcher = new PracticeMatcher();
+        for (int i = 0; i < 1000; i++) matcher.Add(60, 10);
+        Check(matcher.Total == 1, "A thousand same-onset unisons schedule one expected press");
+        Check(matcher.Hit(60, 10, 0.25), "One physical press hits the unison");
+        matcher.Add(60, 10);
+        Check(matcher.Total == 1, "A duplicate scheduled after its hit cannot recreate the event");
+        Check(!matcher.Hit(60, 10, 0.25), "A second physical press cannot hit the resolved unison again");
+        Check(matcher.Advance(11, 0.25) == 0 && matcher.Misses == 0 && matcher.Hits == 1,
+            "Resolved unisons leave no false misses");
+
+        matcher.Clear();
+        double nearby = 10 + 0.000000000001;
+        matcher.Add(60, 10);
+        matcher.Add(64, 10);
+        matcher.Add(60, nearby);
+        matcher.Add(60, 10.25);
+        matcher.Add(64, 10);
+        matcher.Add(60, nearby);
+        Check(matcher.Total == 4, "Deduplication preserves chords, very close onsets and later repetitions");
+        Check(matcher.Hit(64, 10, 0), "Different pitch at the same onset remains available");
+        Check(matcher.Hit(60, 10, 0), "Original onset retains its exact match");
+        Check(matcher.Hit(60, nearby, 0), "Near but distinct onset remains after matching the original onset");
+        Check(matcher.Hit(60, 10.25, 0), "Later repetition remains available");
+        Check(matcher.Hits == 4 && matcher.Advance(11, 0) == 0 && matcher.Misses == 0,
+            "Chord and repetition accounting remains exact");
+
+        matcher.Clear();
+        matcher.Add(60, 10);
+        matcher.Add(60, 10);
+        Check(matcher.Advance(11, 0.25) == 1, "An unplayed unison produces one miss");
+        matcher.Add(60, 10);
+        Check(matcher.Total == 1 && matcher.Advance(12, 0.25) == 0 && matcher.Misses == 1,
+            "A duplicate scheduled after expiration cannot recreate the miss");
+        matcher.Clear();
+        Check(matcher.Total == 0 && matcher.Hits == 0 && matcher.Misses == 0 && matcher.Wrong == 0,
+            "Clear resets score after duplicate and resolved events");
+        matcher.Add(60, 10);
+        matcher.Add(60, 10);
+        Check(matcher.Total == 1 && matcher.Hit(60, 10, 0) && matcher.Hits == 1,
+            "Clear allows the same song onset to be scored on replay");
+
+        Reject(delegate { matcher.Add(-1, 10); }, "Deduplication rejects negative pitch");
+        Reject(delegate { matcher.Add(128, 10); }, "Deduplication rejects pitch above MIDI range");
+        Reject(delegate { matcher.Add(60, Double.NaN); }, "Deduplication rejects NaN onset");
+        Reject(delegate { matcher.Add(60, Double.PositiveInfinity); }, "Deduplication rejects positive infinite onset");
+        Reject(delegate { matcher.Add(60, Double.NegativeInfinity); }, "Deduplication rejects negative infinite onset");
+        Check(matcher.Total == 1 && matcher.Hits == 1 && matcher.Misses == 0,
+            "Invalid events leave score unchanged");
+    }
+
     public static int Main()
     {
         try
@@ -182,6 +234,7 @@ internal static class MidiCoreTests
             Calibration();
             PhysicalHeldNotes();
             Matching();
+            UnisonMatching();
             Console.WriteLine("PASS: " + assertions + " MIDI core assertions");
             return 0;
         }

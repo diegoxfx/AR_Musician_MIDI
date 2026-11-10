@@ -273,6 +273,7 @@ public class MenuControllerGeneric : MonoBehaviour
 
     public void postInstrumentSelectedMenu()
     {
+        if (rhythmGameManager == null || !rhythmGameManager.CanSelectInstrument) return;
         bool multiplayer = ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer;
         if (multiplayer) ShowMultiplayerMenu();
         else ShowSongMenu();

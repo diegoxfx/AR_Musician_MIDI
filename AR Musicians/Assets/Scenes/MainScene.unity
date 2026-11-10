@@ -24453,7 +24453,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1525985361}
         m_TargetAssemblyTypeName: InstrumentSelectorController, Assembly-CSharp
-        m_MethodName: selectPiano
+        m_MethodName: selectBongos
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -25790,6 +25790,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InstrumentSelectorController
   pianoButton: {fileID: 707807398}
   bongosButton: {fileID: 1468774897}
+  rhythmGameManager: {fileID: 721301431}
+  pianoStrategy: {fileID: 721301430}
+  bongoStrategy: {fileID: 721301429}
 --- !u!1 &1531796505
 GameObject:
   m_ObjectHideFlags: 0

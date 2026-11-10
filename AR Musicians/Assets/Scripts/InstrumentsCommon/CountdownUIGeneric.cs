@@ -11,97 +11,76 @@ public class CountdownUIGeneric : MonoBehaviour
     public Image countdownCircle;
 
     [Header("Game Reference")]
-    // Changed from NoteCubeManager to the new Generic RhythmGameManager
     public RhythmGameManager rhythmGameManager;
-
     public float countdownTime = 3f;
 
-    public void StartCountdown()
+    private Coroutine running;
+    private RhythmGameManager subscribedManager;
+    private int activeGeneration = -1;
+
+    public void StartCountdown() { Begin(false); }
+    public void ResumeCountdown() { Begin(true); }
+
+    private void Begin(bool resume)
     {
+        if (rhythmGameManager == null || activeGeneration >= 0) return;
+        int generation = rhythmGameManager.BeginCountdown(resume);
+        if (generation < 0)
+        {
+            rhythmGameManager.RestorePlaybackMenu();
+            return;
+        }
+        activeGeneration = generation;
+        subscribedManager = rhythmGameManager;
+        subscribedManager.CountdownCancelled += Cancel;
         if (countdown != null) countdown.SetActive(true);
-        StartCoroutine(CountdownRoutine());
+        running = StartCoroutine(CountdownRoutine(generation, resume));
     }
 
-    public void ResumeCountdown()
-    {
-        if (countdown != null) countdown.SetActive(true);
-        StartCoroutine(ResumeCountdownRoutine());
-    }
-    private IEnumerator CountdownRoutine()
+    private IEnumerator CountdownRoutine(int generation, bool resume)
     {
         float timeLeft = countdownTime;
-
         while (timeLeft > 0)
         {
-            // Update number display
-            if (countdownText != null)
-                countdownText.text = Mathf.Ceil(timeLeft).ToString();
-
-            // Update circle fill (1 to 0)
-            if (countdownCircle != null)
-                countdownCircle.fillAmount = timeLeft % 1f;
-
+            if (activeGeneration != generation) yield break;
+            if (countdownText != null) countdownText.text = Mathf.Ceil(timeLeft).ToString();
+            if (countdownCircle != null) countdownCircle.fillAmount = timeLeft % 1f;
             timeLeft -= Time.deltaTime;
             yield return null;
         }
-
-        // Final "GO!"
+        if (activeGeneration != generation) yield break;
         if (countdownCircle != null) countdownCircle.fillAmount = 0f;
         if (countdownText != null) countdownText.text = "GO!";
-
         yield return new WaitForSeconds(0.5f);
+        if (activeGeneration != generation) yield break;
 
-        // Hide the countdown UI when done
-        if (countdown != null) countdown.SetActive(false);
-
-        // Trigger the generic manager. 
-        // This will start Piano OR Bongos depending on what Strategy is set.
-        if (rhythmGameManager != null)
-        {
-            rhythmGameManager.Play();
-        }
-        else
-        {
-            Debug.LogError("CountdownUIGeneric: RhythmGameManager is not assigned!");
-        }
+        var manager = subscribedManager;
+        Clear();
+        if (!manager.CompleteCountdown(generation, resume)) manager.RestorePlaybackMenu();
     }
 
-    private IEnumerator ResumeCountdownRoutine()
+    private void Cancel()
     {
-        float timeLeft = countdownTime;
+        if (running != null) StopCoroutine(running);
+        Clear();
+    }
 
-        while (timeLeft > 0)
-        {
-            // Update number display
-            if (countdownText != null)
-                countdownText.text = Mathf.Ceil(timeLeft).ToString();
-
-            // Update circle fill (1 to 0)
-            if (countdownCircle != null)
-                countdownCircle.fillAmount = timeLeft % 1f;
-
-            timeLeft -= Time.deltaTime;
-            yield return null;
-        }
-
-        // Final "GO!"
-        if (countdownCircle != null) countdownCircle.fillAmount = 0f;
-        if (countdownText != null) countdownText.text = "GO!";
-
-        yield return new WaitForSeconds(0.5f);
-
-        // Hide the countdown UI when done
+    private void Clear()
+    {
+        activeGeneration = -1;
+        running = null;
+        if (subscribedManager != null) subscribedManager.CountdownCancelled -= Cancel;
+        subscribedManager = null;
         if (countdown != null) countdown.SetActive(false);
+    }
 
-        // Trigger the generic manager. 
-        // This will start Piano OR Bongos depending on what Strategy is set.
-        if (rhythmGameManager != null)
+    private void OnDisable()
+    {
+        var manager = subscribedManager;
+        if (manager != null)
         {
-            rhythmGameManager.Resume();
+            manager.CancelCountdown();
         }
-        else
-        {
-            Debug.LogError("CountdownUIGeneric: RhythmGameManager is not assigned!");
-        }
+        Cancel();
     }
 }

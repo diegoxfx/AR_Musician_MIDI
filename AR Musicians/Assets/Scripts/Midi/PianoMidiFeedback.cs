@@ -34,6 +34,7 @@ public sealed class PianoMidiFeedback : MonoBehaviour
     {
         piano = strategy;
         game = FindFirstObjectByType<RhythmGameManager>();
+        if (game != null) game.InputInterrupted += InterruptInput;
         var labelObject = new GameObject("USB MIDI status");
         labelObject.transform.SetParent(transform, false);
         label = labelObject.AddComponent<TextMesh>();
@@ -93,17 +94,24 @@ public sealed class PianoMidiFeedback : MonoBehaviour
     private void OnApplicationPause(bool paused)
     {
         if (piano == null) return;
-        if (paused)
-        {
-            bool multiplayer = ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer;
-            if (game != null && game.playing && game.IsPiano && !multiplayer)
-            {
-                game.Pause();
-                game.menucontroller.ShowSingleplayerPauseMenu();
-            }
-            StopInput();
-        }
+        // Unity does not guarantee callback ordering across components.
+        if (game != null) game.SetApplicationPaused(paused);
+        if (paused) StopInput();
         else StartInput();
+    }
+
+    private void OnApplicationFocus(bool focused)
+    {
+        if (game != null) game.SetApplicationFocused(focused);
+        if (!focused) InterruptInput();
+    }
+
+    private void InterruptInput()
+    {
+        held.Reset();
+        flashes.Clear();
+        calibrating = false;
+        if (!rangeReady) instruction = "B: calibrate MIDI again (61 keys)";
     }
 
     private void Update()
@@ -126,7 +134,7 @@ public sealed class PianoMidiFeedback : MonoBehaviour
 
         bool isPiano = game.IsPiano && piano.HasCalibration;
         // Existing A button still opens the pause menu. MIDI setup is only allowed while idle.
-        if (isPiano && !game.HasSession)
+        if (isPiano && game.CanSelectInstrument)
         {
             if (OVRInput.GetDown(OVRInput.Button.Two, OVRInput.Controller.RTouch)) BeginCalibration();
             if (OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.LTouch) && rangeReady)
@@ -134,8 +142,8 @@ public sealed class PianoMidiFeedback : MonoBehaviour
             if (OVRInput.GetDown(OVRInput.Button.Two, OVRInput.Controller.LTouch))
             { enabledFeedback = !enabledFeedback; scoring = false; }
         }
-        if (scoring && game.playing && isPiano) matcher.Advance(game.SongTime, TimingWindow);
-        DrawMarkers(isPiano && rangeReady && enabledFeedback);
+        if (scoring && game.playing && game.InputAllowed && isPiano) matcher.Advance(game.SongTime, TimingWindow);
+        DrawMarkers(isPiano && game.InputAllowed && rangeReady && enabledFeedback);
         label.gameObject.SetActive(isPiano);
         if (isPiano)
         {
@@ -165,6 +173,7 @@ public sealed class PianoMidiFeedback : MonoBehaviour
         if (e.type == "status") { status = e.message; return; }
         if (e.type == "reset") { ResetInput(); return; }
         if (e.type == "channelReset") { held.ResetChannel(e.channel); return; }
+        if (game == null || !game.InputAllowed) return;
         if (e.type != "note" || e.note < 0 || e.note > 127 || e.channel < 0 || e.channel > 15) return;
         held.Set(e.channel, e.note, e.on && e.velocity > 0);
         if (!e.on || e.velocity == 0) return;
@@ -250,6 +259,7 @@ public sealed class PianoMidiFeedback : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (game != null) game.InputInterrupted -= InterruptInput;
         StopInput();
         if (bridge != null) bridge.Dispose();
         foreach (var marker in markers.Values) if (marker != null) Destroy(marker);

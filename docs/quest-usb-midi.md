@@ -74,20 +74,30 @@ Casio's own speakers/headphones. The extension neither synthesizes nor records a
    If positions still disagree, redo the visual/manual plane setup.
 9. Choose a song and start. **Y** toggles MIDI feedback while idle. **A** retains
    the existing pause-menu action. Setup controls are disabled during an active
-   song, including while paused.
+   song, including the start/resume countdowns and while paused.
 
 Calibration is deliberately not persisted across app restarts, USB resets or
 disconnections. A reset clears held keys and disables scoring. If it happens
 during a song, quit that song, reconnect if needed, recalibrate with B, and restart.
-Suspending the single-player app exposes its pause menu. A normal A-button pause
+Suspending the single-player app cancels pending countdowns. Before playback it
+returns to the start lobby; during a session it exposes the pause menu. Returning
+to the app never starts or resumes a song automatically. A normal A-button pause
 retains calibration and can resume; notes pressed during the pause do not score.
+Opening the Quest Universal Menu also pauses practice and ignores MIDI input.
+Focus-only interruptions retain completed calibration, clear held keys/flashes,
+and cancel incomplete calibration. Actual app suspension resets the USB connection
+and requires the recalibration/restart workflow above. App pause, Unity focus and
+Meta input focus are independent gates: all must be restored before accepting input.
+See Meta's [lifecycle events](https://developers.meta.com/vr/documentation/unity/unity-lifecycle/).
 Multiplayer feedback/recovery is outside this extension's tested scope.
 
 ## Feedback and songs
 
 - Held keys light green. An unmatched press flashes red during a scored song.
 - A matching pitch within **300 ms before or after** the scheduled onset counts
-  once as a hit. Missed onsets and extra presses have separate counters.
+  once as a hit. Events from multiple tracks at the exact same pitch and onset
+  count as one physical press. Distinct onsets, however close together, remain
+  separate. Missed onsets and extra presses have separate counters.
 - Chords can match multiple pitches. Sustained duration, pedal, dynamics and
   fingering are not scored. There is no automatic wait-for-correct-note mode.
 - Notes outside the calibrated range are skipped visually and excluded from the
@@ -121,6 +131,23 @@ converter, or explicitly set the legacy offset to 0.
 - `PlaneController`, `PianoStrategy`, `RhythmGameManager`, `CubeFallBehavior` and
   `MidiUtils`: shared layout/pitch/timing integration into the existing application.
 
+Playback has one authoritative state in `RhythmGameManager`:
+
+| State | Transition | Interruption recovery |
+| --- | --- | --- |
+| Idle | Start -> Starting | Stay idle; input/setup blocked until focus returns |
+| Starting | Valid countdown finishes -> Playing | Cancel generation -> Idle and start lobby |
+| Playing | Pause -> Paused; finish/quit -> Idle | Pause clock and show pause menu |
+| Paused | Resume -> Resuming; quit -> Idle | Remain paused |
+| Resuming | Valid countdown finishes -> Playing | Cancel generation -> Paused and pause menu |
+
+Each countdown carries a generation token. Quit, song replacement, component
+disable and lifecycle interruption cancel it; an old coroutine cannot start or
+resume a later session. The song clock stays frozen throughout pause and resume
+countdown. Instrument selection is accepted only while idle with input available;
+the manager updates both the strategy and shared instrument setting together.
+Song preprocessing happens when playback starts, using that accepted strategy.
+
 Input is scored when Unity drains the native queue. Transport latency and frame
 stalls can therefore affect scores; this is learning feedback rather than a
 precision performance measurement. A bounded overflow cancels scoring and asks
@@ -146,14 +173,19 @@ The Java suite tests the actual decoder, tests device lifecycle/queue behavior
 against small simulated Android classes, then optionally compiles the actual
 bridge against the official Android API jar. No test output is written into Assets.
 
-The integration suite compiles the actual Unity-facing classes against lightweight
-stubs with PowerShell 7 / Roslyn. It exercises calibration, resets, pause/resume,
-replay, speed scaling, late-frame placement and scoring. It does not exercise
-real rendering, Android calls, JSON/network loading or the Unity engine lifecycle.
+The integration suite compiles the actual Unity-facing classes, including the
+countdown, instrument selector and menu controller, against lightweight stubs with
+PowerShell 7 / Roslyn. It exercises calibration, resets, pause/resume, interrupted
+countdowns, stale coroutine generations, focus/pause callback order, instrument
+selection, replay, speed scaling, late-frame placement and scoring. It also checks
+the scene's serialized selector references/callbacks and scores each unique onset
+in bundled Sandstorm once (999 duplicate track events must not become misses).
+It does not exercise real rendering, Android calls, JSON/network loading or the
+Unity engine lifecycle; callbacks and coroutine advancement are simulated.
 
-Verified in development: 344 core assertions, 44 integration assertions, Java
-decoder and simulated-device regressions, and bridge compilation against Android
-API 35. These checks are not
+Verified in development: 365 core assertions, 109 integration assertions, 17
+scene-wiring assertions, the bundled Sandstorm scoring regression, Java decoder and simulated-device
+regressions, and bridge compilation against Android API 35. These checks are not
 a Unity player build, headset test, or timing/visual assessment.
 
 Before treating the feature as ready to use, complete this device check:

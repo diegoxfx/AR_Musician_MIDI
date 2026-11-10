@@ -30,7 +30,19 @@ namespace UnityEngine
         public Transform transform { get { return gameObject.transform; } }
         public T GetComponent<T>() where T : Component { return gameObject.GetComponent<T>(); }
     }
-    public class MonoBehaviour : Component { public object StartCoroutine(IEnumerator routine) { return routine; } }
+    public class Coroutine { public IEnumerator Routine; public bool Cancelled; }
+    public class MonoBehaviour : Component
+    {
+        public readonly List<Coroutine> StartedCoroutines = new List<Coroutine>();
+        public Coroutine StartCoroutine(IEnumerator routine)
+        {
+            var handle = new Coroutine { Routine = routine }; StartedCoroutines.Add(handle);
+            // Unity runs the first part immediately, up to its first yield.
+            routine.MoveNext(); return handle;
+        }
+        public void StopCoroutine(Coroutine routine) { routine.Cancelled = true; }
+        public void StopAllCoroutines() { foreach (var item in StartedCoroutines) item.Cancelled = true; }
+    }
     public class GameObject : Object
     {
         public string name;
@@ -103,17 +115,21 @@ namespace UnityEngine
     public class WaitForSeconds { public WaitForSeconds(float value) {} }
     public static class JsonUtility { public static T FromJson<T>(string json) { throw new NotSupportedException("JSON parsing is outside this stub integration suite."); } }
     public static class Resources { public static T GetBuiltinResource<T>(string name) where T : new() { return new T(); } }
-    public static class Mathf { public static float Abs(float value) { return Math.Abs(value); } public static float Max(float a, float b) { return Math.Max(a, b); } public static float Clamp01(float value) { return Math.Max(0,Math.Min(1,value)); } }
-    public static class Time { public static float time, unscaledTime; }
+    public static class Mathf { public static float Abs(float value) { return Math.Abs(value); } public static float Max(float a, float b) { return Math.Max(a, b); } public static float Clamp01(float value) { return Math.Max(0,Math.Min(1,value)); } public static float Ceil(float value) { return (float)Math.Ceiling(value); } }
+    public static class Time { public static float time, unscaledTime, deltaTime = 1, unscaledDeltaTime = 1; }
     public static class Application { public static string streamingAssetsPath; }
     public static class Debug { public static void Log(object value) {} public static void LogWarning(object value) {} public static void LogError(object value) {} }
     public class HeaderAttribute : Attribute { public HeaderAttribute(string label) {} }
     public class TooltipAttribute : Attribute { public TooltipAttribute(string label) {} }
     public class ExecuteAlways : Attribute {}
+    public class SerializeField : Attribute {}
+    public class SpaceAttribute : Attribute { public SpaceAttribute(float value) {} }
     public enum TextAnchor { MiddleCenter }
     public enum TextAlignment { Center }
     public enum PrimitiveType { Cube }
 }
+namespace UnityEngine.UI { public class Button : Component { public bool interactable; } public class Image : Component { public float fillAmount; } }
+namespace TMPro { public class TextMeshProUGUI : Component { public string text; } }
 namespace UnityEngine.Networking { public class UnusedNetworkingStub {} }
 namespace Newtonsoft.Json
 { public static class JsonConvert { public static T DeserializeObject<T>(string json) { throw new NotSupportedException("JSON loading is outside this stub integration suite."); } } }
@@ -124,20 +140,24 @@ public static class OVRInput
     private static Button? nextButton;
     private static Controller nextController;
     public static void Press(Button button, Controller controller) { nextButton = button; nextController = controller; }
+    public static void Reset() { nextButton=null; }
     public static bool GetDown(Button button, Controller controller)
     { if (nextButton == button && nextController == controller) { nextButton = null; return true; } return false; }
 }
+public static class OVRManager
+{
+    public static event Action InputFocusLost, InputFocusAcquired;
+    public static void LoseFocus() { InputFocusLost?.Invoke(); }
+    public static void AcquireFocus() { InputFocusAcquired?.Invoke(); }
+    public static void Reset() { InputFocusLost=null; InputFocusAcquired=null; }
+}
 public class DefinedPlane { public Plane Plane; public Vector3 Center, Corner1, Corner2, Corner3, Corner4; }
 public class Plane { public Vector3 normal; }
-public static class PianoManagerInstrumentDefiner { public static event Action<DefinedPlane> OnPlaneDefined; public static void Define(DefinedPlane plane) { OnPlaneDefined?.Invoke(plane); } }
-public static class ProjectConfig { public static readonly SettingsData Settings = new SettingsData(); public class SettingsData { public bool playing, master, useMultiplayer, enableMultiplayer; } }
-public class MenuControllerGeneric
-{
-    public int SongMenuCalls, PauseMenuCalls;
-    public void ShowSongMenu() { SongMenuCalls++; }
-    public void ShowSingleplayerPauseMenu() { PauseMenuCalls++; }
-    public void ShowMultiplayerPauseMenu(bool masterPauser) { PauseMenuCalls++; }
-}
+public interface IPointInputListener {}
+public class RayCastInputProvider : MonoBehaviour { public void SetListener(IPointInputListener listener) {} }
+public class PianoManagerInstrumentDefiner : MonoBehaviour, IPointInputListener { public static event Action<DefinedPlane> OnPlaneDefined; public static void Define(DefinedPlane plane) { OnPlaneDefined?.Invoke(plane); } public void Activate(bool cv) {} public void Deactivate() {} }
+public class BongosManager : MonoBehaviour, IPointInputListener { public static event Action OnBothBongosDefined; public void Activate(bool cv) {} public void Deactivate() {} }
+public static class ProjectConfig { public static readonly SettingsData Settings = new SettingsData(); public class SettingsData { public bool playing, master, useMultiplayer, enableMultiplayer; public string instrument; public List<string> configured_instruments = new List<string>(); } }
 public class PartialSongData { public string JsonPath; }
 public class SongData { public PartialSongData PartialSongData; }
 public class BongoStrategy : MonoBehaviour, IGameplayStrategy
@@ -145,7 +165,7 @@ public class BongoStrategy : MonoBehaviour, IGameplayStrategy
     public int average_key;
     public float ApproachTime { get { return 2; } }
     public bool IsInstrumentReady() { return true; }
-    public void PreprocessNote(NoteEvent note) {}
+    public void PreprocessNote(NoteEvent note) { note.keyIndex = note.midiNumber; }
     public void SpawnNote(NoteEvent note, float speed) { OnNoteFinished?.Invoke(); }
     public event Action OnNoteFinished;
 }
@@ -172,17 +192,47 @@ public static class UnityIntegrationTests
         public PianoStrategy Piano;
         public PianoMidiFeedback Feedback { get { return Piano.MidiFeedback; } }
         public PlaneController Plane;
+        public CountdownUIGeneric Countdown;
+        public InstrumentSelectorController Selector;
+        public BongoStrategy Bongo;
+        public MenuControllerGeneric Menu { get { return Game.menucontroller; } }
         public Fixture()
         {
+            // Each fixture represents a fresh scene; clear old scene event subscribers.
+            foreach (string name in new [] {"OnPause","OnResume","OnQuit"})
+                typeof(RhythmGameManager).GetField(name,BindingFlags.Static|BindingFlags.NonPublic).SetValue(null,null);
+            typeof(PianoManagerInstrumentDefiner).GetField("OnPlaneDefined",BindingFlags.Static|BindingFlags.NonPublic).SetValue(null,null);
+            OVRManager.Reset();
+            OVRInput.Reset();
             UnityEngine.Object.Components.Clear();
-            Time.time = Time.unscaledTime = 0;
-            Game = new GameObject().AddComponent<RhythmGameManager>(); Game.menucontroller = new MenuControllerGeneric();
+            Time.time = Time.unscaledTime = 0; Time.deltaTime = Time.unscaledDeltaTime = 1;
+            ProjectConfig.Settings.playing = ProjectConfig.Settings.enableMultiplayer = ProjectConfig.Settings.useMultiplayer = false;
+            ProjectConfig.Settings.master = true; ProjectConfig.Settings.instrument = null;
+            Game = new GameObject().AddComponent<RhythmGameManager>();
+            Call(Game,"OnEnable");
+            Game.menucontroller = new GameObject().AddComponent<MenuControllerGeneric>();
+            // Serialized scene references are assigned explicitly; the real menu code owns visibility.
+            foreach (var field in typeof(MenuControllerGeneric).GetFields(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
+            {
+                if (field.FieldType == typeof(GameObject)) field.SetValue(Menu,new GameObject(field.Name));
+                else if (field.FieldType == typeof(UnityEngine.UI.Button)) field.SetValue(Menu,new GameObject(field.Name).AddComponent<UnityEngine.UI.Button>());
+                else if (field.FieldType == typeof(UnityEngine.UI.Button[])) field.SetValue(Menu,new UnityEngine.UI.Button[0]);
+            }
+            Set(Menu,"rhythmGameManager",Game);
+            Menu.HideAllMenus();
             Plane = new GameObject().AddComponent<PlaneController>(); Plane.leftmostKey = "C2"; Plane.totalKeys = 61; Plane.reInit();
             Piano = new GameObject().AddComponent<PianoStrategy>(); Piano.plane = Plane;
             Piano.noteCubePrefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Game.SetStrategy(Piano);
             Call(Piano,"Start");
             Call(Piano,"UpdatePlaneVisuals",new DefinedPlane { Plane = new Plane { normal = new Vector3(0,1,0) }, Corner1 = new Vector3(-1,0,0),Corner2 = new Vector3(1,0,0),Corner3 = new Vector3(1,0,1),Corner4 = new Vector3(-1,0,1) });
+            Bongo = new GameObject().AddComponent<BongoStrategy>();
+            Selector = new GameObject().AddComponent<InstrumentSelectorController>();
+            Set(Selector,"rhythmGameManager",Game); Set(Selector,"pianoStrategy",Piano); Set(Selector,"bongoStrategy",Bongo);
+            Countdown = new GameObject().AddComponent<CountdownUIGeneric>();
+            Countdown.rhythmGameManager=Game; Countdown.countdown=new GameObject("countdown"); Countdown.countdown.SetActive(false);
+            Countdown.countdownText=new GameObject().AddComponent<TMPro.TextMeshProUGUI>();
+            Countdown.countdownCircle=new GameObject().AddComponent<UnityEngine.UI.Image>();
         }
         public void Calibrate()
         { Call(Feedback,"BeginCalibration"); Send(Feedback,"note",36); Send(Feedback,"note",96); }
@@ -240,6 +290,8 @@ public static class UnityIntegrationTests
         Near(-1,f.Game.SongTime,"Duplicate Play does not restart an active song clock");
         Time.time=102.5f; f.Game.Pause();
         Check(!f.Game.playing && f.Game.HasSession,"Pause preserves session");
+        double pausedTime=f.Game.SongTime; Time.time=104;
+        Near(pausedTime,f.Game.SongTime,"SongTime stays frozen in Paused while wall-clock time advances");
         Send(f.Feedback,"note",60); Call(f.Feedback,"Update");
         Check(f.Matcher.Hits==0 && f.Matcher.Wrong==0 && f.Matcher.Misses==0,"Paused MIDI cannot score or expire notes");
         Time.time=104; f.Game.Pause(); f.Game.Play();
@@ -298,17 +350,209 @@ public static class UnityIntegrationTests
         Time.time=10; f.Game.Play(); Time.time=11;
         Call(f.Feedback,"OnApplicationPause",true);
         Check(f.Game.HasSession && !f.Game.playing,"App suspension pauses active song");
-        Check(f.Game.menucontroller.PauseMenuCalls>0,"Suspension exposes resume/quit menu");
+        Check(f.Menu.singleplayerPauseMenu.activeSelf,"Suspension exposes real resume/quit menu");
         Check(!(bool)Field(f.Feedback,"rangeReady") && !(bool)Field(f.Feedback,"scoring"),"Suspension resets MIDI alignment and scoring");
         Call(f.Feedback,"OnApplicationPause",false);
         Check(!f.Game.playing,"App focus return does not unexpectedly resume song");
         f.Game.Quit();
     }
 
+    // Deliberately bypass StopCoroutine: a queued/stale completion must be harmless
+    // because of the production generation token, rather than just our scheduler.
+    private static void DrainEvenIfCancelled(Coroutine handle)
+    {
+        int steps=0;
+        while (handle.Routine.MoveNext()) if (++steps>30) throw new Exception("Countdown did not terminate");
+    }
+    private static Coroutine Latest(CountdownUIGeneric countdown) { return countdown.StartedCoroutines.Last(); }
+    private static void InitialAndResumeCountdownSuspension()
+    {
+        var f=new Fixture(); f.Calibrate(); f.Load(new NoteEvent {midiNumber=60,time=2,duration=1});
+        f.Menu.HideAllMenus(); f.Countdown.StartCountdown();
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Starting && !f.Game.playing,"Real countdown registers Starting before first frame");
+        var initial=Latest(f.Countdown); int starts=f.Countdown.StartedCoroutines.Count;
+        f.Countdown.StartCountdown();
+        Check(f.Countdown.StartedCoroutines.Count==starts,"Repeated start cannot create a competing countdown");
+        Call(f.Game,"OnApplicationPause",true); Call(f.Feedback,"OnApplicationPause",true);
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Idle && !f.Game.HasSession,"Suspending initial countdown returns to Idle without a session");
+        Check(!f.Countdown.countdown.activeSelf && f.Menu.singlePlayerLobbyMenu.activeSelf,"Cancelled initial countdown hides itself and restores real start lobby");
+        DrainEvenIfCancelled(initial);
+        Check(!f.Game.playing && !f.Game.HasSession,"Even forcibly drained cancelled initial countdown cannot start playback");
+        Call(f.Game,"OnApplicationPause",false); Call(f.Feedback,"OnApplicationPause",false);
+        Check(!f.Game.playing,"Foreground return does not start cancelled initial playback");
+        f.Countdown.StartCountdown(); DrainEvenIfCancelled(Latest(f.Countdown));
+        Check(f.Game.playing && !f.Countdown.countdown.activeSelf,"Fresh real countdown completes into Playing");
+        Time.time=1; f.Game.Pause(); f.Menu.HideAllMenus(); f.Countdown.ResumeCountdown();
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Resuming && f.Game.HasSession,"Resume countdown retains the paused session");
+        double pausedTime=f.Game.SongTime; Time.time=30;
+        Near(pausedTime,f.Game.SongTime,"SongTime stays frozen throughout Resuming countdown");
+        var resume=Latest(f.Countdown);
+        Call(f.Feedback,"OnApplicationPause",true); Call(f.Game,"OnApplicationPause",true);
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Paused && f.Game.HasSession,"Suspending resume countdown returns to Paused");
+        Check(!f.Countdown.countdown.activeSelf && f.Menu.singleplayerPauseMenu.activeSelf,"Cancelled resume countdown restores real pause menu");
+        DrainEvenIfCancelled(resume);
+        Check(!f.Game.playing,"Stale cancelled resume callback cannot resume");
+        Call(f.Feedback,"OnApplicationPause",false); Call(f.Game,"OnApplicationPause",false);
+        Check(!f.Game.playing,"Resume-countdown foreground return requires explicit action");
+        f.Countdown.ResumeCountdown(); DrainEvenIfCancelled(Latest(f.Countdown));
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Playing,"Fresh real resume countdown works after recovery");
+        f.Game.Quit();
+    }
+
+    private static void CountdownInvalidation()
+    {
+        var f=new Fixture(); f.Load(new NoteEvent {midiNumber=60,time=0,duration=1});
+        f.Countdown.StartCountdown(); var old=Latest(f.Countdown); f.Game.Quit();
+        Check(f.Menu.songMenu.activeSelf && !f.Countdown.countdown.activeSelf,"Quit during countdown recovers the real song menu");
+        f.Countdown.StartCountdown(); var current=Latest(f.Countdown);
+        DrainEvenIfCancelled(old);
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Starting && f.Countdown.countdown.activeSelf,"Stale quit-generation routine cannot complete or hide the new countdown");
+        DrainEvenIfCancelled(current); Check(f.Game.playing,"Current generation still starts normally"); f.Game.Quit();
+        f.Menu.HideAllMenus(); f.Countdown.StartCountdown(); old=Latest(f.Countdown);
+        f.Game.updateSong(new SongData {PartialSongData=new PartialSongData {JsonPath="missing-regression-fixture.json"}});
+        DrainEvenIfCancelled(old);
+        Check(!f.Game.playing && !f.Game.HasSession && !f.Countdown.countdown.activeSelf,"Replacing a song invalidates pending countdown completion");
+        Check(f.Menu.singlePlayerLobbyMenu.activeSelf,"Replacing a song recovers the real start lobby");
+        f.Load(new NoteEvent {midiNumber=62,time=0,duration=1});
+        f.Countdown.StartCountdown(); old=Latest(f.Countdown); Call(f.Countdown,"OnDisable"); DrainEvenIfCancelled(old);
+        Check(!f.Game.playing && !f.Countdown.countdown.activeSelf,"Disabling real countdown cancels its pending generation");
+    }
+
+    private static void FocusAndInputGates()
+    {
+        var f=new Fixture(); f.Calibrate(); f.Load(new NoteEvent {midiNumber=60,time=0,duration=1});
+        Send(f.Feedback,"note",60); f.Game.Play();
+        Check(((HeldNotes)Field(f.Feedback,"held")).IsHeld(60),"Physical note is held before focus loss");
+        Call(f.Game,"OnApplicationFocus",false); Call(f.Feedback,"OnApplicationFocus",false);
+        Check(!f.Game.InputAllowed && f.Game.State==RhythmGameManager.PlaybackState.Paused,"Focus loss pauses manager and blocks input");
+        Check((bool)Field(f.Feedback,"rangeReady"),"Focus loss preserves completed physical range");
+        Check(!((HeldNotes)Field(f.Feedback,"held")).IsHeld(60),"Focus loss clears all held physical keys");
+        Time.time=20; Send(f.Feedback,"note",60); Call(f.Feedback,"Update");
+        Check(!((HeldNotes)Field(f.Feedback,"held")).IsHeld(60) && f.Matcher.Hits==0 && f.Matcher.Wrong==0 && f.Matcher.Misses==0,"Unfocused notes neither hold keys nor score or expire notes");
+        f.Game.Resume(); Check(!f.Game.playing,"Blocked direct Resume cannot bypass lost focus");
+        Call(f.Feedback,"OnApplicationFocus",true); Call(f.Game,"OnApplicationFocus",true);
+        Check(f.Game.InputAllowed && !f.Game.playing,"Regaining focus allows input without auto-resuming");
+        f.Game.Quit();
+
+        foreach (bool pauseFirst in new [] {true,false})
+        {
+            f=new Fixture();
+            if (pauseFirst) { f.Game.SetApplicationPaused(true); f.Game.SetApplicationFocused(false); }
+            else { f.Game.SetApplicationFocused(false); f.Game.SetApplicationPaused(true); }
+            Check(!f.Game.InputAllowed && !f.Game.CanSelectInstrument,"Both lost lifecycle flags block idle input and selection");
+            if (pauseFirst) f.Game.SetApplicationPaused(false); else f.Game.SetApplicationFocused(true);
+            Check(!f.Game.InputAllowed,"First recovery callback cannot clear the other lifecycle flag");
+            OVRInput.Press(OVRInput.Button.Two,OVRInput.Controller.RTouch); Call(f.Feedback,"Update");
+            Send(f.Feedback,"note",36); Send(f.Feedback,"note",96);
+            Check(!(bool)Field(f.Feedback,"calibrating") && !(bool)Field(f.Feedback,"rangeReady"),"Calibration cannot begin or finish while either lifecycle gate is blocked");
+            f.Selector.selectBongos(); Check(f.Game.IsPiano,"Blocked idle selector cannot change strategy");
+            if (pauseFirst) f.Game.SetApplicationFocused(true); else f.Game.SetApplicationPaused(false);
+            Check(f.Game.InputAllowed && f.Game.CanSelectInstrument,"Both recovery orders unlock only after both flags recover");
+        }
+        f=new Fixture(); Call(f.Feedback,"BeginCalibration"); Send(f.Feedback,"note",36);
+        Call(f.Feedback,"OnApplicationFocus",false);
+        Check(!(bool)Field(f.Feedback,"calibrating"),"Focus loss cancels in-progress calibration");
+        Send(f.Feedback,"note",96); Call(f.Feedback,"OnApplicationFocus",true);
+        Check(!(bool)Field(f.Feedback,"rangeReady"),"Stale endpoint cannot complete calibration across focus loss");
+        f.Load(new NoteEvent {midiNumber=60,time=0,duration=1}); f.Countdown.StartCountdown(); var pending=Latest(f.Countdown);
+        Call(f.Game,"OnApplicationFocus",false); Call(f.Feedback,"OnApplicationFocus",false); DrainEvenIfCancelled(pending);
+        Check(!f.Game.playing && f.Menu.singlePlayerLobbyMenu.activeSelf,"Focus loss cancels an initial countdown and restores start lobby");
+    }
+
+    private static void RealSelectorAndMenu()
+    {
+        var f=new Fixture(); f.Load(new NoteEvent {midiNumber=60,time=0,duration=1},new NoteEvent {midiNumber=72,time=1,duration=1});
+        // UnityEvent listeners can invoke menu navigation before or after selection.
+        f.Menu.postInstrumentSelectedMenu(); f.Selector.selectBongos();
+        Check(!f.Game.IsPiano && ProjectConfig.Settings.instrument=="bongos" && f.Menu.songMenu.activeSelf,"Menu-first actual bongo selection updates strategy and settings");
+        f.Selector.selectPiano(); f.Menu.postInstrumentSelectedMenu();
+        Check(f.Game.IsPiano && ProjectConfig.Settings.instrument=="piano" && f.Menu.songMenu.activeSelf,"Selector-first actual piano selection updates strategy and settings");
+        f.Menu.HideAllMenus(); f.Countdown.StartCountdown();
+        OVRInput.Press(OVRInput.Button.Two,OVRInput.Controller.RTouch); Call(f.Feedback,"Update");
+        Check(!(bool)Field(f.Feedback,"calibrating"),"Actual calibration controller input is blocked during Starting countdown");
+        f.Menu.postInstrumentSelectedMenu(); f.Selector.selectBongos();
+        Check(f.Game.IsPiano && ProjectConfig.Settings.instrument=="piano" && !f.Menu.songMenu.activeSelf,"Menu-first stale selection during Starting cannot navigate or change strategy/settings");
+        f.Selector.selectBongos(); f.Menu.postInstrumentSelectedMenu();
+        Check(f.Game.IsPiano && !f.Menu.songMenu.activeSelf,"Selector-first stale selection during Starting is also rejected");
+        DrainEvenIfCancelled(Latest(f.Countdown));
+        int routines=f.Countdown.StartedCoroutines.Count;
+        f.Countdown.StartCountdown();
+        Check(f.Game.playing && f.Countdown.StartedCoroutines.Count==routines && !f.Menu.singleplayerPauseMenu.activeSelf && !f.Menu.singlePlayerLobbyMenu.activeSelf && !f.Menu.songMenu.activeSelf,"Rejected stale StartCountdown during Playing preserves playback and hidden menus");
+        f.Countdown.ResumeCountdown();
+        Check(f.Game.playing && f.Countdown.StartedCoroutines.Count==routines && !f.Menu.singleplayerPauseMenu.activeSelf && !f.Menu.singlePlayerLobbyMenu.activeSelf && !f.Menu.songMenu.activeSelf,"Rejected stale ResumeCountdown during Playing preserves playback and hidden menus");
+        f.Selector.selectBongos(); f.Menu.postInstrumentSelectedMenu();
+        Check(f.Game.IsPiano && !f.Menu.songMenu.activeSelf,"Actual selector and menu reject changes during Playing");
+        f.Game.Pause(); f.Menu.ShowSingleplayerPauseMenu(); f.Selector.selectBongos(); f.Menu.postInstrumentSelectedMenu();
+        Check(f.Game.IsPiano && f.Menu.singleplayerPauseMenu.activeSelf,"Actual selector and menu reject changes during Paused");
+        f.Game.Quit(); f.Selector.selectBongos(); f.Game.Play();
+        Check(!f.Game.IsPiano && f.Bongo.average_key==66,"Accepted idle switch uses bongo average calculated for the currently loaded song at Play");
+        f.Game.Quit();
+    }
+
+    private static void HeadsetFocusRecovery()
+    {
+        var f=new Fixture(); f.Calibrate(); f.Load(new NoteEvent {midiNumber=60,time=0,duration=1});
+        Send(f.Feedback,"note",60); f.Game.Play(); Time.time=1;
+        OVRManager.LoseFocus();
+        Check(!f.Game.InputAllowed && f.Game.State==RhythmGameManager.PlaybackState.Paused && f.Menu.singleplayerPauseMenu.activeSelf,"Real subscribed OVR focus-loss event pauses playback and restores pause menu");
+        Check((bool)Field(f.Feedback,"rangeReady") && (bool)Field(f.Feedback,"scoring") && !((HeldNotes)Field(f.Feedback,"held")).IsHeld(60),"Headset focus-only interruption clears physical keys and preserves completed range and scoring schedule");
+        f.Game.SetApplicationFocused(false); f.Game.SetApplicationPaused(true); OVRManager.AcquireFocus();
+        Check(!f.Game.InputAllowed,"Headset focus acquisition cannot override app pause and app focus gates");
+        f.Game.SetApplicationPaused(false);
+        Check(!f.Game.InputAllowed,"App unpause cannot override remaining app focus gate");
+        Time.time=100; Send(f.Feedback,"note",60); Call(f.Feedback,"Update");
+        Check(f.Matcher.Hits==0 && f.Matcher.Wrong==0 && f.Matcher.Misses==0,"Overlapping lifecycle gates stop scoring and expiry throughout suspension");
+        f.Game.SetApplicationFocused(true);
+        Check(f.Game.InputAllowed && !f.Game.playing,"All three lifecycle gates must recover, with no automatic resume");
+        f.Game.Resume(); Time.time=101; Send(f.Feedback,"note",60);
+        Check(f.Matcher.Hits==1,"Explicit focus-only resume preserves scoring and pause-adjusted strike time"); f.Game.Quit();
+
+        f=new Fixture(); f.Load(new NoteEvent {midiNumber=60,time=0,duration=1}); f.Menu.HideAllMenus();
+        f.Countdown.StartCountdown(); var initial=Latest(f.Countdown); OVRManager.LoseFocus();
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Idle && f.Menu.singlePlayerLobbyMenu.activeSelf && !f.Countdown.countdown.activeSelf,"Headset focus loss cancels real initial countdown and restores start lobby");
+        OVRManager.AcquireFocus(); DrainEvenIfCancelled(initial);
+        Check(!f.Game.playing,"Headset regain and stale initial coroutine cannot auto-start playback");
+        f.Countdown.StartCountdown(); DrainEvenIfCancelled(Latest(f.Countdown)); f.Game.Pause(); f.Menu.HideAllMenus();
+        f.Countdown.ResumeCountdown(); var resume=Latest(f.Countdown); OVRManager.LoseFocus();
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Paused && f.Menu.singleplayerPauseMenu.activeSelf && !f.Countdown.countdown.activeSelf,"Headset focus loss cancels real resume countdown and restores pause menu");
+        OVRManager.AcquireFocus(); DrainEvenIfCancelled(resume);
+        Check(!f.Game.playing && f.Game.HasSession,"Headset regain and stale resume coroutine preserve paused session");
+        f.Game.Resume(); Call(f.Game,"OnDisable");
+        Check(!f.Game.playing && f.Menu.singleplayerPauseMenu.activeSelf,"Disabling manager interrupts playback through the same recovery path");
+        f.Game.Quit();
+    }
+
+    private static void UnisonScoringIntegration()
+    {
+        var f=new Fixture(); f.Calibrate();
+        f.Load(new NoteEvent {midiNumber=60,time=0,duration=1},new NoteEvent {midiNumber=60,time=0,duration=2},
+            new NoteEvent {midiNumber=61,time=0,duration=1},new NoteEvent {midiNumber=60,time=1,duration=1});
+        f.Game.Play(); Check(f.Matcher.Total==3,"Real BeginSong collapses unison tracks while preserving chord pitches and later repeated notes");
+        Time.time=2; Send(f.Feedback,"note",60); Send(f.Feedback,"note",61); Time.time=3; Send(f.Feedback,"note",60);
+        f.Feedback.EndSong(true);
+        Check(f.Matcher.Hits==3 && f.Matcher.Misses==0 && f.Matcher.Wrong==0,"One physical strike per unison produces exact integration counters");
+        f.Game.Quit();
+    }
+
+    public static string RunBundled(NoteEvent[] source)
+    {
+        assertions=0; var f=new Fixture(); f.Calibrate(); f.Load(source); f.Game.Play();
+        Check(source.Length==12537,"Bundled Sandstorm source fixture has expected size");
+        Check(f.Matcher.Total==10723 && (int)Field(f.Feedback,"skipped")==815,"Bundled Sandstorm schedules 10,723 distinct in-range onsets and excludes 815 out-of-range entries");
+        var strikes=source.Select(n=> { var copy=new NoteEvent {key=n.key,time=n.time}; f.Piano.PreprocessNote(copy); return copy; })
+            .Where(n=>n.keyIndex>=36 && n.keyIndex<=96).GroupBy(n=>new {n.keyIndex,n.time}).Select(g=>g.First()).OrderBy(n=>n.time).ThenBy(n=>n.keyIndex);
+        foreach (var n in strikes) { Time.time=2+n.time; Send(f.Feedback,"note",n.keyIndex); }
+        f.Feedback.EndSong(true);
+        Check(f.Matcher.Hits==10723 && f.Matcher.Misses==0 && f.Matcher.Wrong==0,"Bundled Sandstorm one-strike-per-onset run yields exact hit/miss/extra counters");
+        f.Game.Quit();
+        return "PASS: bundled Sandstorm integration: 12,537 source entries, 10,723 hits, 815 skipped, 0 misses, 0 extras (Unity stubs)";
+    }
+
     public static string Run()
     {
-        assertions=0;
+        assertions=0; Application.streamingAssetsPath=System.IO.Path.GetTempPath();
         CalibrationAndHotplug(); PauseReplayAndTiming(); ZeroDurationCompletion(); LifecycleAndCanonicalPitch();
+        InitialAndResumeCountdownSuspension(); CountdownInvalidation(); FocusAndInputGates(); RealSelectorAndMenu(); HeadsetFocusRecovery(); UnisonScoringIntegration();
         return "PASS: " + assertions + " Unity integration assertions with stubs (not a real Unity build)";
     }
 }

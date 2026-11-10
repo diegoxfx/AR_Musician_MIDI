@@ -195,7 +195,7 @@ namespace ARMusician.Midi
         }
     }
 
-    /// <summary>Matches each scheduled note once. Caller supplies one consistent, pause-adjusted clock.</summary>
+    /// <summary>Matches each distinct pitch/onset once. Caller supplies one consistent, pause-adjusted clock.</summary>
     public sealed class PracticeMatcher
     {
         private sealed class ExpectedNote
@@ -205,6 +205,8 @@ namespace ARMusician.Midi
         }
 
         private readonly List<ExpectedNote> pending = new List<ExpectedNote>();
+        // Keep resolved onsets too: another track may schedule the same unison after it was hit or missed.
+        private readonly HashSet<double>[] scheduledTimes = new HashSet<double>[128];
         public int Hits { get; private set; }
         public int Misses { get; private set; }
         public int Wrong { get; private set; }
@@ -214,6 +216,8 @@ namespace ARMusician.Midi
         {
             MidiNotes.Validate(note);
             ValidateTime(dueTime, "dueTime");
+            if (scheduledTimes[note] == null) scheduledTimes[note] = new HashSet<double>();
+            if (!scheduledTimes[note].Add(dueTime)) return;
             pending.Add(new ExpectedNote { Note = note, DueTime = dueTime });
             Total++;
         }
@@ -267,6 +271,7 @@ namespace ARMusician.Midi
         public void Clear()
         {
             pending.Clear();
+            Array.Clear(scheduledTimes, 0, scheduledTimes.Length);
             Hits = Misses = Wrong = Total = 0;
         }
 

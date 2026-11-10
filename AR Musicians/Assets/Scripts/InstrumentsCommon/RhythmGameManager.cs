@@ -21,12 +21,20 @@ public class RhythmGameManager : MonoBehaviour
     private List<NoteEvent> notes = new List<NoteEvent>();
     private List<NoteEvent> loadedNotes = new List<NoteEvent>();
     private int loadGeneration;
+    private int playbackGeneration;
+    private bool applicationPaused;
+    private bool applicationFocused = true;
+    private bool headsetFocused = true;
+    public enum PlaybackState { Idle, Starting, Playing, Paused, Resuming }
+    public PlaybackState State { get; private set; }
+    public bool InputAllowed { get { return !applicationPaused && applicationFocused && headsetFocused; } }
+    public bool CanSelectInstrument { get { return State == PlaybackState.Idle && InputAllowed; } }
     public bool IsPiano { get { return currentStrategy is PianoStrategy; } }
-    public bool HasSession { get; private set; }
+    public bool HasSession { get { return State == PlaybackState.Playing || State == PlaybackState.Paused || State == PlaybackState.Resuming; } }
     private float lastNoteTime;
-    public double SongTime { get { return Time.time - songStartTime - totalPauseTime; } }
+    public double SongTime { get { return (HasSession && !playing ? pauseBegin : Time.time) - songStartTime - totalPauseTime; } }
     private float songStartTime;
-    public bool playing = false;
+    public bool playing { get { return State == PlaybackState.Playing; } }
     public bool quit = false;
     private float totalPauseTime = 0; // seconds we spent paused
 
@@ -35,6 +43,8 @@ public class RhythmGameManager : MonoBehaviour
     public static event Action<float> OnResume;
     public static event Action OnPause;
     public static event Action OnQuit;
+    public event Action CountdownCancelled;
+    public event Action InputInterrupted;
 
 
     // We count active notes to know when the song is truly "done" visually
@@ -43,6 +53,7 @@ public class RhythmGameManager : MonoBehaviour
     // Call this from MenuController when selecting the instrument
     public void SetStrategy(IGameplayStrategy strategy)
     {
+        if (!CanSelectInstrument || strategy == null) return;
         // Unsubscribe from old strategy if exists
         if (currentStrategy != null)
         {
@@ -50,6 +61,7 @@ public class RhythmGameManager : MonoBehaviour
         }
 
         currentStrategy = strategy;
+        ProjectConfig.Settings.instrument = strategy is PianoStrategy ? "piano" : "bongos";
 
         if (currentStrategy != null)
         {
@@ -64,7 +76,7 @@ public class RhythmGameManager : MonoBehaviour
 
     public void Play()
     {
-        if (HasSession || loadedNotes.Count == 0 || gameSpeed <= 0) return;
+        if (State != PlaybackState.Idle || !InputAllowed || loadedNotes.Count == 0 || gameSpeed <= 0) return;
         if (currentStrategy == null || !currentStrategy.IsInstrumentReady())
         {
             Debug.LogError("Cannot play: Instrument not defined or Strategy missing.");
@@ -73,14 +85,20 @@ public class RhythmGameManager : MonoBehaviour
 
         // Use the strategy's specific lookahead time (FallTime or ApproachTime)
         songStartTime = Time.time + currentStrategy.ApproachTime;
-        playing = true;
+        State = PlaybackState.Playing;
         ProjectConfig.Settings.playing = true;
         totalPauseTime = 0;
         quit = false;
-        HasSession = true;
         notes = loadedNotes.ConvertAll(n => new NoteEvent { key = n.key, midiNumber = n.midiNumber,
             time = n.time, duration = n.duration, keyIndex = n.keyIndex });
         foreach (var n in notes) currentStrategy.PreprocessNote(n);
+        // A song may be loaded before the user changes instruments.
+        if (currentStrategy is BongoStrategy bongos && notes.Count > 0)
+        {
+            int average = 0;
+            foreach (var n in notes) average += n.keyIndex;
+            bongos.average_key = average / notes.Count;
+        }
         lastNoteTime = 0;
         foreach (var n in notes) lastNoteTime = Mathf.Max(lastNoteTime, n.time / gameSpeed);
         activeNoteCount = 0;
@@ -94,16 +112,16 @@ public class RhythmGameManager : MonoBehaviour
     {
         if (!HasSession || !playing) return;
         ProjectConfig.Settings.playing = false;
-        playing = false;
+        State = PlaybackState.Paused;
         pauseBegin = Time.time;
         OnPause?.Invoke();
     }
 
     public void Resume()
     {
-        if (!HasSession || playing) return;
+        if (State != PlaybackState.Paused || !InputAllowed) return;
         ProjectConfig.Settings.playing = true;
-        playing = true;
+        State = PlaybackState.Playing;
         float curPauseTime = Time.time - pauseBegin;
         totalPauseTime += curPauseTime;
         OnResume?.Invoke(curPauseTime);
@@ -111,9 +129,110 @@ public class RhythmGameManager : MonoBehaviour
 
     public void Quit()
     {
+        CancelCountdown();
         quit = true;
         OnQuit?.Invoke();
         OnFinished();
+    }
+
+    public int BeginCountdown(bool resume)
+    {
+        if (!InputAllowed) return -1;
+        if (resume)
+        {
+            if (State != PlaybackState.Paused) return -1;
+            State = PlaybackState.Resuming;
+        }
+        else
+        {
+            if (State != PlaybackState.Idle || loadedNotes.Count == 0 || gameSpeed <= 0 ||
+                currentStrategy == null || !currentStrategy.IsInstrumentReady()) return -1;
+            State = PlaybackState.Starting;
+        }
+        return ++playbackGeneration;
+    }
+
+    public bool CompleteCountdown(int generation, bool resume)
+    {
+        if (generation != playbackGeneration || !InputAllowed ||
+            State != (resume ? PlaybackState.Resuming : PlaybackState.Starting)) return false;
+        State = resume ? PlaybackState.Paused : PlaybackState.Idle;
+        if (resume) Resume(); else Play();
+        return playing;
+    }
+
+    public void CancelCountdown()
+    {
+        if (State != PlaybackState.Starting && State != PlaybackState.Resuming) return;
+        State = State == PlaybackState.Resuming ? PlaybackState.Paused : PlaybackState.Idle;
+        ++playbackGeneration;
+        CountdownCancelled?.Invoke();
+        RestorePlaybackMenu();
+    }
+
+    private void OnEnable()
+    {
+        OVRManager.InputFocusLost += HandleHeadsetFocusLost;
+        OVRManager.InputFocusAcquired += HandleHeadsetFocusAcquired;
+    }
+
+    private void OnDisable()
+    {
+        OVRManager.InputFocusLost -= HandleHeadsetFocusLost;
+        OVRManager.InputFocusAcquired -= HandleHeadsetFocusAcquired;
+        InterruptPlayback();
+    }
+
+    private void HandleHeadsetFocusLost() { SetHeadsetFocused(false); }
+    private void HandleHeadsetFocusAcquired() { SetHeadsetFocused(true); }
+    private void OnApplicationPause(bool paused) { SetApplicationPaused(paused); }
+    private void OnApplicationFocus(bool focused) { SetApplicationFocused(focused); }
+
+    public void SetApplicationPaused(bool paused)
+    {
+        if (applicationPaused == paused) return;
+        applicationPaused = paused;
+        if (paused) InterruptPlayback();
+    }
+
+    public void SetApplicationFocused(bool focused)
+    {
+        if (applicationFocused == focused) return;
+        applicationFocused = focused;
+        if (!focused) InterruptPlayback();
+    }
+
+    public void SetHeadsetFocused(bool focused)
+    {
+        if (headsetFocused == focused) return;
+        headsetFocused = focused;
+        if (!focused) InterruptPlayback();
+    }
+
+    private void InterruptPlayback()
+    {
+        bool hadPlayback = State != PlaybackState.Idle;
+        CancelCountdown();
+        Pause();
+        InputInterrupted?.Invoke();
+        if (hadPlayback) RestorePlaybackMenu();
+    }
+
+    public void RestorePlaybackMenu()
+    {
+        if (menucontroller == null) return;
+        if (State != PlaybackState.Idle && State != PlaybackState.Paused) return;
+        bool multiplayer = ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer;
+        if (HasSession)
+        {
+            if (multiplayer) menucontroller.ShowMultiplayerPauseMenu(ProjectConfig.Settings.master);
+            else menucontroller.ShowSingleplayerPauseMenu();
+        }
+        else
+        {
+            if (multiplayer) menucontroller.ShowMultiplayerLobbyMenu();
+            else menucontroller.ShowSinglePlayerLobbyMenu();
+        }
     }
 
     IEnumerator PlayAudioWithDelay(float delay)
@@ -133,6 +252,7 @@ public class RhythmGameManager : MonoBehaviour
     public IEnumerator updateSongRoutine(SongData songdata)
     {
         int generation = ++loadGeneration;
+        CancelCountdown();
         if (HasSession) Quit();
         loadedNotes.Clear();
         Debug.Log("Processing song: " + songdata.PartialSongData.JsonPath);
@@ -158,24 +278,6 @@ public class RhythmGameManager : MonoBehaviour
             if (notes == null) yield break;
             loadedNotes = notes.ConvertAll(n => new NoteEvent { key = n.key, midiNumber = n.midiNumber,
                 time = n.time, duration = n.duration });
-
-            // DELEGATE: Ask the strategy to interpret the notes (Piano keys vs Bongo sides)
-            foreach (var n in notes)
-            {
-                if (currentStrategy != null)
-                    currentStrategy.PreprocessNote(n);
-            }
-            if (currentStrategy is BongoStrategy && notes.Count > 0)
-            {
-                int average_key = 0;
-                foreach (var n in notes)
-                {
-                    average_key += n.keyIndex;
-                }
-                average_key /= notes.Count;
-                BongoStrategy strat = (BongoStrategy)currentStrategy;
-                strat.average_key = average_key;
-            }
         }
     }
 
@@ -210,10 +312,10 @@ public class RhythmGameManager : MonoBehaviour
 
     public void OnFinished()
     {
+        CancelCountdown();
         if (currentStrategy is PianoStrategy piano && piano.MidiFeedback != null)
             piano.MidiFeedback.EndSong(!quit);
-        playing = false;
-        HasSession = false;
+        State = PlaybackState.Idle;
         ProjectConfig.Settings.playing = false;
         totalPauseTime = 0;
         menucontroller.ShowSongMenu();
