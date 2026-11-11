@@ -5,6 +5,7 @@ $scripts = Join-Path $repository 'AR Musicians\Assets\Scripts'
 & (Join-Path $PSScriptRoot 'check-scene-wiring.ps1')
 $sources = @(
     (Join-Path $scripts 'Midi\MidiCore.cs'),
+    (Join-Path $scripts 'Midi\LearningPractice.cs'),
     (Join-Path $scripts 'Midi\PianoMidiFeedback.cs'),
     (Join-Path $scripts 'Piano\PianoHUD\PlaneController.cs'),
     (Join-Path $scripts 'Piano\PianoHUD\PianoStrategy.cs'),

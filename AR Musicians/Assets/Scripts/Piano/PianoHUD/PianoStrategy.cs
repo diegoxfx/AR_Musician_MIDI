@@ -23,6 +23,7 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
         game = FindFirstObjectByType<RhythmGameManager>();
         MidiFeedback = gameObject.AddComponent<PianoMidiFeedback>();
         MidiFeedback.Initialize(this);
+        gameObject.AddComponent<PracticeOptionsUI>().Initialize(game, MidiFeedback);
     }
 
     private void OnDestroy()

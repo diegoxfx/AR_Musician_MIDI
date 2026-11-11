@@ -178,6 +178,21 @@ public class BongosManager : MonoBehaviour, IPointInputListener { public static 
 public static class ProjectConfig { public static readonly SettingsData Settings = new SettingsData(); public class SettingsData { public bool playing, master, useMultiplayer, enableMultiplayer; public string instrument; public List<string> configured_instruments = new List<string>(); } }
 public class PartialSongData { public string JsonPath, InlineJson; public bool IsExternal { get { return InlineJson != null; } } }
 public class SongData { public PartialSongData PartialSongData; }
+public class PracticeOptionsUI : MonoBehaviour
+{
+    public void Initialize(RhythmGameManager game, PianoMidiFeedback feedback) {}
+}
+// Audio synthesis has its own pure/Unity-stub suite. Here verify manager transport wiring.
+public class MidiReferenceAudio : MonoBehaviour
+{
+    public bool SoundEnabled = true;
+    public int Begun, Stopped;
+    public double LastTime;
+    public bool LastPlaying;
+    public void BeginSong(List<NoteEvent> notes, float speed) { Begun++; }
+    public void Sync(double time, bool playing) { LastTime = time; LastPlaying = playing; }
+    public void Stop() { Stopped++; LastPlaying = false; }
+}
 public class BongoStrategy : MonoBehaviour, IGameplayStrategy
 {
     public int average_key;
@@ -736,6 +751,85 @@ public static class UnityIntegrationTests
         f.Game.Quit();
     }
 
+    private static void LearningModeTransport()
+    {
+        var f = new Fixture();
+        Check(!f.Game.LearningMode && !f.Game.SetLearningMode(true), "Learning is optional and rejects uncalibrated MIDI");
+        f.Calibrate();
+        Check(f.Game.SetLearningMode(true), "Calibrated idle piano can enable learning");
+        ProjectConfig.Settings.enableMultiplayer=ProjectConfig.Settings.useMultiplayer=true;
+        f.Load(new NoteEvent {midiNumber=60,time=1,duration=1});
+        Check(f.Game.BeginCountdown(false)==-1, "Learning cannot enter multiplayer countdown");
+        f.Game.Play(); Check(!f.Game.playing, "Learning cannot start multiplayer through direct Play");
+        ProjectConfig.Settings.enableMultiplayer=ProjectConfig.Settings.useMultiplayer=false;
+        f.Selector.selectBongos();
+        Check(!f.Game.LearningMode && !f.Game.SetLearningMode(true), "Selecting bongos clears learning preference and rejects it");
+        f.Selector.selectPiano(); Check(f.Game.SetLearningMode(true), "Returning to piano can enable learning");
+        f.Game.SetReferenceSoundEnabled(false);
+        f.Load(new NoteEvent {midiNumber=60,time=1,duration=1},new NoteEvent {midiNumber=64,time=1,duration=1},
+            new NoteEvent {midiNumber=60,time=2,duration=0},new NoteEvent {midiNumber=35,time=3,duration=0});
+        f.Game.Play();
+        var audio=f.Game.GetComponent<MidiReferenceAudio>();
+        Check(audio!=null && audio.Begun==1 && !audio.SoundEnabled, "Reference audio starts lazily and respects pre-song sound preference");
+        Check(!f.Game.SetLearningMode(false) && f.Game.LearningTotalGroups==2, "Learning option cannot change mid-song and excludes out-of-range notes");
+        Near(-2,f.Game.SongTime,"Learning preserves approach lookahead");
+        Time.time=100;
+        Near(1,f.Game.SongTime,"Visual consumer before manager clamps a long frame to first chord onset");
+        Call(f.Game,"Update");
+        Near(1,f.Game.SongTime,"Manager and later visual consumers share the same clamped timeline");
+        Check(f.Game.WaitingForLearningNotes && f.Game.PendingNotes=="C4 + E4", "Waiting chord names remain available to UI");
+        f.Game.ReceivePracticeNote(61,true);
+        Check(f.Game.LearningCompletedGroups==0,"Wrong learning pitch cannot move song");
+        f.Game.ReceivePracticeNote(60,true);
+        Check(f.Game.WaitingForLearningNotes && f.Game.PendingNotes=="E4","Partial chord is insufficient");
+        f.Game.ReceivePracticeNote(64,true);
+        Check(f.Game.LearningCompletedGroups==1 && !f.Game.WaitingForLearningNotes,"All chord pitches release gate");
+        Near(1,f.Game.SongTime,"Immediate consumers after correct chord cannot jump over waiting wall time");
+        Time.time=100.25f; Near(1.25,f.Game.SongTime,"Timeline resumes from gate without jump");
+        Time.time=200; Call(f.Game,"Update"); Near(2,f.Game.SongTime,"Second long frame clamps next repeated-note gate");
+        f.Game.ReceivePracticeNote(60,true);
+        Check(f.Game.LearningCompletedGroups==1,"Old held key does not satisfy repeated pitch");
+        f.Game.ReceivePracticeNote(60,false); f.Game.ReceivePracticeNote(60,true);
+        Check(f.Game.LearningCompletedGroups==2,"Repeated pitch requires release and fresh strike");
+        f.Game.Pause(); Check(!audio.LastPlaying,"Explicit pause silences reference transport");
+        Time.time=400; Near(2,f.Game.SongTime,"Explicit pause freezes learning clock");
+        int generation=f.Game.BeginCountdown(true); Time.time=405;
+        Check(generation>0 && !f.Game.playing,"Resume countdown remains paused");
+        Check(f.Game.CompleteCountdown(generation,true),"Explicit resume countdown can restore learning");
+        Near(2,f.Game.SongTime,"Countdown time is not counted after resuming");
+        Time.time=405.25f; Near(2.25,f.Game.SongTime,"Learning resumes at normal speed after explicit pause");
+        f.Game.Quit(); Check(audio.Stopped==1 && !f.Game.HasSession && f.Game.LearningTotalGroups==0,"Quit stops reference audio and clears learning progress");
+        f.Game.Play(); Near(-2,f.Game.SongTime,"Replay resets approach clock");
+        Check(f.Game.LearningCompletedGroups==0 && f.Game.LearningTotalGroups==2,"Replay resets gate schedule");
+        f.Game.Quit();
+
+        f = new Fixture(); f.Calibrate(); f.Game.SetLearningMode(true);
+        f.Load(new NoteEvent {midiNumber=60,time=0,duration=1},new NoteEvent {midiNumber=64,time=0,duration=1}); f.Game.Play();
+        Time.time=2; Send(f.Feedback,"note",60); Send(f.Feedback,"note",64);
+        Check(f.Game.LearningCompletedGroups==1 && f.Matcher.Hits==0 && f.Matcher.Misses==0 && f.Matcher.Wrong==0,"Real MIDI forwards learning notes without traditional scoring");
+        Time.time=20; Call(f.Feedback,"Update");
+        Check(f.Matcher.Misses==0,"Waiting/practice never generates time-window misses");
+        Send(f.Feedback,"reset");
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Paused && f.Menu.singleplayerPauseMenu.activeSelf,"USB reset restores reachable pause controls");
+        f.Game.Resume(); Check(!f.Game.playing && f.Game.BeginCountdown(true)==-1,"Invalidated MIDI cannot resume learning or bypass countdown readiness");
+        f.Game.Quit();
+        Check(!f.Game.SetLearningMode(true),"Reset requires calibration before next learning song");
+
+        f = new Fixture(); f.Calibrate(); f.Game.SetLearningMode(true);
+        f.Load(new NoteEvent {midiNumber=60,time=0,duration=1},new NoteEvent {midiNumber=64,time=0,duration=1}); f.Game.Play();
+        Time.time=2; f.Game.ReceivePracticeNote(60,true); f.Game.SetApplicationFocused(false);
+        Check(f.Game.State==RhythmGameManager.PlaybackState.Paused && f.Game.PendingNotes=="C4 + E4","Focus loss resets partial chord credit and pauses learning");
+        Time.time=100; f.Game.SetApplicationFocused(true); Check(!f.Game.playing,"Focus return cannot auto-resume learning");
+        f.Game.Resume(); Near(0,f.Game.SongTime,"Focus resume excludes suspended duration");
+        f.Game.ReceivePracticeNote(64,true); Check(f.Game.LearningCompletedGroups==0,"Partial pre-focus chord cannot combine with post-focus note");
+        f.Game.ReceivePracticeNote(60,true); Check(f.Game.LearningCompletedGroups==1,"Fresh full chord recovers after focus interruption"); f.Game.Quit();
+
+        f = new Fixture(); f.Load(new NoteEvent {midiNumber=60,time=10,duration=1}); f.Game.Play();
+        Time.time=5; Near(3,f.Game.SongTime,"Disabled learning retains original wall-clock transport"); f.Game.Pause();
+        Time.time=100; Near(3,f.Game.SongTime,"Normal mode pause remains unchanged"); f.Game.Resume();
+        Time.time=101; Near(4,f.Game.SongTime,"Normal mode resume remains unchanged"); f.Game.Quit();
+    }
+
     public static string RunBundled(NoteEvent[] source)
     {
         assertions=0; var f=new Fixture(); f.Calibrate(); f.Load(source); f.Game.Play();
@@ -760,6 +854,7 @@ public static class UnityIntegrationTests
         InitialAndResumeCountdownSuspension(); CountdownInvalidation(); FocusAndInputGates(); RealSelectorAndMenu(); HeadsetFocusRecovery(); UnisonScoringIntegration();
         RejectedCountdownButtonFlows();
         MultiplayerLifecyclePolicy();
+        LearningModeTransport();
         return "PASS: " + assertions + " Unity integration assertions with stubs (not a real Unity build)";
     }
 }

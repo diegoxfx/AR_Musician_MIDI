@@ -191,7 +191,7 @@ public class SongsFinder : MonoBehaviour
     /// Looks through the `StreamingAssets` folder to find all .json files.
     /// Delegates to platform-specific methods.
     /// </summary>
-    public IEnumerator FindJsons(System.Action<LinkedList<PartialSongData>> callback)
+    public virtual IEnumerator FindJsons(System.Action<LinkedList<PartialSongData>> callback)
     {
         var foundSongs = new LinkedList<PartialSongData>();
         string streamingAssetsPath = Application.streamingAssetsPath;

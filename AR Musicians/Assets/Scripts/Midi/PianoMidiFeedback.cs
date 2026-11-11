@@ -23,6 +23,9 @@ public sealed class PianoMidiFeedback : MonoBehaviour
     private KeyboardCalibration calibration;
     private bool initialized, calibrating, rangeReady, enabledFeedback = true, scoring;
     public bool IsInitialized => initialized;
+    public bool IsCalibrated => initialized && rangeReady;
+    public int FirstNote => firstNote;
+    public int LastNote => firstNote + keyCount - 1;
     private int firstNote = 36, keyCount = 61, skipped;
     private string status = "USB MIDI: starting", instruction = "B: MIDI calibration (61 keys)";
     private readonly Dictionary<int, GameObject> markers = new Dictionary<int, GameObject>();
@@ -60,8 +63,8 @@ public sealed class PianoMidiFeedback : MonoBehaviour
             if (labelRenderer == null) throw new InvalidOperationException("MIDI status TextMesh has no MeshRenderer");
             label.font = font;
             labelRenderer.sharedMaterial = font.material;
-            label.fontSize = 48;
-            label.characterSize = 0.012f;
+            label.fontSize = 32;
+            label.characterSize = 0.003f;
             label.anchor = TextAnchor.MiddleCenter;
             label.alignment = TextAlignment.Center;
             label.color = Color.white;
@@ -115,6 +118,7 @@ public sealed class PianoMidiFeedback : MonoBehaviour
         scoring = false;
         calibrating = false;
         rangeReady = false;
+        if (game != null) game.OnPracticeInputReset();
         instruction = game != null && game.HasSession
             ? "MIDI reset: quit the song, press B to recalibrate, then restart"
             : "B: calibrate MIDI again (61 keys)";
@@ -193,18 +197,34 @@ public sealed class PianoMidiFeedback : MonoBehaviour
             if (OVRInput.GetDown(OVRInput.Button.Two, OVRInput.Controller.LTouch))
             { enabledFeedback = !enabledFeedback; scoring = false; }
         }
-        if (scoring && game.playing && game.InputAllowed && isPiano) matcher.Advance(game.SongTime, TimingWindow);
+        if (scoring && !game.LearningMode && game.playing && game.InputAllowed && isPiano) matcher.Advance(game.SongTime, TimingWindow);
         DrawMarkers(isPiano && game.InputAllowed && rangeReady && enabledFeedback);
-        label.gameObject.SetActive(isPiano);
+        // Ordinary play keeps the keyboard unobstructed; show only actionable setup
+        // instructions or the compact learning prompt while practising.
+        label.gameObject.SetActive(isPiano && (!game.playing || game.LearningMode || !rangeReady));
         if (isPiano)
         {
-            string result = "Hits " + matcher.Hits + "  Misses " + matcher.Misses + "  Extra " + matcher.Wrong;
-            label.text = status + "\n" + instruction + "\n" +
-                (enabledFeedback ? result + "  Out of range " + skipped : "Feedback off") +
-                "\nB: calibrate  X: reverse keys  Y: feedback on/off";
-            label.transform.position = piano.plane.transform.TransformPoint(new Vector3(0, 0.72f, 0));
+            label.text = CompactStatus();
+            label.transform.position = piano.plane.transform.TransformPoint(new Vector3(0, 0.56f, 0));
             if (Camera.main != null) label.transform.rotation = Quaternion.LookRotation(label.transform.position - Camera.main.transform.position);
         }
+    }
+
+    private string CompactStatus()
+    {
+        if (calibrating) return "MIDI calibration\n" + instruction;
+        if (!rangeReady)
+        {
+            if (game.HasSession) return "MIDI reset: quit and calibrate with B";
+            if (status.StartsWith("Connected USB MIDI:", StringComparison.Ordinal)) return "MIDI connected · B to calibrate";
+            if (status.StartsWith("Opening USB MIDI:", StringComparison.Ordinal)) return "Connecting MIDI…";
+            if (status.StartsWith("Waiting for", StringComparison.Ordinal)) return "Connect the keyboard USB cable";
+            return status.Length <= 70 ? status : status.Substring(0, 67) + "…";
+        }
+        if (game.LearningMode && game.HasSession)
+            return game.WaitingForLearningNotes ? "Play " + game.PendingNotes
+                : "Learning · " + game.LearningCompletedGroups + "/" + game.LearningTotalGroups;
+        return enabledFeedback ? "MIDI ready · B recalibrate" : "MIDI ready · feedback off (Y)";
     }
 
     private void BeginCalibration()
@@ -217,7 +237,7 @@ public sealed class PianoMidiFeedback : MonoBehaviour
         calibration = new KeyboardCalibration(keyCount);
         calibration.Begin();
         calibrating = true;
-        instruction = "Press and release the LEFTMOST key, then the RIGHTMOST key";
+        instruction = "Press and release the LEFTMOST key";
     }
 
     private void Receive(MidiEvent e)
@@ -226,12 +246,23 @@ public sealed class PianoMidiFeedback : MonoBehaviour
         bool defining = UpdateDefinitionState();
         if (e.type == "status") { status = e.message; return; }
         if (e.type == "reset") { ResetInput(); return; }
-        if (e.type == "channelReset") { held.ResetChannel(e.channel); return; }
+        if (e.type == "channelReset")
+        {
+            held.ResetChannel(e.channel);
+            game?.OnPracticeInputReset();
+            return;
+        }
         if (defining) return;
         if (game == null || !game.InputAllowed) return;
         if (e.type != "note" || e.note < 0 || e.note > 127 || e.channel < 0 || e.channel > 15) return;
-        held.Set(e.channel, e.note, e.on && e.velocity > 0);
-        if (!e.on || e.velocity == 0) return;
+        bool wasHeld = held.IsHeld(e.note);
+        bool noteOn = e.on && e.velocity > 0;
+        held.Set(e.channel, e.note, noteOn);
+        if (!noteOn)
+        {
+            if (rangeReady && wasHeld && !held.IsHeld(e.note)) game.ReceivePracticeNote(e.note, false);
+            return;
+        }
         if (calibrating)
         {
             calibration.Observe(e.note);
@@ -249,8 +280,10 @@ public sealed class PianoMidiFeedback : MonoBehaviour
             }
             return;
         }
-        if (!rangeReady || !enabledFeedback || !game.IsPiano) return;
-        bool hit = scoring && game.playing && matcher.Hit(e.note, game.SongTime, TimingWindow);
+        if (!rangeReady || !game.IsPiano) return;
+        if (!wasHeld) game.ReceivePracticeNote(e.note, true);
+        if (!enabledFeedback) return;
+        bool hit = scoring && !game.LearningMode && game.playing && matcher.Hit(e.note, game.SongTime, TimingWindow);
         flashes[e.note] = hit ? Time.unscaledTime + 0.25f : -Time.unscaledTime - 0.25f;
     }
 
@@ -260,7 +293,7 @@ public sealed class PianoMidiFeedback : MonoBehaviour
         calibrating = false;
         matcher.Clear();
         skipped = 0;
-        scoring = enabledFeedback && rangeReady;
+        scoring = enabledFeedback && rangeReady && !game.LearningMode;
         if (!scoring) return;
         foreach (var n in song)
         {

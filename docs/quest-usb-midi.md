@@ -42,14 +42,18 @@ The Android bridge uses the platform
 and opens a USB device's **output** port to receive notes. Availability depends on
 the headset OS exposing that device through `MidiManager`; Android's
 [MIDI implementation](https://source.android.com/docs/core/audio/midi) explains the
-USB host dependency. This exact Quest/Casio combination has **not been tested on
-hardware**. If the MIDI service is absent or the keyboard is not enumerated, the
+USB host dependency. On 2026-11-10 the user confirmed working USB-MIDI input
+and usable piano detection with the CT-S200 and Quest 3 on version 1.1.1.
+If the MIDI service is absent or the keyboard is not enumerated, the
 HUD reports it and vision-only playback remains available. There is no raw USB
 driver fallback in this version. Do not assume a successful Android compilation
 proves hardware compatibility.
 
-MIDI carries performance events here, not the keyboard's audio. Listen to the
-Casio's own speakers/headphones. The extension neither synthesizes nor records audio.
+MIDI carries performance events here, not the keyboard's audio. The Casio's own
+speakers/headphones play your performance. Version 1.2.0 also synthesizes a piano
+guide from the selected song on the Quest speakers/headphones. This guide uses
+the same clock as the falling notes; it is not a recording or the original song's
+instrumentation. It does not send notes back to the keyboard or record audio.
 
 ## Build and setup
 
@@ -79,7 +83,8 @@ Casio's own speakers/headphones. The extension neither synthesizes nor records a
    Press **X** on the left controller if the horizontal direction is reversed.
    If positions still disagree, redo the visual/manual plane setup.
 9. Open **Singleplayer > Piano**, choose a song with **< / >**, press **Select**,
-   then **Start**. **Y** toggles MIDI feedback while idle. **A** retains
+   then choose **Learning: ON/OFF** and **Piano guide sound: ON/OFF** before
+   **Start**. **Y** toggles MIDI feedback while idle. **A** retains
    the existing pause-menu action. Setup controls are disabled during an active
    song, including the start/resume countdowns and while paused.
 
@@ -101,11 +106,31 @@ loss gates MIDI input but does not pause only that peer's running song clock.
 Pending countdowns still cancel when interrupted. Networked recovery remains
 outside this extension's tested scope.
 
+## Learning and guide sound (1.2.0)
+
+After endpoint calibration, enable **Learning: ON** in the single-player start
+lobby. The timeline stops at each playable note/chord until all required pitches
+have been pressed. An already-held key does not count as a fresh press; release
+and press repeated notes again. Chord onsets within 20 ms are grouped, exact
+duplicate events count once, and presses up to 150 ms early may count. Out-of-range
+notes do not block progress. Learning mode shows progress instead of timing scores.
+
+Pause/focus loss clears partial chord credit. Returning to the app requires an
+explicit Resume; USB reset requires Quit, endpoint calibration and Start again.
+Replay starts with no previous progress. Mode changes are available only while
+idle, and learning requires calibrated MIDI input and single-player piano.
+
+**Piano guide sound** defaults to ON and can be changed before Start, including
+without a MIDI keyboard. The local synthesizer follows song speed, pause, replay
+and learning stops. At a learning stop a reference note sounds once and decays;
+it does not repeatedly attack while waiting. Normal playback hides the compact
+MIDI label; calibration, reset and learning prompts remain visible when useful.
+
 ## Automated test APK build
 
 The editor entry point `QuestApkBuild.Build` builds `MainScene` as one ARM64/IL2CPP
 development APK with Android debug signing. It sets package `com.armusician.midi`,
-version 1.1.1 / code 4, minimum API 32 and target API 35. Install Unity 6000.2.8f1
+version 1.2.0 / code 5, minimum API 32 and target API 35. Install Unity 6000.2.8f1
 with Android Build Support, SDK/NDK tools and OpenJDK, and activate a Unity license.
 
 Download these files from the upstream README's public Polybox share into
@@ -182,6 +207,17 @@ adb shell am force-stop com.armusician.midi
 adb shell am start -n com.armusician.midi/com.unity3d.player.appui.AppUIGameActivity
 ```
 
+Let the app create `Music`; do not create it with `adb mkdir`. On this Quest a
+shell-created directory had mode `2770`, making it visible over ADB but unreadable
+to the app. The helper now rejects that state. For an existing directory created
+by that older helper, the scoped repair below affects one directory only, with
+no recursive change. The app-specific parent still restricts access. The helper
+accepts the app-owned directory or that explicit legacy access repair.
+
+```powershell
+adb shell chmod 2777 /sdcard/Android/data/com.armusician.midi/files/Music
+```
+
 Choose **single-player**. Personal songs appear after the bundled songs in filename
 order, labelled `Personal MIDI`. Their default title is the filename and their
 duration is calculated from actual note ends and MIDI tempo changes. The importer
@@ -214,6 +250,10 @@ bundled catalog. Import diagnostics are saved as `Music/import-report.txt`:
 ```powershell
 adb pull '/sdcard/Android/data/com.armusician.midi/files/Music/import-report.txt' .
 ```
+
+If `Music` is inaccessible, the report falls back to `files/midi-import-report.txt`
+and the song selector displays the import error. The report is written early in
+startup, and bundled-catalog failures no longer prevent the personal scan.
 
 To bound startup parsing and memory, the importer accepts at most 1 MiB per MIDI,
 64 KiB per metadata file, 256 MIDI candidates, 100,000 notes per song, 250,000 notes
@@ -310,6 +350,9 @@ Run from the repository root:
 pwsh -File ./tests/run-integration-tests.ps1
 pwsh -File ./tests/run-song-import-tests.ps1 -NewtonsoftDll '<Unity Newtonsoft package>/Runtime/Newtonsoft.Json.dll'
 pwsh -File ./tests/run-song-loading-tests.ps1 -NewtonsoftDll '<Unity Newtonsoft package>/Runtime/Newtonsoft.Json.dll'
+pwsh -File ./tests/run-learning-tests.ps1
+pwsh -File ./tests/run-reference-audio-tests.ps1
+pwsh -File ./tests/run-copy-quest-songs-tests.ps1
 ./tests/java/test.ps1 -JdkBin '<JDK bin directory>' -AndroidJar '<Android SDK platform>/android.jar'
 ```
 
@@ -328,19 +371,25 @@ in bundled Sandstorm once (999 duplicate track events must not become misses).
 It does not exercise real rendering, Android calls, JSON/network loading or the
 Unity engine lifecycle; callbacks and coroutine advancement are simulated.
 
-Verified in development: 365 core assertions, 134 integration assertions, 40
+Verified for 1.2.0: 365 core assertions, 253 integration assertions, 45
 scene-wiring assertions, the bundled Sandstorm scoring regression, Java decoder and simulated-device
 regressions, and bridge compilation against Android API 35. These source-level
 checks do not validate headset behavior, timing or visual alignment.
 
 External-song tests add 28 import assertions using the shipped DryWetMidi parser
-and Newtonsoft, plus 57 loading/selector assertions against actual production
+and Newtonsoft, plus 66 loading/selector assertions against actual production
 sources with Unity stubs. They cover tempo changes, chords, overwritten/deleted
 files, bounds and corrupt inputs, metadata fallback, startup publication, copied
 snapshots, empty/loading menus, stale song-load completion and multiplayer mode
 changes before loading, countdown, playback or resume. The scene Select button
 now invokes only the guarded selection handler: loading/empty states cannot
 navigate prematurely into the play lobby.
+
+Learning tests cover 24 assertions around chords, repeated presses, early input,
+pause/reset and wall-clock clamping. Synth tests check PCM energy/limits and
+transport, scaling, mute, replay and frozen-time behavior. The copy helper has
+nine simulated-ADB cases for missing, app-owned and legacy-repaired directories.
+Independent QA approved both the learning/audio and personal-library changes.
 
 The initial 2026-11-10 Unity 6000.2.8f1 build produced the standalone ARM64/IL2CPP development
 APK (version 1.0.1, package `com.armusician.midi`, 341,800,066 bytes). Unity returned
@@ -395,7 +444,9 @@ Before treating the feature as ready to use, complete this device check:
   cleared markers, a reachable pause menu, and the recalibration/restart workflow.
 - Disable MIDI feedback and verify ordinary visual playback and bongo selection.
 
-Quest/CT-S200 hardware validation remains pending. The build preserves upstream
+The user has confirmed USB-MIDI input and piano detection on 1.1.1. The new
+audio, learning mode and corrected personal-song import still need headset
+acceptance testing. The build preserves upstream
 dependencies and input settings: Unity warns about Android input handling `Both`
 and 16 KB alignment in `libUnityARFoundationMeta.so` and `libhaptics_sdk.so`.
 The upstream bongo model has a two-dimensional keypoint output while the common

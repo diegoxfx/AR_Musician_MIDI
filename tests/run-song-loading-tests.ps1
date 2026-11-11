@@ -19,7 +19,8 @@ $sources = @(
     'Songs\MidiUtils.cs', 'Songs\ExternalMidiLibrary.cs', 'Songs\SongsFinder.cs',
     'Songs\SongLoader.cs', 'Songs\SongsUIHandlerGeneric.cs', 'Songs\ISongMetadata.cs',
     'Songs\SongDifficulty.cs', 'Songs\FileList.cs', 'Piano\PianoHUD\NoteEvent.cs',
-    'InstrumentsCommon\IGameplayStrategy.cs', 'InstrumentsCommon\RhythmGameManager.cs'
+    'InstrumentsCommon\IGameplayStrategy.cs', 'InstrumentsCommon\RhythmGameManager.cs',
+    'Midi\LearningPractice.cs', 'Midi\MidiCore.cs'
 ) | ForEach-Object { Join-Path $scripts $_ }
 $sources += Join-Path $PSScriptRoot 'csharp\SongLoadingIntegrationTests.cs'
 $frameworkReferences = Get-ChildItem -LiteralPath (Join-Path $PSHOME 'ref') -Filter '*.dll' | Select-Object -ExpandProperty FullName

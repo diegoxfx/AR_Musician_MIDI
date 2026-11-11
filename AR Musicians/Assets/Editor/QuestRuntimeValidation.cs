@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>Checks the actual scene assets, beyond the standalone test doubles.</summary>
 public static class QuestRuntimeValidation
@@ -45,7 +46,32 @@ public static class QuestRuntimeValidation
             Require(labels.Length == 1 && labels[0].font != null, "The MIDI status font was not initialized.");
             Require(labels[0].GetComponent<MeshRenderer>()?.sharedMaterial != null,
                 "The MIDI status text material was not initialized.");
-            string result = "PASS: real MainScene, piano prefab material/shader, and MIDI feedback initialization.\n" +
+            var manager = UnityEngine.Object.FindFirstObjectByType<RhythmGameManager>();
+            Require(manager != null && manager.menucontroller != null, "The game/menu controller is missing.");
+            var lobby = manager.menucontroller.singlePlayerLobbyMenu;
+            Require(lobby != null, "The single-player lobby is missing.");
+            var options = host.AddComponent<PracticeOptionsUI>();
+            options.Initialize(manager, feedback);
+            options.Initialize(manager, feedback);
+            var buttons = lobby.GetComponentsInChildren<Button>(true);
+            foreach (string name in new[] { "LearningModeButton", "ReferenceSoundButton" })
+            {
+                var matches = buttons.Where(button => button.name == name).ToArray();
+                Require(matches.Length == 1, "Practice option missing or duplicated: " + name);
+                Require(matches[0].onClick.GetPersistentEventCount() == 0,
+                    "Practice option inherited the serialized Start callback: " + name);
+                var text = matches[0].GetComponentInChildren<TMPro.TMP_Text>(true);
+                Require(text != null && text.font != null, "Practice option font is missing: " + name);
+            }
+            manager.SetStrategy(piano);
+            // The live button callbacks must toggle only their setting, never start a song/countdown.
+            var sound = buttons.Single(button => button.name == "ReferenceSoundButton");
+            bool originalSound = manager.ReferenceSoundEnabled;
+            sound.onClick.Invoke();
+            Require(manager.ReferenceSoundEnabled != originalSound && manager.State == RhythmGameManager.PlaybackState.Idle,
+                "Sound option failed to toggle independently of playback.");
+            sound.onClick.Invoke();
+            string result = "PASS: real MainScene, piano prefab material/shader, MIDI feedback initialization, and lobby practice controls.\n" +
                 "Editor validation does not verify headset input, spatial permissions, or USB hardware.\n";
             string[] args = Environment.GetCommandLineArgs();
             int outputIndex = Array.IndexOf(args, "-validationOutput");

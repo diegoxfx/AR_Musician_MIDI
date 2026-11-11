@@ -14,13 +14,22 @@ using Debug = UnityEngine.Debug;
 
 namespace UnityEngine
 {
-    public class Component { }
-    public class Coroutine { public IEnumerator Routine; }
+    public class GameObject
+    {
+        public T AddComponent<T>() where T : Component, new() { return new T { gameObject = this }; }
+    }
+    public class Component
+    {
+        public GameObject gameObject = new GameObject();
+        public T GetComponent<T>() where T : Component { return null; }
+    }
+    public class Coroutine { public IEnumerator Routine; public bool Cancelled; }
     public class MonoBehaviour : Component
     {
         public readonly List<Coroutine> StartedCoroutines = new List<Coroutine>();
         public Coroutine StartCoroutine(IEnumerator routine)
         { var result = new Coroutine { Routine = routine }; StartedCoroutines.Add(result); routine.MoveNext(); return result; }
+        public void StopCoroutine(Coroutine routine) { routine.Cancelled = true; (routine.Routine as IDisposable)?.Dispose(); }
     }
     public class AudioSource : Component { }
     public class HeaderAttribute : Attribute { public HeaderAttribute(string text) { } }
@@ -66,7 +75,14 @@ public class MenuControllerGeneric
     public void ShowMultiplayerPauseMenu(bool master) { } public void ShowSingleplayerPauseMenu() { }
     public void ShowMultiplayerLobbyMenu() { } public void ShowSinglePlayerLobbyMenu() { } public void ShowSongMenu() { }
 }
-public class FeedbackStub { public void BeginSong(List<NoteEvent> notes, float speed) { } public void EndSong(bool finished) { } }
+public class FeedbackStub { public bool IsCalibrated; public int FirstNote = 36, LastNote = 96; public void BeginSong(List<NoteEvent> notes, float speed) { } public void EndSong(bool finished) { } }
+public class MidiReferenceAudio : MonoBehaviour
+{
+    public bool SoundEnabled;
+    public void BeginSong(List<NoteEvent> notes, float speed) { }
+    public void Sync(double time, bool playing) { }
+    public void Stop() { }
+}
 public class PianoStrategy : IGameplayStrategy
 {
     public FeedbackStub MidiFeedback;
@@ -116,7 +132,7 @@ public static class SongLoadingIntegrationTests
         Directory.CreateDirectory(Application.persistentDataPath);
         try
         {
-            MetadataAndSnapshots(); SelectorLifecycle(); GameplayLoading(); StartupCatalog();
+            MetadataAndSnapshots(); SelectorLifecycle(); GameplayLoading(); StartupCatalog(); LoaderRecovery();
             Console.WriteLine("Song loading integration tests passed (" + assertions + " assertions; real source, Newtonsoft and DryWetMidi).");
         }
         finally { Reset(); Directory.Delete(root, true); }
@@ -279,5 +295,43 @@ public static class SongLoadingIntegrationTests
         Check(Loaded(manager).Count == 1 && Loaded(manager)[0].midiNumber == 60, "Deleting source after startup does not invalidate playback snapshot");
         published.Clear();
         Check(SongLoader.CurrentSongs.Count == 2, "Subscriber collection mutation does not clear cached catalog");
+        Call(new SongLoader(), "Awake");
+        Check(SongLoader.CurrentSongs.Count == 2, "Late loader Awake cannot erase an already published catalog");
+    }
+
+    private class BrokenFinder : SongsFinder
+    {
+        public override IEnumerator FindJsons(Action<LinkedList<PartialSongData>> callback)
+        { yield return FailLater(); }
+        private IEnumerator FailLater() { yield return null; throw new IOException("broken APK manifest"); }
+    }
+
+    private static void LoaderRecovery()
+    {
+        Reset();
+        string music = Path.Combine(Application.persistentDataPath, "Music");
+        File.WriteAllBytes(Path.Combine(music, "recovery.mid"), new byte[] {
+            0x4d,0x54,0x68,0x64,0,0,0,6,0,0,0,1,1,0xe0,
+            0x4d,0x54,0x72,0x6b,0,0,0,13,0,0x90,60,100,0x83,0x60,0x80,60,0,0,0xff,0x2f,0 });
+        var loader = new SongLoader(); Set(loader, "_songsFinder", new BrokenFinder());
+        Call(loader, "Start");
+        Check(File.ReadAllText(Path.Combine(music, "import-report.txt")).Contains("loading started"), "A diagnostic exists before asynchronous discovery completes");
+        Coroutine interrupted = loader.StartedCoroutines[0];
+        Call(loader, "OnDisable");
+        Check(interrupted.Cancelled, "Disabling loader explicitly discards its incomplete coroutine");
+        Call(loader, "OnEnable");
+        Check(loader.StartedCoroutines.Count == 2, "Re-enabling restarts an interrupted import rather than staying stuck forever");
+        IEnumerator fetch = loader.StartedCoroutines[1].Routine;
+        if (fetch.Current is IEnumerator) Drain((IEnumerator)fetch.Current);
+        Drain(fetch);
+        Check(SongLoader.CurrentSongs.Count == 1 && SongLoader.CurrentSongs.First.Value.IsExternal, "A nested bundled discovery exception cannot suppress valid personal MIDI");
+        Check(SongLoader.ImportStatus.Contains("broken APK manifest"), "Import failure retains a useful menu diagnostic");
+        string report = File.ReadAllText(Path.Combine(music, "import-report.txt"));
+        Check(report.Contains("Imported songs: 1") && report.Contains("IOException") && report.Contains("broken APK manifest"), "Final report identifies source/type and preserves personal import success");
+        TMPro.TMP_Text title; var selector = Selector(out title); var artist = new TMPro.TMP_Text(); Set(selector, "songArtistTMP", artist);
+        Call(selector, "OnEnable");
+        Check(artist.text.Contains("broken APK manifest"), "Late menu shows failure even while a valid song is available");
+        Call(selector, "OnDisable"); Call(loader, "OnEnable");
+        Check(loader.StartedCoroutines.Count == 2, "Completed import is not duplicated by menu/lifecycle re-enables");
     }
 }

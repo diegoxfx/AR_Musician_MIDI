@@ -105,8 +105,8 @@ public static class QuestApkBuild
 
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, PackageName);
             PlayerSettings.productName = "AR-Musician MIDI";
-            PlayerSettings.bundleVersion = "1.1.1";
-            PlayerSettings.Android.bundleVersionCode = 4;
+            PlayerSettings.bundleVersion = "1.2.0";
+            PlayerSettings.Android.bundleVersionCode = 5;
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
             PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel32;

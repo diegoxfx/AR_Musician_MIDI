@@ -103,14 +103,16 @@ public class SongsUIHandlerGeneric : MonoBehaviour
         if (selectedSong == null)
         {
             SetText(songTitleTMP, catalogLoaded ? "No songs available" : "Loading songs...");
-            SetText(songArtistTMP, "");
+            SetText(songArtistTMP, SongLoader.ImportStatus ?? "");
             SetText(songReleaseYearTMP, "");
             SetText(songDurationTMP, "");
             SetText(songDifficultyTMP, "");
             return;
         }
         SetText(songTitleTMP, selectedSong.title);
-        SetText(songArtistTMP, string.Join(", ", selectedSong.artists) + (selectedSong.IsExternal ? " (Personal MIDI)" : ""));
+        string artist = string.Join(", ", selectedSong.artists) + (selectedSong.IsExternal ? " (Personal MIDI)" : "");
+        if (!string.IsNullOrEmpty(SongLoader.ImportStatus)) artist += "\n" + SongLoader.ImportStatus;
+        SetText(songArtistTMP, artist);
         SetText(songReleaseYearTMP, selectedSong.releaseYear < 0 ? "" : Convert.ToString(selectedSong.releaseYear));
         SetText(songDurationTMP, Convert.ToString(selectedSong.duration));
         SetText(songDifficultyTMP, selectedSong.difficulty.ToString());

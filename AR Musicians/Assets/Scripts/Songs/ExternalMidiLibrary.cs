@@ -140,13 +140,36 @@ namespace Assets.Scripts.Songs
                         catch (Exception ex) when (IsFileError(ex))
                         { errors.Add(fileName + " metadata ignored: " + ex.Message); }
                     }
-                    songs.Add(new ExternalMidiSong(fileName, JsonConvert.SerializeObject(notes), duration, metadata));
+                    songs.Add(new ExternalMidiSong(fileName, SerializeNotes(notes), duration, metadata));
                 }
                 // Untrusted files stay isolated even if the parser reports an unexpected format exception.
                 catch (Exception ex) when (!(ex is OutOfMemoryException))
-                { errors.Add(fileName + ": " + ex.Message); }
+                { errors.Add(fileName + ": " + ex.GetType().Name + ": " + ex.Message); }
             }
             return new ExternalMidiScanResult(folder, songs, errors);
+        }
+
+        // Explicit field writes avoid reflection-generated collection serializers on IL2CPP.
+        private static string SerializeNotes(List<NoteEvent> notes)
+        {
+            var builder = new StringBuilder();
+            using (var output = new StringWriter(builder, System.Globalization.CultureInfo.InvariantCulture))
+            using (var writer = new JsonTextWriter(output))
+            {
+                writer.WriteStartArray();
+                foreach (NoteEvent note in notes)
+                {
+                    writer.WriteStartObject();
+                    writer.WritePropertyName("key"); writer.WriteValue(note.key);
+                    writer.WritePropertyName("midiNumber"); writer.WriteValue(note.midiNumber);
+                    writer.WritePropertyName("time"); writer.WriteValue(note.time);
+                    writer.WritePropertyName("duration"); writer.WriteValue(note.duration);
+                    writer.WritePropertyName("keyIndex"); writer.WriteValue(note.keyIndex);
+                    writer.WriteEndObject();
+                }
+                writer.WriteEndArray();
+            }
+            return builder.ToString();
         }
 
         private static byte[] ReadBounded(string path, int limit)
