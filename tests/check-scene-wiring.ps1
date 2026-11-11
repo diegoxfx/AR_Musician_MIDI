@@ -95,4 +95,15 @@ foreach ($button in @(
     Assert-Scene ($managerId -eq (Read-Reference $selector 'rhythmGameManager')) "$($button.Name) countdown must use the same game manager as the selector"
     Assert-Scene ((Read-Reference $blocks[$managerId] 'menucontroller') -eq $menuId) "$($button.Name) must hide the same menu controller used by countdown recovery"
 }
-"PASS: $script:checks MainScene serialized wiring assertions (structural checks, not Unity scene execution)"
+# Follow the actual scene's note prefab reference through to its material, not a synthetic cube.
+$pianoId = Read-Reference $selector 'pianoStrategy'
+$notePrefabGuid = Read-ScriptGuid 'NoteCube.prefab'
+Assert-Scene ($blocks[$pianoId] -match "noteCubePrefab: \{fileID: 1319196051180581704, guid: $notePrefabGuid, type: 3\}") 'Scene piano must use the verified NoteCube prefab'
+$notePrefab = Get-Content (Join-Path $assets 'NoteCube.prefab') -Raw
+Assert-Scene ($notePrefab -match '(?ms)^--- !u!23 &3909001038680870316\r?\nMeshRenderer:.*?m_GameObject: \{fileID: 1319196051180581704\}') 'NoteCube prefab root must have its MeshRenderer'
+$noteMaterialGuid = Read-ScriptGuid 'NoteCube.mat'
+Assert-Scene ($notePrefab -match "(?m)^  - \{fileID: 2100000, guid: $noteMaterialGuid, type: 2\}\r?`$") 'NoteCube renderer must reference the real NoteCube material asset'
+$noteMaterial = Get-Content (Join-Path $assets 'NoteCube.mat') -Raw
+Assert-Scene ($noteMaterial -match '(?m)^--- !u!21 &2100000\r?$') 'NoteCube material reference must resolve to its actual asset object'
+Assert-Scene ($noteMaterial -match '(?m)^  m_Shader: \{fileID: 10755, guid: 0000000000000000f000000000000000, type: 0\}\r?$') 'NoteCube material must retain its built-in unlit shader reference'
+"PASS: $script:checks MainScene serialized wiring and note material assertions (structural checks, not Unity scene execution)"

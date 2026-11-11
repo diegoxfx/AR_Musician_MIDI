@@ -62,7 +62,13 @@ Casio's own speakers/headphones. The extension neither synthesizes nor records a
 4. Build/install to Quest, then disconnect the computer and connect the keyboard.
    This is an Android standalone build, not a Windows/PCVR build. The Editor shows
    that USB input requires the Android player.
-5. Select piano and complete the existing vision or manual keyboard-plane setup.
+5. Open **Configure Instrument**, enable **CV Detection**, and select piano.
+   Allow both headset camera and spatial-data permissions. Look at the whole
+   keyboard and press **X on the left controller** to detect it; then press
+   **A on the right controller** to confirm the detected surface. Detection must
+   locate all three required corners in 3D before confirmation is possible.
+   A camera preview alone is not a completed calibration. Retry with X if the
+   surface is incomplete, or disable CV Detection for manual setup.
    The scene defaults to **61 keys, C2**. Detected corners must span the playable
    keyboard, not the outer case. MIDI calibration then verifies the actual range.
 6. Wait for the HUD to report the connected USB MIDI keyboard.
@@ -72,7 +78,8 @@ Casio's own speakers/headphones. The extension neither synthesizes nor records a
 8. Check a low, middle and high key. Each press should light the matching location.
    Press **X** on the left controller if the horizontal direction is reversed.
    If positions still disagree, redo the visual/manual plane setup.
-9. Choose a song and start. **Y** toggles MIDI feedback while idle. **A** retains
+9. Open **Singleplayer > Piano**, choose a song with **< / >**, press **Select**,
+   then **Start**. **Y** toggles MIDI feedback while idle. **A** retains
    the existing pause-menu action. Setup controls are disabled during an active
    song, including the start/resume countdowns and while paused.
 
@@ -98,7 +105,7 @@ outside this extension's tested scope.
 
 The editor entry point `QuestApkBuild.Build` builds `MainScene` as one ARM64/IL2CPP
 development APK with Android debug signing. It sets package `com.armusician.midi`,
-version 1.1.0 / code 3, minimum API 32 and target API 35. Install Unity 6000.2.8f1
+version 1.1.1 / code 4, minimum API 32 and target API 35. Install Unity 6000.2.8f1
 with Android Build Support, SDK/NDK tools and OpenJDK, and activate a Unity license.
 
 Download these files from the upstream README's public Polybox share into
@@ -359,6 +366,23 @@ were verified. This build reports 361 warnings and the same one caught Conduit
 exception. Android tools verified the signature, ARM64 ABI and version. The new
 folder scan has source-level integration coverage, but transferring and importing
 a MIDI on the physical Quest remains a device acceptance test.
+
+The 1.1.1 setup fix addresses two reproduced configuration defects. The headset
+had camera access but lacked `USE_SCENE`, so camera inference could run while
+environment raycasts could not produce the three corners needed for A to confirm.
+CV setup now requests both permissions, reports missing data on screen, and only
+accepts a complete valid set of three hits. Repeating or canceling setup discards
+unconfirmed points. During setup, MIDI does not also interpret X as a key-layout
+reversal; returning to the menu restores the MIDI controls.
+
+A Unity Editor probe of the actual scene also reproduced an
+`ArgumentNullException` in `PianoMidiFeedback.Initialize`: the note prefab referred
+to a missing material. The prefab now references a tracked material, and MIDI
+initialization validates its resources and cleans up safely on failure. The APK
+build runs `QuestRuntimeValidation.Run` before packaging to verify the real scene,
+material, shader, font and feedback initialization. This Editor check is separate
+from the controller/state tests and does not validate Android USB or physical
+keyboard detection.
 
 Before treating the feature as ready to use, complete this device check:
 

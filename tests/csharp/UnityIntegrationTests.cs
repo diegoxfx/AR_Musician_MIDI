@@ -46,6 +46,7 @@ namespace UnityEngine
     public class GameObject : Object
     {
         public string name;
+        public static bool SuppressTextMeshRenderer;
         public bool activeSelf = true;
         public Transform transform;
         private readonly List<Component> components = new List<Component>();
@@ -53,7 +54,7 @@ namespace UnityEngine
         public T AddComponent<T>() where T : Component, new()
         {
             var component = new T { gameObject = this }; components.Add(component); Components.Add(component);
-            if (component is TextMesh && GetComponent<MeshRenderer>() == null) AddComponent<MeshRenderer>();
+            if (component is TextMesh && !SuppressTextMeshRenderer && GetComponent<MeshRenderer>() == null) AddComponent<MeshRenderer>();
             return component;
         }
         public T GetComponent<T>() where T : Component { return components.OfType<T>().FirstOrDefault(); }
@@ -98,7 +99,14 @@ namespace UnityEngine
         public override bool Equals(object other) { return other is Color && this==(Color)other; }
         public override int GetHashCode() { return value; }
     }
-    public class Material : Object { public Color color; public Material() {} public Material(Material source) {} }
+    public class Shader : Object {}
+    public class Material : Object
+    {
+        public Color color; public Shader shader = new Shader();
+        public Material() {}
+        public Material(Material source)
+        { if (source == null) throw new ArgumentNullException("source"); shader = source.shader; color = source.color; }
+    }
     public class MaterialPropertyBlock { public void SetColor(string name, Color color) {} }
     public class Renderer : Component
     { public Material sharedMaterial = new Material(); public Material material = new Material(); public void SetPropertyBlock(MaterialPropertyBlock block) {} }
@@ -114,11 +122,21 @@ namespace UnityEngine
     public class AndroidJavaObject : IDisposable { public void Dispose() {} }
     public class WaitForSeconds { public WaitForSeconds(float value) {} }
     public static class JsonUtility { public static T FromJson<T>(string json) { throw new NotSupportedException("JSON parsing is outside this stub integration suite."); } }
-    public static class Resources { public static T GetBuiltinResource<T>(string name) where T : new() { return new T(); } }
+    public static class Resources
+    {
+        public static bool MissingFont, MissingFontMaterial;
+        public static T GetBuiltinResource<T>(string name) where T : new()
+        {
+            if (MissingFont) return default(T);
+            var value = new T(); var font = value as Font;
+            if (font != null && MissingFontMaterial) font.material = null;
+            return value;
+        }
+    }
     public static class Mathf { public static float Abs(float value) { return Math.Abs(value); } public static float Max(float a, float b) { return Math.Max(a, b); } public static float Clamp01(float value) { return Math.Max(0,Math.Min(1,value)); } public static float Ceil(float value) { return (float)Math.Ceiling(value); } }
     public static class Time { public static float time, unscaledTime, deltaTime = 1, unscaledDeltaTime = 1; }
     public static class Application { public static string streamingAssetsPath; }
-    public static class Debug { public static void Log(object value) {} public static void LogWarning(object value) {} public static void LogError(object value) {} }
+    public static class Debug { public static readonly List<string> Warnings = new List<string>(); public static void Log(object value) {} public static void LogWarning(object value) { Warnings.Add(value.ToString()); } public static void LogError(object value) {} }
     public class HeaderAttribute : Attribute { public HeaderAttribute(string label) {} }
     public class TooltipAttribute : Attribute { public TooltipAttribute(string label) {} }
     public class ExecuteAlways : Attribute {}
@@ -155,7 +173,7 @@ public class DefinedPlane { public Plane Plane; public Vector3 Center, Corner1, 
 public class Plane { public Vector3 normal; }
 public interface IPointInputListener {}
 public class RayCastInputProvider : MonoBehaviour { public void SetListener(IPointInputListener listener) {} }
-public class PianoManagerInstrumentDefiner : MonoBehaviour, IPointInputListener { public static event Action<DefinedPlane> OnPlaneDefined; public static void Define(DefinedPlane plane) { OnPlaneDefined?.Invoke(plane); } public void Activate(bool cv) {} public void Deactivate() {} }
+public class PianoManagerInstrumentDefiner : MonoBehaviour, IPointInputListener { public static event Action<DefinedPlane> OnPlaneDefined; public bool IsDefining { get; private set; } public static void Define(DefinedPlane plane) { OnPlaneDefined?.Invoke(plane); } public void Activate(bool cv) { IsDefining=true; } public void Deactivate() { IsDefining=false; } }
 public class BongosManager : MonoBehaviour, IPointInputListener { public static event Action OnBothBongosDefined; public void Activate(bool cv) {} public void Deactivate() {} }
 public static class ProjectConfig { public static readonly SettingsData Settings = new SettingsData(); public class SettingsData { public bool playing, master, useMultiplayer, enableMultiplayer; public string instrument; public List<string> configured_instruments = new List<string>(); } }
 public class PartialSongData { public string JsonPath, InlineJson; public bool IsExternal { get { return InlineJson != null; } } }
@@ -195,8 +213,9 @@ public static class UnityIntegrationTests
         public CountdownUIGeneric Countdown;
         public InstrumentSelectorController Selector;
         public BongoStrategy Bongo;
+        public PianoManagerInstrumentDefiner Definer;
         public MenuControllerGeneric Menu { get { return Game.menucontroller; } }
-        public Fixture()
+        public Fixture(string missingResource = null, bool withDefiner = false)
         {
             // Each fixture represents a fresh scene; clear old scene event subscribers.
             foreach (string name in new [] {"OnPause","OnResume","OnQuit"})
@@ -204,7 +223,12 @@ public static class UnityIntegrationTests
             typeof(PianoManagerInstrumentDefiner).GetField("OnPlaneDefined",BindingFlags.Static|BindingFlags.NonPublic).SetValue(null,null);
             OVRManager.Reset();
             OVRInput.Reset();
+            Debug.Warnings.Clear();
+            Resources.MissingFont = missingResource == "font";
+            Resources.MissingFontMaterial = missingResource == "font material";
+            GameObject.SuppressTextMeshRenderer = missingResource == "text renderer";
             UnityEngine.Object.Components.Clear();
+            if (withDefiner) Definer = new GameObject().AddComponent<PianoManagerInstrumentDefiner>();
             Time.time = Time.unscaledTime = 0; Time.deltaTime = Time.unscaledDeltaTime = 1;
             ProjectConfig.Settings.playing = ProjectConfig.Settings.enableMultiplayer = ProjectConfig.Settings.useMultiplayer = false;
             ProjectConfig.Settings.master = true; ProjectConfig.Settings.instrument = null;
@@ -223,8 +247,13 @@ public static class UnityIntegrationTests
             Plane = new GameObject().AddComponent<PlaneController>(); Plane.leftmostKey = "C2"; Plane.totalKeys = 61; Plane.reInit();
             Piano = new GameObject().AddComponent<PianoStrategy>(); Piano.plane = Plane;
             Piano.noteCubePrefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            if (missingResource == "prefab") Piano.noteCubePrefab = null;
+            if (missingResource == "renderer") Piano.noteCubePrefab = new GameObject("invalid prefab");
+            if (missingResource == "material") Piano.noteCubePrefab.GetComponent<Renderer>().sharedMaterial = null;
+            if (missingResource == "shader") Piano.noteCubePrefab.GetComponent<Renderer>().sharedMaterial.shader = null;
             Game.SetStrategy(Piano);
             Call(Piano,"Start");
+            Resources.MissingFont = Resources.MissingFontMaterial = GameObject.SuppressTextMeshRenderer = false;
             Call(Piano,"UpdatePlaneVisuals",new DefinedPlane { Plane = new Plane { normal = new Vector3(0,1,0) }, Corner1 = new Vector3(-1,0,0),Corner2 = new Vector3(1,0,0),Corner3 = new Vector3(1,0,1),Corner4 = new Vector3(-1,0,1) });
             Bongo = new GameObject().AddComponent<BongoStrategy>();
             Selector = new GameObject().AddComponent<InstrumentSelectorController>();
@@ -238,6 +267,104 @@ public static class UnityIntegrationTests
         { Call(Feedback,"BeginCalibration"); Send(Feedback,"note",36); Send(Feedback,"note",96); }
         public void Load(params NoteEvent[] notes) { Set(Game,"loadedNotes",new List<NoteEvent>(notes)); }
         public PracticeMatcher Matcher { get { return (PracticeMatcher)Field(Feedback,"matcher"); } }
+    }
+
+    private static void OptionalMidiInitializationFailure()
+    {
+        foreach (var missing in new [] { "prefab", "renderer", "material", "shader", "font", "font material", "text renderer" })
+        {
+            var f = new Fixture(missing);
+            Check(!f.Feedback.IsInitialized, "Missing " + missing + " must fail MIDI initialization explicitly");
+            Check(Debug.Warnings.Count == 1 && Debug.Warnings[0].StartsWith("USB MIDI disabled:") &&
+                Debug.Warnings[0].IndexOf(missing == "text renderer" ? "MeshRenderer" : missing == "renderer" ? "Renderer" : missing.Split(' ')[0], StringComparison.OrdinalIgnoreCase) >= 0,
+                "Missing " + missing + " produces one actionable resource diagnostic");
+            Check(f.Piano.IsInstrumentReady(), "Optional MIDI failure preserves vision calibration for " + missing);
+            Call(f.Feedback,"BeginCalibration");
+            f.Feedback.BeginSong(new List<NoteEvent> { new NoteEvent { keyIndex=60,time=0 } },1);
+            Send(f.Feedback,"note",36); Send(f.Feedback,"note",96); Send(f.Feedback,"note",60);
+            Call(f.Feedback,"Update"); f.Feedback.EndSong(true);
+            Check(!(bool)Field(f.Feedback,"calibrating") && !(bool)Field(f.Feedback,"scoring") &&
+                !(bool)Field(f.Feedback,"rangeReady") && f.Matcher.Total==0 && f.Matcher.Hits==0 &&
+                !((HeldNotes)Field(f.Feedback,"held")).IsHeld(60), "Failed MIDI cannot calibrate, hold keys, schedule or score for " + missing);
+            Call(f.Feedback,"OnApplicationFocus",false); Call(f.Feedback,"OnApplicationPause",true);
+            Check(f.Game.InputAllowed, "Failed optional MIDI lifecycle cannot block visual game input for " + missing);
+            Check(Field(f.Feedback,"label")==null && Field(f.Feedback,"markerMaterial")==null &&
+                !UnityEngine.Object.Components.OfType<TextMesh>().Any(), "Failed initialization releases visual resources for " + missing);
+
+            // Repair resources and retry on the same component, rather than hiding a persistent partial state.
+            f.Piano.noteCubePrefab=GameObject.CreatePrimitive(PrimitiveType.Cube);
+            f.Feedback.Initialize(f.Piano);
+            Check(f.Feedback.IsInitialized,"MIDI can initialize after repairing " + missing);
+            f.Calibrate();
+            Check((bool)Field(f.Feedback,"rangeReady"),"Repaired MIDI can calibrate after " + missing);
+            Call(f.Feedback,"OnDestroy"); Call(f.Feedback,"OnDestroy");
+            Call(f.Feedback,"Update");
+            Check(!f.Feedback.IsInitialized && Field(f.Feedback,"label")==null &&
+                ((Dictionary<int,GameObject>)Field(f.Feedback,"markers")).Count==0,
+                "Destroy is idempotent and releases repaired MIDI for " + missing);
+        }
+    }
+
+    private static void MidiYieldsToPianoDefinition()
+    {
+        var f = new Fixture(withDefiner:true); f.Calibrate();
+        Send(f.Feedback,"note",60); Call(f.Feedback,"Update");
+        var markers=(Dictionary<int,GameObject>)Field(f.Feedback,"markers");
+        Check(markers[60].activeSelf && ((TextMesh)Field(f.Feedback,"label")).gameObject.activeSelf,"Calibrated MIDI shows held notes before reopening CV setup");
+        bool reversed=f.Plane.reverseHorizontal;
+        f.Definer.Activate(true);
+        OVRInput.Press(OVRInput.Button.One,OVRInput.Controller.LTouch); Call(f.Feedback,"Update"); OVRInput.Reset();
+        Check(f.Plane.reverseHorizontal==reversed && (bool)Field(f.Feedback,"rangeReady"),"Reopened CV setup owns X without changing the completed MIDI range or alignment");
+        Check(!markers.Values.Any(m=>m.activeSelf) && !((TextMesh)Field(f.Feedback,"label")).gameObject.activeSelf &&
+            !((HeldNotes)Field(f.Feedback,"held")).IsHeld(60),"Entering setup clears held notes and hides old-layout markers and label");
+        OVRInput.Press(OVRInput.Button.Two,OVRInput.Controller.RTouch); Call(f.Feedback,"Update"); OVRInput.Reset();
+        OVRInput.Press(OVRInput.Button.Two,OVRInput.Controller.LTouch); Call(f.Feedback,"Update"); OVRInput.Reset();
+        Send(f.Feedback,"note",36); Send(f.Feedback,"note",96);
+        Check(!(bool)Field(f.Feedback,"calibrating") && (bool)Field(f.Feedback,"rangeReady") && (bool)Field(f.Feedback,"enabledFeedback") &&
+            !((HeldNotes)Field(f.Feedback,"held")).IsHeld(36) && !((HeldNotes)Field(f.Feedback,"held")).IsHeld(96),"Setup ignores B, Y and physical notes while preserving completed calibration");
+        f.Definer.Deactivate();
+        OVRInput.Press(OVRInput.Button.One,OVRInput.Controller.LTouch); Call(f.Feedback,"Update");
+        Check(f.Plane.reverseHorizontal!=reversed && ((TextMesh)Field(f.Feedback,"label")).gameObject.activeSelf,"Fresh X works and MIDI label returns after setup finishes");
+
+        f = new Fixture(withDefiner:true);
+        Call(f.Feedback,"BeginCalibration"); Send(f.Feedback,"note",36);
+        f.Definer.Activate(true); Send(f.Feedback,"note",96);
+        Check(!(bool)Field(f.Feedback,"calibrating") && !(bool)Field(f.Feedback,"rangeReady") &&
+            !((HeldNotes)Field(f.Feedback,"held")).IsHeld(36) && !((HeldNotes)Field(f.Feedback,"held")).IsHeld(96),"A setup-entry MIDI event cancels partial calibration before the next Update");
+        f.Definer.Deactivate(); Call(f.Feedback,"Update"); Send(f.Feedback,"note",96);
+        Check(!(bool)Field(f.Feedback,"rangeReady"),"Finishing setup cannot resume a stale partial calibration");
+        f.Calibrate(); f.Definer.Activate(true); Send(f.Feedback,"reset");
+        Check(!(bool)Field(f.Feedback,"rangeReady"),"USB reset still invalidates completed calibration during setup");
+
+        f = new Fixture(withDefiner:true); f.Calibrate();
+        f.Load(new NoteEvent {midiNumber=60,time=0,duration=1}); f.Game.Play();
+        f.Definer.Activate(true); Time.time=100; Send(f.Feedback,"note",60); Call(f.Feedback,"Update"); f.Feedback.EndSong(true);
+        Check(f.Matcher.Hits==0 && f.Matcher.Misses==0 && f.Matcher.Wrong==0 && !(bool)Field(f.Feedback,"scoring"),"Setup entry suppresses incoming scoring and per-frame/final matcher advancement");
+        f.Game.Quit();
+    }
+
+    private static void CancelPianoDefinitionThroughMenu()
+    {
+        var f = new Fixture(withDefiner:true); f.Calibrate();
+        Set(f.Menu,"pianoManager",f.Definer);
+        f.Menu.ShowCVPlaneDefinitionMenu(); Call(f.Feedback,"Update");
+        Check(f.Definer.IsDefining && ((GameObject)Field(f.Menu,"cvPlaneDefinitionMenu")).activeSelf,
+            "Opening CV activates setup after navigation hides the previous menus");
+        f.Menu.ShowMainMenu();
+        Check(!f.Definer.IsDefining && f.Menu.mainMenu.activeSelf && !((GameObject)Field(f.Menu,"cvPlaneDefinitionMenu")).activeSelf,
+            "Cancelling CV through Main Menu deactivates its hidden piano setup");
+        bool reversed=f.Plane.reverseHorizontal;
+        OVRInput.Press(OVRInput.Button.One,OVRInput.Controller.LTouch); Call(f.Feedback,"Update");
+        Check((bool)Field(f.Feedback,"rangeReady") && f.Plane.reverseHorizontal!=reversed,
+            "Cancelling CV retains completed MIDI calibration and immediately restores X control");
+        f.Menu.StartPianoSetup();
+        Check(f.Definer.IsDefining && ((GameObject)Field(f.Menu,"manualPlaneDefinitionMenu")).activeSelf,
+            "Starting manual setup remains active after HideAllMenus cleanup");
+        f.Menu.ShowCVPlaneDefinitionMenu();
+        Check(f.Definer.IsDefining && ((GameObject)Field(f.Menu,"cvPlaneDefinitionMenu")).activeSelf &&
+            !((GameObject)Field(f.Menu,"manualPlaneDefinitionMenu")).activeSelf,
+            "Switching active manual setup to CV cleans up the old session and keeps the new setup active");
+        f.Menu.ShowMainMenu();
     }
 
     private static void CalibrationAndHotplug()
@@ -626,6 +753,9 @@ public static class UnityIntegrationTests
     public static string Run()
     {
         assertions=0; Application.streamingAssetsPath=System.IO.Path.GetTempPath();
+        OptionalMidiInitializationFailure();
+        MidiYieldsToPianoDefinition();
+        CancelPianoDefinitionThroughMenu();
         CalibrationAndHotplug(); PauseReplayAndTiming(); ZeroDurationCompletion(); LifecycleAndCanonicalPitch();
         InitialAndResumeCountdownSuspension(); CountdownInvalidation(); FocusAndInputGates(); RealSelectorAndMenu(); HeadsetFocusRecovery(); UnisonScoringIntegration();
         RejectedCountdownButtonFlows();

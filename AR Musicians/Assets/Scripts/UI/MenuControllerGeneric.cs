@@ -82,6 +82,7 @@ public class MenuControllerGeneric : MonoBehaviour
 
     public void HideAllMenus()
     {
+        if (pianoManager != null && pianoManager.IsDefining) pianoManager.Deactivate();
         mainMenu.SetActive(false);
         songMenu.SetActive(false);
         instrumentSelectorMenu.SetActive(false);

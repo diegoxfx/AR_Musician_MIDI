@@ -63,6 +63,8 @@ public static class QuestApkBuild
                 "The existing Android XR settings do not contain an OpenXR loader; no XR settings were changed.");
             record.xrLoaders = xr.Manager.activeLoaders.Select(loader => loader == null ? "Missing" : loader.GetType().FullName).ToArray();
 
+            QuestRuntimeValidation.Run();
+            record.runtimeInitializationVerified = true;
             var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
             // Opening a scene can unload assets held only by managed references.
             // Import both first, then load persistent objects into the open scene.
@@ -103,8 +105,8 @@ public static class QuestApkBuild
 
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, PackageName);
             PlayerSettings.productName = "AR-Musician MIDI";
-            PlayerSettings.bundleVersion = "1.1.0";
-            PlayerSettings.Android.bundleVersionCode = 3;
+            PlayerSettings.bundleVersion = "1.1.1";
+            PlayerSettings.Android.bundleVersionCode = 4;
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
             PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel32;
@@ -264,7 +266,7 @@ public static class QuestApkBuild
     {
         public string startedUtc, finishedUtc, unityVersion, scene, apkPath, packageName;
         public string architecture, scriptingBackend, signing, result;
-        public bool development, serializedModelsVerified;
+        public bool development, serializedModelsVerified, runtimeInitializationVerified;
         public int minApi, targetApi;
         public int totalErrors, totalWarnings;
         public long apkBytes;
