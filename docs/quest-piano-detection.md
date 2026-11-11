@@ -2,7 +2,9 @@
 
 `unsloth/sam3.1` can segment the visible keybed on the PC. The 672 × 672 Sentis version began execution on Quest 3 but encountered sustained system memory pressure during its first encoder run. Keep the existing standalone detector for now. A Quest implementation of SAM 3.1 would need a lower-memory runtime and a new device test, even for a single initial capture. A complete CT-S200 frame and headset alignment are still needed to measure calibration accuracy.
 
-## Selected next experiment: real photographs, SAM labels, compact YOLO
+## Real photographs, SAM labels and compact YOLO
+
+The subsequent [300-photo pilot result](keybed-pilot-300.md), completed locally on 2026-11-11, trained and evaluated a three-class YOLO26n-seg candidate. Validation selected 960 × 960 over 480 × 640 (height × width). Only 2 of 28 test photographs matched all keys without extra predictions, so automatic calibration is not ready. Desktop export parity and Unity import passed; actual Quest execution remains pending because no device was connected. The earlier research and stock-model checks below describe how the pilot was chosen, not the current model's measured performance.
 
 The user selected standalone Quest and real internet photographs, with SAM running locally on the PC to propose labels. Synthetic piano images are outside this experiment. The intended student detects both the playable surface and individual keys, using three instance-segmentation classes: `playable_keybed`, `white_key`, and `black_key`. Fit four ordered perspective corners to the accepted keybed mask. Each individual key retains its own observed mask; a detected outer rectangle alone must not be reported as individual-key detection.
 

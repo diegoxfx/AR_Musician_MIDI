@@ -12,9 +12,11 @@ USB-MIDI input and piano detection were confirmed by the user on Quest 3 + CT-S2
 with version 1.1.1; the redesigned 1.3.0 practice flow still needs headset acceptance.
 The production vision models remain unchanged. The separate
 [real-photo SAM-to-YOLO experiment](SynthesiaSet/piano_perception/keybed_yolo/README.md)
-targets the playable surface and individual keys. Preliminary models have been
-trained, but no replacement has been validated on Quest or integrated into the
-app. See [device evidence and detection limits](docs/quest-piano-detection.md).
+targets the playable surface and individual keys. A [300-photo reviewed pilot](docs/keybed-pilot-300.md)
+has been trained and evaluated: only 2 of 28 test photographs matched every key
+without extra predictions, so it is not ready for automatic calibration. The
+export passed desktop parity and Unity import; Quest execution and integration
+remain pending. See [device evidence and detection limits](docs/quest-piano-detection.md).
 
 ## Origin and attribution
 
