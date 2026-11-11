@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using ARMusician.Midi;
 using Assets.Scripts.Songs;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -86,12 +87,14 @@ public class MidiReferenceAudio : MonoBehaviour
 public class PianoStrategy : IGameplayStrategy
 {
     public FeedbackStub MidiFeedback;
+    public PlaneController plane = new PlaneController();
     public float ApproachTime { get { return 1; } }
     public bool IsInstrumentReady() { return true; }
-    public void PreprocessNote(NoteEvent note) { }
+    public void PreprocessNote(NoteEvent note) { note.keyIndex = note.midiNumber; }
     public void SpawnNote(NoteEvent note, float speed) { }
     public event Action OnNoteFinished;
 }
+public class PlaneController { public float GetLocalKeyWidth(int pitch) { return pitch >= 36 && pitch <= 96 ? 1 : 0; } }
 public class BongoStrategy : PianoStrategy { public int average_key; }
 
 public static class SongLoadingIntegrationTests
@@ -229,13 +232,24 @@ public static class SongLoadingIntegrationTests
         Check(Loaded(manager)[0].midiNumber == 72, "Bundled JSON still loads from StreamingAssets");
         var older = manager.updateSongRoutine(External(Notes60));
         Check(older.MoveNext(), "First selection pauses before committing parsed notes");
-        Drain(manager.updateSongRoutine(External(Notes72)));
+        int earlierVersion = manager.SongLoadVersion;
+        Check(manager.IsSongLoading && manager.LoadedSong == null && !manager.HasLoadedSong,
+            "Beginning a load exposes pending state and invalidates previous identity/readiness");
+        var newestSong = External(Notes72);
+        Drain(manager.updateSongRoutine(newestSong));
+        int completedVersion = manager.SongLoadVersion;
+        Check(completedVersion > earlierVersion && !manager.IsSongLoading && manager.LoadedSong == newestSong,
+            "Completed current load exposes identity and a new version for cached UI readiness");
         Drain(older);
+        Check(manager.SongLoadVersion == completedVersion && manager.LoadedSong == newestSong && !manager.IsSongLoading,
+            "Stale load cannot change current loading state, identity or readiness version");
         Check(Loaded(manager).Count == 1 && Loaded(manager)[0].midiNumber == 72, "Stale load cannot overwrite later selection");
         foreach (string invalid in new[] { "{broken", "null", "[null]", "[{\"time\":-1,\"duration\":1}]", "[{\"time\":0,\"duration\":-1}]", "[{\"time\":\"NaN\",\"duration\":1}]" })
         {
             Drain(manager.updateSongRoutine(External(invalid)));
             Check(Loaded(manager).Count == 0, "Invalid JSON/note data cannot leave a previously loaded song playable: " + invalid);
+            Check(!manager.IsSongLoading && manager.LoadedSong == null,
+                "Invalid note data completes with no loaded song identity");
         }
         Drain(manager.updateSongRoutine(Bundled("missing.json")));
         Check(Loaded(manager).Count == 0, "Missing bundled file is handled safely");
@@ -267,11 +281,13 @@ public static class SongLoadingIntegrationTests
     {
         Reset();
         string music = Path.Combine(Application.persistentDataPath, "Music"); Directory.CreateDirectory(music);
-        // Minimal format-0 MIDI: middle C held 480 ticks at the default 120 BPM.
+        // Format-0 MIDI with a left-hand track label and middle C held 480 ticks at 120 BPM.
         File.WriteAllBytes(Path.Combine(music, "personal.mid"), new byte[] {
             0x4d,0x54,0x68,0x64,0,0,0,6,0,0,0,1,1,0xe0,
-            0x4d,0x54,0x72,0x6b,0,0,0,13,0,0x90,60,100,0x83,0x60,0x80,60,0,0,0xff,0x2f,0 });
+            0x4d,0x54,0x72,0x6b,0,0,0,26,0,0xff,3,9,76,101,102,116,32,72,97,110,100,
+            0,0x90,60,100,0x83,0x60,0x80,60,0,0,0xff,0x2f,0 });
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "bundle_metadata.json"), "{\"title\":\"Bundled Title\",\"artists\":[\"Bundled Artist\"],\"duration\":9}");
+        File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "RuntimeActionBindings.json"), "{\"bindings\":[]}");
         var loader = new SongLoader(); Set(loader, "_songsFinder", new SongsFinder()); Call(loader, "Awake");
         int publications = 0; LinkedList<SongData> published = null;
         SongLoader.OnSongsLoaded += songs => { publications++; published = songs; };
@@ -283,6 +299,8 @@ public static class SongLoadingIntegrationTests
         if (fetch.Current is IEnumerator) Drain((IEnumerator)fetch.Current);
         Drain(fetch);
         Check(publications == 1 && SongLoader.CurrentSongs != null && published.Count == 2, "Startup publishes bundled plus personal catalog once after import completes");
+        Check(published.All(song => !song.PartialSongData.JsonPath.EndsWith("RuntimeActionBindings.json", StringComparison.OrdinalIgnoreCase)),
+            "Unity OpenXR configuration is excluded from the real startup song catalog");
         Check(published.First.Value.title == "Bundled Title" && !published.First.Value.IsExternal && published.Last.Value.IsExternal, "Bundled ordering/metadata remain before imported songs");
         var snapshot = published.Last.Value;
         Check(snapshot.duration == 1 && snapshot.PartialSongData.InlineJson.Contains("60"), "Real MIDI startup scan supplies note snapshot and actual duration");
@@ -293,6 +311,7 @@ public static class SongLoadingIntegrationTests
         File.Delete(Path.Combine(music, "personal.mid"));
         var manager = new RhythmGameManager(); Drain(manager.updateSongRoutine(snapshot));
         Check(Loaded(manager).Count == 1 && Loaded(manager)[0].midiNumber == 60, "Deleting source after startup does not invalidate playback snapshot");
+        Check(Loaded(manager)[0].sourceHand == PianoHand.Left, "External track hand survives catalog snapshot and gameplay JSON loading");
         published.Clear();
         Check(SongLoader.CurrentSongs.Count == 2, "Subscriber collection mutation does not clear cached catalog");
         Call(new SongLoader(), "Awake");

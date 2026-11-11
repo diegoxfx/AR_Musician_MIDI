@@ -6,6 +6,8 @@ $scripts = Join-Path $repository 'AR Musicians\Assets\Scripts'
 $sources = @(
     (Join-Path $scripts 'Midi\MidiCore.cs'),
     (Join-Path $scripts 'Midi\LearningPractice.cs'),
+    (Join-Path $scripts 'Midi\PianoHandPartition.cs'),
+    (Join-Path $scripts 'Midi\PianoRollLayout.cs'),
     (Join-Path $scripts 'Midi\PianoMidiFeedback.cs'),
     (Join-Path $scripts 'Piano\PianoHUD\PlaneController.cs'),
     (Join-Path $scripts 'Piano\PianoHUD\PianoStrategy.cs'),
@@ -14,6 +16,7 @@ $sources = @(
     (Join-Path $scripts 'InstrumentsCommon\IGameplayStrategy.cs'),
     (Join-Path $scripts 'InstrumentsCommon\RhythmGameManager.cs'),
     (Join-Path $scripts 'InstrumentsCommon\CountdownUIGeneric.cs'),
+    (Join-Path $scripts 'UI\AppText.cs'),
     (Join-Path $scripts 'UI\InstrumentSelectorController.cs'),
     (Join-Path $scripts 'UI\MenuControllerGeneric.cs'),
     (Join-Path $PSScriptRoot 'csharp\UnityIntegrationTests.cs')

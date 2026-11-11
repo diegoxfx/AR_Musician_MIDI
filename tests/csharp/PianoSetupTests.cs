@@ -88,6 +88,7 @@ namespace UnityEngine
     public static class Debug { public static void Log(object value) {} public static void LogWarning(object value) {} }
     public class HeaderAttribute : Attribute { public HeaderAttribute(string value) {} }
     public class SerializeField : Attribute { }
+    public class RangeAttribute : Attribute { public RangeAttribute(float min, float max) {} }
     public class RequireComponent : Attribute { public RequireComponent(Type type) {} }
     public enum PrimitiveType { Quad }
 }
@@ -146,7 +147,9 @@ public class ModelManager : MonoBehaviour
 {
     public int Calls;
     public Vector2[] Keypoints = { new Vector2(1,1),new Vector2(6,1),new Vector2(6,6),new Vector2(1,6) };
-    public Vector2[] RunInference(Texture texture,int count) { Calls++; return Keypoints; }
+    public float[] Confidences = { 0.9f, 0.9f, 0.9f, 0.9f };
+    public Vector2[] RunInference(Texture texture,int count,out float[] confidences)
+    { Calls++; confidences=Confidences; return Keypoints; }
 }
 public interface IPointInputListener { bool IsActive { get; } void RegisterPoint(Vector3 position); }
 public class PlaneCorrectionNodeGeneric : Component { public PianoManagerInstrumentDefiner manager; public int vertexIndex; }
@@ -161,6 +164,51 @@ public static class PianoSetupTests
     private static void Call(object target,string method) => target.GetType().GetMethod(method,BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).Invoke(target,null);
     private static int PointCount(PianoManagerInstrumentDefiner manager) => ((List<Vector3>)Field(manager.GetType(),"capturedPoints").GetValue(manager)).Count;
     private static readonly Vector3[] Corners = {new Vector3(0,0,0),new Vector3(1,0,0),new Vector3(1,0,0.2f)};
+
+    private static void ValidateDetectionQuality()
+    {
+        const float cutoff = PianoDetectionValidator.DefaultMinimumConfidence;
+        var scores = new[] { 0.3f, 0.6f, 0.8f, 0.7f };
+        var corners = new[] { new Vector2(47,132), new Vector2(280,116), new Vector2(290,141), new Vector2(28,165) };
+        Check(PianoDetectionValidator.Validate(corners, scores, 320, 240, cutoff) == PianoDetectionIssue.None,
+            "A usable perspective view should permit spatial raycasts");
+        Check(PianoDetectionValidator.Validate(corners, null, 320, 240, cutoff) == PianoDetectionIssue.MissingCorners,
+            "Missing confidence output should fail safely");
+
+        // Actual recorded Quest corner output from the 1.1.1 setup investigation.
+        var captured = new[] { new Vector2(47,132), new Vector2(301,116), new Vector2(319,141), new Vector2(28,165) };
+        var capturedScores = new[] { 0.301474f, 0.592472f, 0.031148f, 0.637529f };
+        Check(PianoDetectionValidator.Validate(captured, capturedScores, 320, 240, cutoff) == PianoDetectionIssue.ClippedCorner,
+            "A corner on the rightmost pixel should ask the player to reframe");
+        captured[2] = new Vector2(318,141);
+        Check(PianoDetectionValidator.Validate(captured, capturedScores, 320, 240, cutoff) == PianoDetectionIssue.LowConfidence,
+            "A low-confidence corner inside the frame should also prevent confirmation");
+
+        var invalid = (Vector2[])corners.Clone();
+        invalid[3] = new Vector2(float.NaN,165);
+        Check(PianoDetectionValidator.Validate(invalid, scores, 320, 240, cutoff) == PianoDetectionIssue.InvalidCorner,
+            "The fourth corner must have finite coordinates");
+        invalid[3] = new Vector2(28,float.PositiveInfinity);
+        Check(PianoDetectionValidator.Validate(invalid, scores, 320, 240, cutoff) == PianoDetectionIssue.InvalidCorner,
+            "Infinite coordinates must be rejected");
+        invalid[3] = corners[2];
+        Check(PianoDetectionValidator.Validate(invalid, scores, 320, 240, cutoff) == PianoDetectionIssue.InvalidGeometry,
+            "Duplicate corners must be rejected");
+        invalid[2] = corners[3];
+        Check(PianoDetectionValidator.Validate(invalid, scores, 320, 240, cutoff) == PianoDetectionIssue.InvalidGeometry,
+            "Crossed edges must be rejected");
+        invalid[2] = corners[2];
+        invalid[3] = new Vector2(180,133);
+        Check(PianoDetectionValidator.Validate(invalid, scores, 320, 240, cutoff) == PianoDetectionIssue.InvalidGeometry,
+            "A fourth corner inside the other three must be rejected");
+        invalid = new[] { new Vector2(12,12), new Vector2(14,12), new Vector2(14,13), new Vector2(12,13) };
+        Check(PianoDetectionValidator.Validate(invalid, scores, 320, 240, cutoff) == PianoDetectionIssue.InvalidGeometry,
+            "A tiny polygon without coincident corners must still be rejected");
+        scores[3] = float.NaN;
+        Check(PianoDetectionValidator.Validate(corners, scores, 320, 240, cutoff) == PianoDetectionIssue.LowConfidence,
+            "A nonfinite confidence must fail safely");
+    }
+
     private sealed class Rig
     {
         public PianoManagerInstrumentDefiner Manager;
@@ -185,6 +233,7 @@ public static class PianoSetupTests
     }
     public static void Run()
     {
+        ValidateDetectionQuality();
         Permission.Allowed.Clear(); Permission.Requests.Clear();
         var rig=new Rig(); rig.Manager.Activate(true);
         Check(rig.Manager.IsDefining,"CV setup must be defining immediately on activation");
@@ -230,10 +279,21 @@ public static class PianoSetupTests
             rig.CV.raycastManager=rig.Rays;
             Check(!rig.Manager.TryRegisterDetectedPoints(new[] {Corners[0],Corners[0],Corners[0]}),"Collapsed hit positions must be rejected");
             Check(!rig.Manager.TryRegisterDetectedPoints(new[] {Corners[0],Corners[1],new Vector3(float.NaN,0,0)}),"Nonfinite positions must be rejected");
-            rig.Model.Keypoints=null; rig.Capture(); Check(!rig.Manager.CanConfirm && rig.Text.text.Contains("three corner rays"),"Null inference must fail safely");
+            rig.Model.Keypoints=null; rig.Capture(); Check(!rig.Manager.CanConfirm && rig.Text.text.Contains("All four corners"),"Null inference must fail safely");
             rig.Model.Keypoints=new[] {new Vector2(-1,1),new Vector2(1,1),new Vector2(1,2),new Vector2(0,2)};
             rig.Capture(); Check(!rig.Manager.CanConfirm && rig.Text.text.Contains("outside the camera image"),"Invalid image corner must not form geometry");
             rig.Model.Keypoints=new[] {new Vector2(1,1),new Vector2(6,1),new Vector2(6,6),new Vector2(1,6)};
+            rig.Model.Confidences[3]=0.03f;
+            int rayCount=rig.Rays.Calls;
+            rig.Capture(); Check(!rig.Manager.CanConfirm && rig.Rays.Calls==rayCount && rig.Text.text.Contains("located reliably"),
+                "The fourth corner must pass the image gate even though it is not used for raycasts");
+            AppText.SetLanguage(AppLanguage.Spanish);
+            Check(rig.CV.StatusMessage.Contains("Aléjate") && rig.CV.StatusMessage.Contains("configuración manual"),
+                "The current status must reflect a language change without another capture");
+            rig.CV.CaptureKeyboard(); Check(rig.Text.text.Contains("Aléjate") && rig.Text.text.Contains("configuración manual"),
+                "The rejection must explain how to retry or use manual setup in Spanish");
+            AppText.SetLanguage(AppLanguage.English);
+            rig.Model.Confidences[3]=0.9f;
             rig.HitAll(); rig.Capture(); rig.Confirm();
             Check(events==1 && !rig.Manager.CanConfirm && !rig.Manager.IsActive && !rig.CV.active,"A right must confirm exactly once and stop capture");
             Check(!rig.Manager.IsDefining,"Confirmation must end definition so gameplay input can resume");

@@ -50,7 +50,7 @@ public class CountdownUIGeneric : MonoBehaviour
         }
         if (activeGeneration != generation) yield break;
         if (countdownCircle != null) countdownCircle.fillAmount = 0f;
-        if (countdownText != null) countdownText.text = "GO!";
+        if (countdownText != null) countdownText.text = AppText.Choose("GO!", "¡YA!");
         yield return new WaitForSeconds(0.5f);
         if (activeGeneration != generation) yield break;
 

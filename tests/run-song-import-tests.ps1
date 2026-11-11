@@ -18,6 +18,7 @@ if (-not $NewtonsoftDll -or -not (Test-Path -LiteralPath $NewtonsoftDll)) {
 $sources = @(
     (Join-Path $scripts 'Songs\MidiUtils.cs'),
     (Join-Path $scripts 'Songs\ExternalMidiLibrary.cs'),
+    (Join-Path $scripts 'Midi\PianoHandPartition.cs'),
     (Join-Path $scripts 'Piano\PianoHUD\NoteEvent.cs'),
     (Join-Path $PSScriptRoot 'csharp\ExternalMidiLibraryTests.cs')
 )

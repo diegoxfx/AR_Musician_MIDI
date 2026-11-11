@@ -53,8 +53,12 @@ public static class QuestRuntimeValidation
             var options = host.AddComponent<PracticeOptionsUI>();
             options.Initialize(manager, feedback);
             options.Initialize(manager, feedback);
-            var buttons = lobby.GetComponentsInChildren<Button>(true);
-            foreach (string name in new[] { "LearningModeButton", "ReferenceSoundButton" })
+            var roots = new[] { lobby, manager.menucontroller.mainMenu,
+                manager.menucontroller.songMenu, manager.menucontroller.singleplayerPauseMenu };
+            var buttons = roots.SelectMany(root => root.GetComponentsInChildren<Button>(true)).Distinct().ToArray();
+            foreach (string name in new[] { "StartPracticeButton", "LearnModeButton", "PlayModeButton",
+                "LeftHandButton", "BothHandsButton", "RightHandButton", "GuideSoundButton",
+                "CalibrateMidiButton", "ConfirmPianoButton", "ResumePracticeButton", "ChooseSongButton" })
             {
                 var matches = buttons.Where(button => button.name == name).ToArray();
                 Require(matches.Length == 1, "Practice option missing or duplicated: " + name);
@@ -64,14 +68,20 @@ public static class QuestRuntimeValidation
                 Require(text != null && text.font != null, "Practice option font is missing: " + name);
             }
             manager.SetStrategy(piano);
+            options.ShowSettings();
             // The live button callbacks must toggle only their setting, never start a song/countdown.
-            var sound = buttons.Single(button => button.name == "ReferenceSoundButton");
+            var sound = buttons.Single(button => button.name == "GuideSoundButton");
             bool originalSound = manager.ReferenceSoundEnabled;
             sound.onClick.Invoke();
             Require(manager.ReferenceSoundEnabled != originalSound && manager.State == RhythmGameManager.PlaybackState.Idle,
                 "Sound option failed to toggle independently of playback.");
             sound.onClick.Invoke();
-            string result = "PASS: real MainScene, piano prefab material/shader, MIDI feedback initialization, and lobby practice controls.\n" +
+            foreach (string icon in new[] { "book", "piano", "settings", "chevron", "plus", "minus", "back" })
+                Require(Resources.Load<Sprite>("PracticeIcons/" + icon) != null, "Practice icon is missing: " + icon);
+            options.ShowPrepare();
+            Require(options.IsVisible && options.CurrentView == PracticeView.Prepare && !options.CanStart,
+                "Uncalibrated preparation must be visible and must not allow playback.");
+            string result = "PASS: real MainScene, piano prefab material/shader, MIDI feedback initialization, compact practice controls and icons.\n" +
                 "Editor validation does not verify headset input, spatial permissions, or USB hardware.\n";
             string[] args = Environment.GetCommandLineArgs();
             int outputIndex = Array.IndexOf(args, "-validationOutput");

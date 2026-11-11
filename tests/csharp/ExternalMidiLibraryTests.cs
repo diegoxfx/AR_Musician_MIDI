@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ARMusician.Midi;
 using Assets.Scripts.Songs;
 using Newtonsoft.Json;
-
-namespace UnityEngine { } // NoteEvent has no Unity API dependency.
 
 public static class ExternalMidiLibraryTests
 {
@@ -18,6 +17,7 @@ public static class ExternalMidiLibraryTests
         try
         {
             TempoAndTracks(Path.Combine(root, "timing"));
+            TrackHands(Path.Combine(root, "hands"));
             FreshSnapshot(Path.Combine(root, "fresh"));
             IsolationAndMetadata(Path.Combine(root, "isolation"));
             Bounds(Path.Combine(root, "bounds"));
@@ -32,10 +32,37 @@ public static class ExternalMidiLibraryTests
     { Check(Math.Abs(actual - expected) < 0.00001, description + ": " + actual); }
     private static string Folder(string path) { Directory.CreateDirectory(path); return path; }
     private static NoteEvent[] Notes(ExternalMidiSong song) { return JsonConvert.DeserializeObject<NoteEvent[]>(song.Json); }
-    private static byte[] NoteTrack(int pitch, int duration = 480)
+    private static byte[] NoteTrack(int pitch, int duration = 480, params string[] names)
     {
-        var bytes = new List<byte>(); Event(bytes, 0, 0x90, (byte)pitch, 100); Event(bytes, duration, 0x80, (byte)pitch, 0);
+        var bytes = new List<byte>();
+        foreach (string name in names)
+        {
+            var label = Encoding.ASCII.GetBytes(name);
+            Event(bytes, 0, 0xff, 0x03, (byte)label.Length);
+            bytes.AddRange(label);
+        }
+        Event(bytes, 0, 0x90, (byte)pitch, 100); Event(bytes, duration, 0x80, (byte)pitch, 0);
         return End(bytes);
+    }
+    private static void TrackHands(string folder)
+    {
+        Folder(folder);
+        string midi = Path.Combine(folder, "hands.mid");
+        WriteMidi(midi, NoteTrack(84, 480, "Piano Left-Hand"), NoteTrack(45, 480, "R.H. (Piano)"),
+            NoteTrack(61, 480, "Left Hand", "Right Hand"), NoteTrack(47, 480, "Left"), NoteTrack(60));
+        var scan = ExternalMidiLibrary.Scan(folder);
+        Check(scan.Errors.Count == 0 && scan.Songs.Count == 1, "Named and unnamed tracks import in a single arrangement");
+        var notes = Notes(scan.Songs[0]);
+        Check(notes.Length == 5 && notes.All(n => n.time == 0), "Hand assignment preserves all same-onset notes");
+        Check(notes.Single(n => n.midiNumber == 84).sourceHand == PianoHand.Left &&
+            notes.Single(n => n.midiNumber == 45).sourceHand == PianoHand.Right, "Explicit track names survive import, even across the pitch split");
+        Check(notes.Where(n => n.midiNumber == 61 || n.midiNumber == 47 || n.midiNumber == 60)
+            .All(n => n.sourceHand == PianoHand.Unspecified), "Conflicting, ambiguous, and missing names leave hand assignment open");
+        string json = Path.Combine(folder, "converted.json");
+        MidiUtils.ConvertMidiToJson(midi, json);
+        var converted = JsonConvert.DeserializeObject<NoteEvent[]>(File.ReadAllText(json));
+        Check(converted.Select(n => (n.midiNumber, n.sourceHand)).SequenceEqual(notes.Select(n => (n.midiNumber, n.sourceHand))),
+            "Editor JSON conversion preserves the same hand data as personal MIDI import");
     }
     private static void TempoAndTracks(string folder)
     {
@@ -52,6 +79,7 @@ public static class ExternalMidiLibraryTests
         Check(scan.Errors.Count == 0 && scan.Songs.Count == 1, "Tempo/multitrack import succeeds");
         var notes = Notes(scan.Songs[0]);
         Check(notes.Length == 4, "All tracks, chord notes and duplicate notes retained");
+        Check(notes.Select(n => n.midiNumber).SequenceEqual(new[] { 61, 64, 61, 67 }), "Conversion preserves chronological order across tracks and track order at shared onsets");
         Check(notes.Count(n => n.midiNumber == 61 && n.key == "C#4") == 2, "Sharps preserve canonical MIDI pitch");
         foreach (var note in notes.Where(n => n.midiNumber == 61)) Near(note.duration, 1.5, "Note duration spans tempo change");
         Near(notes.Single(n => n.midiNumber == 67).time, 1.5, "Note start uses tempo map");

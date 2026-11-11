@@ -14,6 +14,12 @@ public sealed class PianoMidiFeedback : MonoBehaviour
     }
     [Serializable] private class EventBatch { public MidiEvent[] events; }
 
+    private enum TransportStatus
+    {
+        Starting, Waiting, Connecting, Connected, VirtualConnected, Disconnected,
+        Stopped, Interrupted, Reconnect, Unavailable, Unsupported, Unknown
+    }
+
     private PianoStrategy piano;
     private RhythmGameManager game;
     private PianoManagerInstrumentDefiner definer;
@@ -23,11 +29,26 @@ public sealed class PianoMidiFeedback : MonoBehaviour
     private KeyboardCalibration calibration;
     private bool initialized, calibrating, rangeReady, enabledFeedback = true, scoring;
     public bool IsInitialized => initialized;
+    public bool IsConnected => initialized && transportConnected;
     public bool IsCalibrated => initialized && rangeReady;
+    public bool IsCalibrating => initialized && calibrating;
+    public bool FeedbackEnabled => enabledFeedback;
+    public string StatusMessage => CompactStatus();
+    public bool SuppressStatusLabel
+    {
+        get => suppressStatusLabel;
+        set
+        {
+            suppressStatusLabel = value;
+            if (value && label != null) label.gameObject.SetActive(false);
+        }
+    }
     public int FirstNote => firstNote;
     public int LastNote => firstNote + keyCount - 1;
     private int firstNote = 36, keyCount = 61, skipped;
-    private string status = "USB MIDI: starting", instruction = "B: MIDI calibration (61 keys)";
+    private TransportStatus transport;
+    private bool transportConnected;
+    private bool suppressStatusLabel, resetDuringSession;
     private readonly Dictionary<int, GameObject> markers = new Dictionary<int, GameObject>();
     private readonly Dictionary<int, float> flashes = new Dictionary<int, float>();
     private Material markerMaterial;
@@ -57,6 +78,7 @@ public sealed class PianoMidiFeedback : MonoBehaviour
             if (font == null || font.material == null)
                 throw new InvalidOperationException("MIDI status font or font material is missing");
             var labelObject = new GameObject("USB MIDI status");
+            labelObject.SetActive(false);
             labelObject.transform.SetParent(transform, false);
             label = labelObject.AddComponent<TextMesh>();
             var labelRenderer = label.GetComponent<MeshRenderer>();
@@ -80,14 +102,16 @@ public sealed class PianoMidiFeedback : MonoBehaviour
         catch (Exception e)
         {
             ReleaseResources();
-            status = "USB MIDI disabled: " + e.Message;
-            Debug.LogWarning(status);
+            transport = TransportStatus.Unavailable;
+            Debug.LogWarning("USB MIDI disabled: " + e.Message);
         }
     }
 
     private void StartInput()
     {
 #if UNITY_ANDROID && !UNITY_EDITOR
+        transportConnected = false;
+        transport = TransportStatus.Starting;
         try
         {
             if (bridge == null) bridge = new AndroidJavaClass("com.armusicians.midi.QuestMidi");
@@ -95,14 +119,22 @@ public sealed class PianoMidiFeedback : MonoBehaviour
             using (var activity = player.GetStatic<AndroidJavaObject>("currentActivity"))
                 bridge.CallStatic("start", activity);
         }
-        catch (Exception e) { status = "USB MIDI unavailable: " + e.Message; }
+        catch (Exception e)
+        {
+            transport = TransportStatus.Unavailable;
+            Debug.LogWarning("USB MIDI unavailable: " + e.Message);
+        }
+#elif UNITY_EDITOR || UNITY_STANDALONE_WIN
+        transportConnected = virtualInput;
+        transport = virtualInput ? TransportStatus.VirtualConnected : TransportStatus.Unsupported;
 #else
-        status = "USB MIDI requires the Android player";
+        transport = TransportStatus.Unsupported;
 #endif
     }
 
     private void StopInput()
     {
+        transportConnected = false;
         if (bridge != null)
         {
             try { bridge.CallStatic("stop"); }
@@ -117,11 +149,9 @@ public sealed class PianoMidiFeedback : MonoBehaviour
         flashes.Clear();
         scoring = false;
         calibrating = false;
+        if (rangeReady && game != null && game.HasSession) resetDuringSession = true;
         rangeReady = false;
         if (game != null) game.OnPracticeInputReset();
-        instruction = game != null && game.HasSession
-            ? "MIDI reset: quit the song, press B to recalibrate, then restart"
-            : "B: calibrate MIDI again (61 keys)";
     }
 
     private void OnApplicationPause(bool paused)
@@ -145,7 +175,6 @@ public sealed class PianoMidiFeedback : MonoBehaviour
         held.Reset();
         flashes.Clear();
         calibrating = false;
-        if (!rangeReady) instruction = "B: calibrate MIDI again (61 keys)";
     }
 
     private bool UpdateDefinitionState()
@@ -177,7 +206,14 @@ public sealed class PianoMidiFeedback : MonoBehaviour
                         foreach (var e in batch.events) Receive(e);
                 }
             }
-            catch (Exception e) { status = "USB MIDI error: " + e.Message; StopInput(); bridge.Dispose(); bridge = null; }
+            catch (Exception e)
+            {
+                transport = TransportStatus.Unavailable;
+                Debug.LogWarning("USB MIDI error: " + e.Message);
+                StopInput();
+                bridge.Dispose();
+                bridge = null;
+            }
         }
 
         if (defining)
@@ -191,20 +227,19 @@ public sealed class PianoMidiFeedback : MonoBehaviour
         // Existing A button still opens the pause menu. MIDI setup is only allowed while idle.
         if (isPiano && game.CanSelectInstrument)
         {
-            if (OVRInput.GetDown(OVRInput.Button.Two, OVRInput.Controller.RTouch)) BeginCalibration();
-            if (OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.LTouch) && rangeReady)
-            { piano.plane.reverseHorizontal = !piano.plane.reverseHorizontal; instruction = "Check low, middle and high keys; X reverses alignment"; }
+            if (OVRInput.GetDown(OVRInput.Button.Two, OVRInput.Controller.RTouch)) RequestCalibration();
+            if (OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.LTouch)) ReverseKeyboardAlignment();
             if (OVRInput.GetDown(OVRInput.Button.Two, OVRInput.Controller.LTouch))
-            { enabledFeedback = !enabledFeedback; scoring = false; }
+                SetFeedbackEnabled(!enabledFeedback);
         }
         if (scoring && !game.LearningMode && game.playing && game.InputAllowed && isPiano) matcher.Advance(game.SongTime, TimingWindow);
         DrawMarkers(isPiano && game.InputAllowed && rangeReady && enabledFeedback);
-        // Ordinary play keeps the keyboard unobstructed; show only actionable setup
-        // instructions or the compact learning prompt while practising.
-        label.gameObject.SetActive(isPiano && (!game.playing || game.LearningMode || !rangeReady));
-        if (isPiano)
+        bool showLabel = !SuppressStatusLabel && isPiano && game.InputAllowed &&
+            (game.CanSelectInstrument || (game.playing && game.LearningMode && rangeReady));
+        label.gameObject.SetActive(showLabel);
+        if (showLabel)
         {
-            label.text = CompactStatus();
+            label.text = StatusMessage;
             label.transform.position = piano.plane.transform.TransformPoint(new Vector3(0, 0.56f, 0));
             if (Camera.main != null) label.transform.rotation = Quaternion.LookRotation(label.transform.position - Camera.main.transform.position);
         }
@@ -212,20 +247,120 @@ public sealed class PianoMidiFeedback : MonoBehaviour
 
     private string CompactStatus()
     {
-        if (calibrating) return "MIDI calibration\n" + instruction;
+        if (calibrating) return AppText.Choose("MIDI calibration", "Calibración MIDI") + "\n" + CalibrationPrompt();
         if (!rangeReady)
         {
-            if (game.HasSession) return "MIDI reset: quit and calibrate with B";
-            if (status.StartsWith("Connected USB MIDI:", StringComparison.Ordinal)) return "MIDI connected · B to calibrate";
-            if (status.StartsWith("Opening USB MIDI:", StringComparison.Ordinal)) return "Connecting MIDI…";
-            if (status.StartsWith("Waiting for", StringComparison.Ordinal)) return "Connect the keyboard USB cable";
-            return status.Length <= 70 ? status : status.Substring(0, 67) + "…";
+            if (resetDuringSession && game != null && game.HasSession)
+                return AppText.Choose("MIDI reset · Exit the song and recalibrate", "MIDI reiniciado · Sal de la canción y vuelve a calibrar");
+            return TransportMessage();
         }
-        if (game.LearningMode && game.HasSession)
-            return game.WaitingForLearningNotes ? "Play " + game.PendingNotes
-                : "Learning · " + game.LearningCompletedGroups + "/" + game.LearningTotalGroups;
-        return enabledFeedback ? "MIDI ready · B recalibrate" : "MIDI ready · feedback off (Y)";
+        if (game != null && game.LearningMode && game.playing)
+            return game.WaitingForLearningNotes ? AppText.Choose("Play ", "Toca ") + game.PendingNotes
+                : AppText.Choose("Learning · ", "Aprendizaje · ") + game.LearningCompletedGroups + "/" + game.LearningTotalGroups;
+        return enabledFeedback
+            ? AppText.Choose("MIDI ready · B to recalibrate", "MIDI listo · B para recalibrar")
+            : AppText.Choose("MIDI ready · indicators off (Y)", "MIDI listo · indicadores desactivados (Y)");
     }
+
+    private string CalibrationPrompt()
+    {
+        string error = calibration.Error;
+        if (error == "The note must be in the MIDI range 0 to 127.")
+            return AppText.Choose("Use a note in MIDI range 0–127", "Usa una nota del rango MIDI 0–127");
+        if (error == "The keyboard endpoints must be white keys.")
+            return AppText.Choose("Use a white key at each end", "Usa una tecla blanca en cada extremo");
+        if (error != null && error.StartsWith("The high note must be ", StringComparison.Ordinal))
+            return AppText.Choose($"Expected {keyCount} keys. Try the rightmost key again.",
+                $"Se necesitan {keyCount} teclas. Vuelve a tocar la tecla del extremo derecho.");
+        if (error != null) return AppText.Choose("Try that key again", "Vuelve a tocar esa tecla");
+        return calibration.FirstNote < 0
+            ? AppText.Choose("Press and release the leftmost key", "Pulsa y suelta la tecla del extremo izquierdo")
+            : AppText.Choose("Press the rightmost key", "Pulsa la tecla del extremo derecho");
+    }
+
+    private string TransportMessage()
+    {
+        switch (transport)
+        {
+            case TransportStatus.Starting: return AppText.Choose("Starting USB MIDI…", "Iniciando MIDI USB…");
+            case TransportStatus.Waiting: return AppText.Choose("Connect the keyboard USB cable", "Conecta el cable USB del teclado");
+            case TransportStatus.Connecting: return AppText.Choose("Connecting MIDI…", "Conectando MIDI…");
+            case TransportStatus.Connected: return AppText.Choose("MIDI connected · B to calibrate", "MIDI conectado · B para calibrar");
+            case TransportStatus.VirtualConnected: return AppText.Choose("Virtual MIDI connected · B to calibrate", "MIDI virtual conectado · B para calibrar");
+            case TransportStatus.Disconnected: return AppText.Choose("MIDI disconnected", "MIDI desconectado");
+            case TransportStatus.Stopped: return AppText.Choose("USB MIDI stopped", "MIDI USB detenido");
+            case TransportStatus.Interrupted: return AppText.Choose("MIDI interrupted · Recalibrate", "MIDI interrumpido · Vuelve a calibrar");
+            case TransportStatus.Reconnect: return AppText.Choose("Reconnect the MIDI keyboard", "Vuelve a conectar el teclado MIDI");
+            case TransportStatus.Unavailable: return AppText.Choose("USB MIDI unavailable", "MIDI USB no disponible");
+            case TransportStatus.Unsupported: return AppText.Choose("USB MIDI requires the Android player", "MIDI USB requiere la app para Android");
+            default: return AppText.Choose("USB MIDI status unknown", "Estado de MIDI USB desconocido");
+        }
+    }
+
+    private static TransportStatus ReadTransportStatus(string message)
+    {
+        if (string.IsNullOrEmpty(message)) return TransportStatus.Unknown;
+        if (message.StartsWith("Connected USB MIDI:", StringComparison.Ordinal)) return TransportStatus.Connected;
+        if (message.StartsWith("Opening USB MIDI:", StringComparison.Ordinal)) return TransportStatus.Connecting;
+        if (message.StartsWith("Waiting for a USB MIDI keyboard", StringComparison.Ordinal)) return TransportStatus.Waiting;
+        if (message.StartsWith("USB MIDI disconnected:", StringComparison.Ordinal)) return TransportStatus.Disconnected;
+        if (message.StartsWith("USB MIDI stopped", StringComparison.Ordinal)) return TransportStatus.Stopped;
+        if (message.StartsWith("USB MIDI queue overflow", StringComparison.Ordinal)) return TransportStatus.Interrupted;
+        if (message.StartsWith("USB MIDI failed for ", StringComparison.Ordinal)) return TransportStatus.Reconnect;
+        if (message.StartsWith("USB MIDI unavailable:", StringComparison.Ordinal) ||
+            message.StartsWith("USB MIDI requires Android", StringComparison.Ordinal) ||
+            message.StartsWith("Android MIDI service unavailable", StringComparison.Ordinal) ||
+            message.StartsWith("USB MIDI setup failed:", StringComparison.Ordinal)) return TransportStatus.Unavailable;
+        return TransportStatus.Unknown;
+    }
+
+    /// <summary>Shared guarded action for a menu button or a controller shortcut.</summary>
+    public bool RequestCalibration()
+    {
+        if (!IsConnected || game == null || piano == null || !game.IsPiano ||
+            !game.CanSelectInstrument || !piano.HasCalibration || UpdateDefinitionState()) return false;
+        BeginCalibration();
+        return calibrating;
+    }
+
+    public bool SetFeedbackEnabled(bool enabled)
+    {
+        if (!initialized || game == null || piano == null || !piano.HasCalibration ||
+            !game.IsPiano || !game.CanSelectInstrument || UpdateDefinitionState()) return false;
+        enabledFeedback = enabled;
+        scoring = false;
+        return true;
+    }
+
+    public bool ReverseKeyboardAlignment()
+    {
+        if (!initialized || game == null || piano == null || !game.IsPiano ||
+            !game.CanSelectInstrument || !rangeReady || UpdateDefinitionState()) return false;
+        piano.plane.reverseHorizontal = !piano.plane.reverseHorizontal;
+        return true;
+    }
+
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
+    private bool virtualInput;
+
+    public void EnableVirtualInput()
+    {
+        virtualInput = true;
+        transportConnected = true;
+        transport = TransportStatus.VirtualConnected;
+    }
+
+    public void BeginVirtualCalibration()
+    {
+        if (virtualInput) RequestCalibration();
+    }
+
+    public void ReceiveVirtualNote(int pitch, bool on, int velocity = 96)
+    {
+        if (!virtualInput) return;
+        Receive(new MidiEvent { type = "note", channel = 0, note = pitch, on = on, velocity = on ? velocity : 0 });
+    }
+#endif
 
     private void BeginCalibration()
     {
@@ -237,14 +372,26 @@ public sealed class PianoMidiFeedback : MonoBehaviour
         calibration = new KeyboardCalibration(keyCount);
         calibration.Begin();
         calibrating = true;
-        instruction = "Press and release the LEFTMOST key";
     }
 
     private void Receive(MidiEvent e)
     {
         if (!initialized || e == null) return;
         bool defining = UpdateDefinitionState();
-        if (e.type == "status") { status = e.message; return; }
+        if (e.type == "status")
+        {
+            // Device names and bridge errors belong in diagnostics. The UI shows a short localized state.
+            transport = ReadTransportStatus(e.message);
+            if (transport == TransportStatus.Connected || transport == TransportStatus.VirtualConnected)
+                transportConnected = true;
+            else if (transport != TransportStatus.Interrupted && transport != TransportStatus.Unknown)
+                transportConnected = false;
+            // Queue overflow invalidates the note range, not the open device.
+            // An unknown diagnostic must not create a connection that never existed.
+            if (!transportConnected) calibrating = false;
+            if (!string.IsNullOrEmpty(e.message)) Debug.Log(e.message);
+            return;
+        }
         if (e.type == "reset") { ResetInput(); return; }
         if (e.type == "channelReset")
         {
@@ -266,7 +413,7 @@ public sealed class PianoMidiFeedback : MonoBehaviour
         if (calibrating)
         {
             calibration.Observe(e.note);
-            instruction = calibration.Error ?? "Now press the RIGHTMOST key";
+            if (calibration.Error != null) Debug.Log(calibration.Error);
             if (calibration.IsComplete)
             {
                 firstNote = calibration.FirstNote;
@@ -276,7 +423,6 @@ public sealed class PianoMidiFeedback : MonoBehaviour
                 piano.plane.leftmostKey = MidiNotes.Format(firstNote);
                 piano.plane.reInit();
                 RebuildMarkers();
-                instruction = "MIDI " + firstNote + "–" + calibration.LastNote + ": check low, middle and high keys";
             }
             return;
         }
@@ -291,6 +437,7 @@ public sealed class PianoMidiFeedback : MonoBehaviour
     {
         if (!initialized || UpdateDefinitionState()) return;
         calibrating = false;
+        resetDuringSession = false;
         matcher.Clear();
         skipped = 0;
         scoring = enabledFeedback && rangeReady && !game.LearningMode;
@@ -307,7 +454,6 @@ public sealed class PianoMidiFeedback : MonoBehaviour
         if (!initialized || UpdateDefinitionState()) return;
         if (completed && scoring) matcher.Advance(double.MaxValue, TimingWindow);
         scoring = false;
-        if (!rangeReady) instruction = "B: calibrate MIDI again (61 keys)";
     }
 
     private void RebuildMarkers()
@@ -349,13 +495,16 @@ public sealed class PianoMidiFeedback : MonoBehaviour
 
     private void OnDestroy()
     {
-        ReleaseResources();
+        ReleaseResources(false);
     }
 
-    private void ReleaseResources()
+    private void ReleaseResources(bool notifyGame = true)
     {
         initialized = false;
         if (game != null) game.InputInterrupted -= InterruptInput;
+        // Component destruction is not a live device disconnect. Its owning
+        // scene/menu may already be gone, so do not request recovery UI.
+        if (!notifyGame) game = null;
         StopInput();
         if (bridge != null) bridge.Dispose();
         bridge = null;

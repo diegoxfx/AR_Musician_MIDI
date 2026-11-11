@@ -6,6 +6,7 @@ using System.Text;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using Newtonsoft.Json;
+using ARMusician.Midi;
 
 namespace Assets.Scripts.Songs
 {
@@ -107,7 +108,7 @@ namespace Assets.Scripts.Songs
                     var tempoMap = midi.GetTempoMap();
                     var notes = new List<NoteEvent>();
                     double duration = 0;
-                    foreach (var note in midi.GetNotes())
+                    foreach (var (note, hand) in MidiUtils.ReadNotesWithHands(midi))
                     {
                         if (notes.Count >= MaxNotesPerSong)
                             throw new InvalidDataException("Song exceeds the " + MaxNotesPerSong + " note limit.");
@@ -118,7 +119,7 @@ namespace Assets.Scripts.Songs
                             throw new InvalidDataException("Note timing exceeds the 24-hour song limit.");
                         duration = Math.Max(duration, end);
                         notes.Add(new NoteEvent { key = MidiUtils.GetNoteName(note.NoteNumber), midiNumber = note.NoteNumber,
-                            time = (float)start, duration = (float)length });
+                            sourceHand = hand, time = (float)start, duration = (float)length });
                     }
                     if (notes.Count == 0)
                         throw new InvalidDataException("MIDI contains no complete playable notes.");
@@ -162,6 +163,10 @@ namespace Assets.Scripts.Songs
                     writer.WriteStartObject();
                     writer.WritePropertyName("key"); writer.WriteValue(note.key);
                     writer.WritePropertyName("midiNumber"); writer.WriteValue(note.midiNumber);
+                    if (note.sourceHand != PianoHand.Unspecified)
+                    {
+                        writer.WritePropertyName("sourceHand"); writer.WriteValue((int)note.sourceHand);
+                    }
                     writer.WritePropertyName("time"); writer.WriteValue(note.time);
                     writer.WritePropertyName("duration"); writer.WriteValue(note.duration);
                     writer.WritePropertyName("keyIndex"); writer.WriteValue(note.keyIndex);

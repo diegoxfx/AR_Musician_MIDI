@@ -46,6 +46,7 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
 
     public bool CanConfirm => definitionActive && inCorrectionMode && !isDefined && capturedPoints.Count == 3;
     public bool IsDefining => definitionActive;
+    public int CapturedPointCount => capturedPoints.Count;
 
 
     // Piano specific arrays that the correctors need
@@ -354,7 +355,7 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
     /// <summary>
     /// The final step: "Printing" the plane after correction is done.
     /// </summary>
-    private void ConfirmFinalPlane()
+    public void ConfirmFinalPlane()
     {
         if (!CanConfirm) return;
         // --- Calculate the mathematical plane ---

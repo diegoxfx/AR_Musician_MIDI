@@ -1,8 +1,10 @@
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using System.IO;
+using ARMusician.Midi;
 
 namespace Assets.Scripts.Songs
 {
@@ -18,12 +20,9 @@ namespace Assets.Scripts.Songs
             // Get tempo map (for converting ticks to seconds)
             var tempoMap = midiFile.GetTempoMap();
 
-            // Extract note events
-            var notes = midiFile.GetNotes();
-
             List<NoteEvent> noteList = new List<NoteEvent>();
 
-            foreach (var note in notes)
+            foreach (var (note, hand) in ReadNotesWithHands(midiFile))
             {
                 // Convert MIDI pitch to note name (like "C4")
                 string noteName = GetNoteName(note.NoteNumber);
@@ -36,6 +35,7 @@ namespace Assets.Scripts.Songs
                 {
                     key = noteName,
                     midiNumber = note.NoteNumber,
+                    sourceHand = hand,
                     time = (float)startSec,
                     duration = (float)durSec
                 });
@@ -46,6 +46,30 @@ namespace Assets.Scripts.Songs
 
             // Save JSON
             File.WriteAllText(outputPath, json);
+        }
+
+        internal static IEnumerable<(Note Note, PianoHand Hand)> ReadNotesWithHands(MidiFile midi)
+        {
+            // Match the chronological order of MidiFile.GetNotes while preserving the originating track.
+            return midi.GetTrackChunks().SelectMany(track =>
+            {
+                var hand = ReadTrackHand(track);
+                return track.GetNotes().Select(note => (Note: note, Hand: hand));
+            }).OrderBy(item => item.Note.Time);
+        }
+
+        private static PianoHand ReadTrackHand(TrackChunk track)
+        {
+            PianoHand hand = PianoHand.Unspecified;
+            foreach (var midiEvent in track.Events)
+            {
+                if (!(midiEvent is SequenceTrackNameEvent name)) continue;
+                var candidate = PianoHandPartition.ParseTrackName(name.Text);
+                if (candidate == PianoHand.Unspecified) continue;
+                if (hand != PianoHand.Unspecified && hand != candidate) return PianoHand.Unspecified;
+                hand = candidate;
+            }
+            return hand;
         }
 
         public static string GetNoteName(int midiNumber)

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using ARMusician.Midi;
 
 public class PianoStrategy : MonoBehaviour, IGameplayStrategy
 {
@@ -56,7 +57,8 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
         }
         // --- Exact Logic from original SpawnCube ---
         float velocity = plane.height / fallTime;
-        float blockHeight = velocity * note.duration;
+        float visibleDuration = note.visualDuration >= 0 ? note.visualDuration / gameSpeed : note.duration;
+        float blockHeight = velocity * visibleDuration;
 
         GameObject cube = Instantiate(noteCubePrefab);
 
@@ -68,12 +70,19 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
         cube.transform.rotation = plane.transform.rotation;
 
         // Scale logic
-        cube.transform.localScale = new Vector3(keyWidth * plane.width, blockHeight, blockDepth);
+        cube.transform.localScale = new Vector3(keyWidth * plane.width * CubeFallBehavior.WidthRatio, blockHeight, blockDepth);
 
         // Color logic
         Renderer rend = cube.GetComponent<Renderer>();
         if (rend != null)
-            rend.material.color = plane.IsWhiteKey(note.keyIndex) ? Color.white : Color.black;
+        {
+            PianoHand hand = note.assignedHand != PianoHand.Unspecified ? note.assignedHand
+                : PianoHandPartition.Assign(note.keyIndex, note.sourceHand, game != null ? game.SplitPitch : PianoHandPartition.DefaultSplitPitch);
+            // Color denotes the hand, including accidentals. Black-key notes must
+            // remain visible against dark rooms and the keyboard itself.
+            rend.material.color = hand == PianoHand.Left
+                ? new Color(1f, 0.64f, 0.25f, 1f) : new Color(0.65f, 0.43f, 1f, 1f);
+        }
 
         // Behavior
         var fall = cube.AddComponent<CubeFallBehavior>(); // Renamed from CubeFall to be generic

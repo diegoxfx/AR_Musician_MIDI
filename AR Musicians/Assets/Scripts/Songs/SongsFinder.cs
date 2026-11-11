@@ -88,8 +88,7 @@ public class SongsFinder : MonoBehaviour
             // Filter specifically for your song JSONs
             foreach (string filePath in allPaths.Where(path => path != null).OrderBy(path => path, StringComparer.Ordinal))
             {
-                if (!filePath.EndsWith(".json")) continue;
-                if (filePath.Contains("file_manifest") || filePath.Contains(METADATA_SUFFIX)) continue;
+                if (!IsSongJson(filePath)) continue;
 
                 // We assume the manifest paths are relative to StreamingAssets (e.g. "Music/Song.json")
                 string relativeJsonPath = filePath;
@@ -131,7 +130,7 @@ public class SongsFinder : MonoBehaviour
             : new string[0];
         foreach (string jsonFilePath in jsonFiles)
         {
-            if (jsonFilePath.Contains("metadata") || jsonFilePath.Contains("file_manifest"))
+            if (!IsSongJson(jsonFilePath))
                 continue;
 
             string fileNameWithoutExt = Path.GetFileNameWithoutExtension(jsonFilePath);
@@ -154,6 +153,17 @@ public class SongsFinder : MonoBehaviour
         }
 
         yield return null; // Yield once to maintain coroutine structure.
+    }
+
+    private static bool IsSongJson(string path)
+    {
+        string name = Path.GetFileName(path.Replace('\\', '/'));
+        // Unity's OpenXR build adds this configuration to StreamingAssets.
+        // It is not note data and must not become a fallback-title song.
+        return name.EndsWith(".json", StringComparison.OrdinalIgnoreCase) &&
+            !name.EndsWith(METADATA_SUFFIX + ".json", StringComparison.OrdinalIgnoreCase) &&
+            !name.Equals("file_manifest.json", StringComparison.OrdinalIgnoreCase) &&
+            !name.Equals("RuntimeActionBindings.json", StringComparison.OrdinalIgnoreCase);
     }
 
     public IEnumerator LoadJsonFile(string relativePath, Action<string> callback)

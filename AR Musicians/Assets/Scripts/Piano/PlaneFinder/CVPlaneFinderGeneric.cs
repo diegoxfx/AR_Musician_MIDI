@@ -7,6 +7,25 @@ using UnityEngine.Android;
 
 public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
 {
+    private enum CaptureStatus
+    {
+        Ready,
+        MissingPermissions,
+        MissingCameraPermission,
+        MissingSpatialPermission,
+        MissingSetup,
+        SpatialUnsupported,
+        WaitingForCamera,
+        CameraImageUnavailable,
+        RejectedImage,
+        CaptureFailed,
+        MissingRays,
+        SpatialNotReady,
+        SpatialMiss,
+        InvalidSurface,
+        SurfaceDetected
+    }
+
     [Header("Configuration")]
     public EnvironmentRaycastManager raycastManager;
 
@@ -21,6 +40,8 @@ public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
     // ML Model manager for inference
     [SerializeField] private ModelManager modelManager;
 
+    [SerializeField, Range(0f, 1f)] private float minimumCornerConfidence = PianoDetectionValidator.DefaultMinimumConfidence;
+
     // Reuses the instructions in CVmenu so failures are visible inside the headset.
     [SerializeField] private TMP_Text statusText;
     #endregion
@@ -28,15 +49,29 @@ public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
     // Texture which stores the camera feed
     private Texture2D picture;
     private bool captureRequirementsMet;
+    private CaptureStatus captureStatus;
+    private PianoDetectionIssue detectionIssue;
 
-    private const string CaptureInstructions = "Press X on the left controller to detect the keyboard.";
-    private const string RetryInstructions = "Press X on the left controller to retry. A on the right confirms only a complete detection.";
+    public string StatusMessage => DescribeStatus();
+
+    private static string CaptureInstructions => AppText.Choose(
+        "Press X on the left controller to detect the keyboard.",
+        "Pulsa X en el mando izquierdo para detectar el teclado.");
+    private static string RetryInstructions => AppText.Choose(
+        "Press X on the left controller to retry. A on the right confirms only a complete detection.",
+        "Pulsa X en el mando izquierdo para reintentar. A en el derecho confirma una detección completa.");
+    private static string ReframeInstructions => AppText.Choose(
+        "Move back and center all the keys, then press X (left) to retry. You can also use manual setup.",
+        "Aléjate y centra todas las teclas. Pulsa X (izquierdo) para reintentar o usa la configuración manual.");
 
 
     private void Start()
     {
         if (quadRenderer != null) quadRenderer.enabled = active;
     }
+
+    private void OnEnable() => AppText.Changed += RefreshStatusText;
+    private void OnDisable() => AppText.Changed -= RefreshStatusText;
 
 
     void Update()
@@ -45,15 +80,15 @@ public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
 
         // Update after Android's permission dialog or camera startup without erasing
         // the result of the last detection on every frame.
-        bool ready = CheckCaptureRequirements(out string reason);
+        bool ready = CheckCaptureRequirements(out CaptureStatus reason);
         if (!ready && captureRequirementsMet && manager != null) manager.ResetDefinition();
         if (!ready || !captureRequirementsMet)
-            SetStatus(ready ? CaptureInstructions : reason);
+            SetStatus(reason);
         captureRequirementsMet = ready;
 
         if (OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.LTouch))
         {
-            TakePicture();
+            CaptureKeyboard();
         }
     }
 
@@ -68,46 +103,52 @@ public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
         if (missing.Count > 0) Permission.RequestUserPermissions(missing.ToArray());
     }
 
-    private bool CheckCaptureRequirements(out string reason)
+    private bool CheckCaptureRequirements(out CaptureStatus reason)
     {
         bool cameraAllowed = Permission.HasUserAuthorizedPermission(OVRPermissionsRequester.PassthroughCameraAccessPermission);
         bool sceneAllowed = Permission.HasUserAuthorizedPermission(OVRPermissionsRequester.ScenePermission);
         if (!cameraAllowed || !sceneAllowed)
         {
-            string missing = !cameraAllowed && !sceneAllowed ? "Camera and spatial data permissions are missing."
-                : !cameraAllowed ? "Camera permission is missing." : "Spatial data permission is missing.";
-            reason = missing + " Allow access in the headset permission dialog or app settings, then press X (left) to retry. A cannot confirm yet.";
+            reason = !cameraAllowed && !sceneAllowed ? CaptureStatus.MissingPermissions
+                : !cameraAllowed ? CaptureStatus.MissingCameraPermission : CaptureStatus.MissingSpatialPermission;
             return false;
         }
         if (manager == null || cameraAccess == null || modelManager == null || raycastManager == null)
         {
-            reason = "Detection unavailable: camera, model or spatial raycast setup is missing. A cannot confirm.";
+            reason = CaptureStatus.MissingSetup;
             return false;
         }
         if (!EnvironmentRaycastManager.IsSupported)
         {
-            reason = "Spatial raycast is not supported on this device/runtime. Automatic detection cannot define a surface; A cannot confirm.";
+            reason = CaptureStatus.SpatialUnsupported;
             return false;
         }
         if (!cameraAccess.IsPlaying)
         {
-            reason = "Waiting for the camera feed. " + RetryInstructions;
+            reason = CaptureStatus.WaitingForCamera;
             return false;
         }
-        reason = null;
+        reason = CaptureStatus.Ready;
         return true;
     }
 
-    private void SetStatus(string message)
+    private void SetStatus(CaptureStatus status)
     {
-        if (statusText != null) statusText.text = message;
+        captureStatus = status;
+        RefreshStatusText();
     }
 
-    void TakePicture()
+    private void RefreshStatusText()
+    {
+        if (statusText != null) statusText.text = StatusMessage;
+    }
+
+    public void CaptureKeyboard()
     {
         if (!active || manager == null) return;
         manager.ResetDefinition();
-        if (!CheckCaptureRequirements(out string reason))
+        captureRequirementsMet = CheckCaptureRequirements(out CaptureStatus reason);
+        if (!captureRequirementsMet)
         {
             SetStatus(reason);
             RequestCapturePermissions();
@@ -118,10 +159,11 @@ public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
             Vector2Int resolution = cameraAccess.CurrentResolution;
             int width = resolution[0];
             int height = resolution[1];
+            Texture cameraTexture = cameraAccess.GetTexture();
 
-            if (width <= 0 || height <= 0 || cameraAccess.GetTexture() == null)
+            if (width <= 0 || height <= 0 || cameraTexture == null)
             {
-                SetStatus("Camera image is not ready. " + RetryInstructions);
+                SetStatus(CaptureStatus.CameraImageUnavailable);
                 return;
             }
 
@@ -132,50 +174,115 @@ public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
                 picture = new Texture2D(width, height);
             }
 
-            Color32[] colors = new Color32[width * height];
-            colors = cameraAccess.GetColors().ToArray();
-            picture.SetPixels32(colors);
+            picture.SetPixels32(cameraAccess.GetColors().ToArray());
             picture.Apply();
+            if (quadRenderer != null) quadRenderer.material.mainTexture = picture;
 
-            Vector2[] kpts = modelManager.RunInference(cameraAccess.GetTexture(), 4);
-            if (kpts == null || kpts.Length != 4)
+            Vector2[] kpts = modelManager.RunInference(cameraTexture, 4, out float[] confidences);
+            detectionIssue = PianoDetectionValidator.Validate(kpts, confidences, width, height, minimumCornerConfidence);
+            if (detectionIssue != PianoDetectionIssue.None)
             {
-                SetStatus("Incomplete keyboard detection: three corner rays are required. " + RetryInstructions);
+                SetStatus(CaptureStatus.RejectedImage);
                 return;
             }
-            Ray[] rays = new Ray[kpts.Length - 1];
 
-            // Parse the keypoitns to rays
-            for (int i = 0; i < kpts.Length - 1; i++)
+            // All four corners validate the image. The plane uses TL, TR and BR.
+            Ray[] rays = new Ray[3];
+            for (int i = 0; i < rays.Length; i++)
             {
                 Vector2 kpt = kpts[i];
-                if (float.IsNaN(kpt.x) || float.IsInfinity(kpt.x) || float.IsNaN(kpt.y) || float.IsInfinity(kpt.y)
-                    || kpt.x < 0 || kpt.x >= width || kpt.y < 0 || kpt.y >= height)
-                {
-                    SetStatus("Incomplete keyboard detection: a corner is outside the camera image. " + RetryInstructions);
-                    return;
-                }
                 int y = picture.height - Mathf.FloorToInt(kpt.y);
-                var viewportPoint = new Vector2(
-                    (float)kpt.x / cameraAccess.CurrentResolution.x,
-                    (float)y / cameraAccess.CurrentResolution.y
-                );
-                var ray = cameraAccess.ViewportPointToRay(viewportPoint);
-                rays[i] = ray;
+                var viewportPoint = new Vector2(kpt.x / width, (float)y / height);
+                rays[i] = cameraAccess.ViewportPointToRay(viewportPoint);
             }
 
             parseRays(rays);
 
             drawQuad(picture, kpts);
             picture.Apply();
-            if (quadRenderer != null) quadRenderer.material.mainTexture = picture;
         }
         catch (Exception exception)
         {
             manager.ResetDefinition();
             Debug.LogWarning("Keyboard detection failed: " + exception.Message);
-            SetStatus("Keyboard detection failed; no surface can be confirmed. " + RetryInstructions);
+            SetStatus(CaptureStatus.CaptureFailed);
         }
+    }
+
+    private string DescribeStatus()
+    {
+        switch (captureStatus)
+        {
+            case CaptureStatus.MissingPermissions:
+                return DescribeMissingPermission("Camera and spatial data permissions are missing.", "Faltan los permisos de cámara y datos espaciales.");
+            case CaptureStatus.MissingCameraPermission:
+                return DescribeMissingPermission("Camera permission is missing.", "Falta el permiso de cámara.");
+            case CaptureStatus.MissingSpatialPermission:
+                return DescribeMissingPermission("Spatial data permission is missing.", "Falta el permiso de datos espaciales.");
+            case CaptureStatus.MissingSetup:
+                return AppText.Choose("Detection unavailable. Camera, model or spatial raycast setup is missing. Use manual setup.",
+                    "Detección no disponible. Falta la cámara, el modelo o la proyección espacial. Usa la configuración manual.");
+            case CaptureStatus.SpatialUnsupported:
+                return AppText.Choose("Spatial raycast is not supported on this device. Use manual setup.",
+                    "Este dispositivo no admite la proyección espacial. Usa la configuración manual.");
+            case CaptureStatus.WaitingForCamera:
+                return AppText.Choose("Waiting for the camera feed.", "Esperando la imagen de la cámara.") + " " + RetryInstructions;
+            case CaptureStatus.CameraImageUnavailable:
+                return AppText.Choose("Camera image is not ready.", "La imagen de la cámara aún no está disponible.") + " " + RetryInstructions;
+            case CaptureStatus.RejectedImage:
+                return DescribeDetectionIssue(detectionIssue);
+            case CaptureStatus.CaptureFailed:
+                return AppText.Choose("Keyboard detection failed.", "No se pudo detectar el teclado.") + " " + RetryInstructions;
+            case CaptureStatus.MissingRays:
+                return AppText.Choose("Incomplete keyboard detection. Unable to project three corner rays.",
+                    "Detección incompleta. No se pudieron proyectar tres esquinas.") + " " + RetryInstructions;
+            case CaptureStatus.SpatialNotReady:
+                return AppText.Choose("Spatial raycast is not ready. Wait for spatial data, then press X (left) to retry. A cannot confirm yet.",
+                    "Los datos espaciales aún no están disponibles. Espera y pulsa X (izquierdo) para reintentar.");
+            case CaptureStatus.SpatialMiss:
+                return AppText.Choose("Incomplete keyboard detection. A corner did not hit a visible surface.",
+                    "Detección incompleta. Una esquina no coincide con una superficie visible.") + " " + RetryInstructions;
+            case CaptureStatus.InvalidSurface:
+                return AppText.Choose("Incomplete keyboard detection. The three surface corners are invalid.",
+                    "Detección incompleta. Las tres esquinas proyectadas no forman una superficie válida.") + " " + RetryInstructions;
+            case CaptureStatus.SurfaceDetected:
+                return AppText.Choose("Keyboard surface detected. Adjust the corners if needed. Press A on the right controller to confirm, or X on the left to retry.",
+                    "Superficie del teclado detectada. Ajusta las esquinas si hace falta. Pulsa A (derecho) para confirmar o X (izquierdo) para reintentar.");
+            default:
+                return CaptureInstructions;
+        }
+    }
+
+    private static string DescribeMissingPermission(string english, string spanish)
+    {
+        return AppText.Choose(english, spanish) + " " + AppText.Choose(
+            "Allow access in the headset permission dialog or app settings, then press X (left) to retry. A cannot confirm yet.",
+            "Concede el permiso en el visor o en los ajustes de la app. Luego pulsa X (izquierdo) para reintentar.");
+    }
+
+    private static string DescribeDetectionIssue(PianoDetectionIssue issue)
+    {
+        string description;
+        switch (issue)
+        {
+            case PianoDetectionIssue.InvalidCorner:
+                description = AppText.Choose("A detected corner is outside the camera image.", "Una esquina detectada queda fuera de la imagen.");
+                break;
+            case PianoDetectionIssue.ClippedCorner:
+                description = AppText.Choose("A detected corner reaches the edge of the camera image.", "Una esquina detectada toca el borde de la imagen.");
+                break;
+            case PianoDetectionIssue.LowConfidence:
+                description = AppText.Choose("A keyboard corner could not be located reliably.", "Una esquina del teclado no se pudo localizar con suficiente confianza.");
+                break;
+            case PianoDetectionIssue.InvalidGeometry:
+                description = AppText.Choose("The detected corners do not form a usable keyboard outline.", "Las esquinas detectadas no forman un contorno válido del teclado.");
+                break;
+            default:
+                description = AppText.Choose("Incomplete keyboard detection. All four corners must be visible.",
+                    "Detección incompleta. Se necesitan las cuatro esquinas visibles para ubicar el teclado.");
+                break;
+        }
+        return description + " " + ReframeInstructions;
     }
 
     /// <summary>
@@ -205,14 +312,14 @@ public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
     {
         if (!active || manager == null) return;
         manager.ResetDefinition();
-        if (!CheckCaptureRequirements(out string reason))
+        if (!CheckCaptureRequirements(out CaptureStatus reason))
         {
             SetStatus(reason);
             return;
         }
         if (rays == null || rays.Length != 3)
         {
-            SetStatus("Incomplete keyboard detection: three corner rays are required. " + RetryInstructions);
+            SetStatus(CaptureStatus.MissingRays);
             return;
         }
 
@@ -224,16 +331,13 @@ public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
             if (!raycastManager.Raycast(rays[i], out var hit))
             {
                 SetStatus(hit.status == EnvironmentRaycastHitStatus.NotReady
-                    ? "Spatial raycast is not ready. Wait for spatial data, then press X (left) to retry. A cannot confirm yet."
-                    : "Incomplete keyboard detection: a corner did not hit a visible surface. " + RetryInstructions);
+                    ? CaptureStatus.SpatialNotReady : CaptureStatus.SpatialMiss);
                 return;
             }
             points[i] = hit.point;
         }
         bool accepted = manager.TryRegisterDetectedPoints(points);
-        SetStatus(accepted && manager.CanConfirm
-            ? "Keyboard surface detected. Adjust the corners if needed. Press A on the right controller to confirm, or X on the left to retry."
-            : "Incomplete keyboard detection: the three surface corners are invalid. " + RetryInstructions);
+        SetStatus(accepted && manager.CanConfirm ? CaptureStatus.SurfaceDetected : CaptureStatus.InvalidSurface);
     }
 
     override public void Activate()
@@ -242,8 +346,8 @@ public class CVPlaneFinderGeneric : AbstractPlaneFinderGeneric
         base.Activate();
         if (quadRenderer != null) quadRenderer.enabled = true;
         RequestCapturePermissions();
-        captureRequirementsMet = CheckCaptureRequirements(out string reason);
-        SetStatus(captureRequirementsMet ? CaptureInstructions : reason);
+        captureRequirementsMet = CheckCaptureRequirements(out CaptureStatus reason);
+        SetStatus(reason);
     }
 
     public override void Deactivate()

@@ -92,12 +92,14 @@ namespace UnityEngine
     { public static Quaternion LookRotation(Vector3 forward) { return new Quaternion(); } public static Quaternion LookRotation(Vector3 forward, Vector3 up) { return new Quaternion(); } }
     public struct Color
     {
-        private int value;
-        public static Color white=new Color {value=1}, black=new Color {value=2}, green=new Color {value=3}, red=new Color {value=4}, cyan=new Color {value=5}, darkCyan=new Color {value=6};
-        public static bool operator ==(Color a, Color b) { return a.value==b.value; }
-        public static bool operator !=(Color a, Color b) { return a.value!=b.value; }
+        public float r,g,b,a;
+        public Color(float r,float g,float b,float a=1) { this.r=r; this.g=g; this.b=b; this.a=a; }
+        public static Color white=new Color(1,1,1), black=new Color(0,0,0), green=new Color(0,1,0), red=new Color(1,0,0), cyan=new Color(0,1,1), darkCyan=new Color(0,0.5f,0.5f);
+        public static Color Lerp(Color a,Color b,float t) { return new Color(a.r+(b.r-a.r)*t,a.g+(b.g-a.g)*t,a.b+(b.b-a.b)*t,a.a+(b.a-a.a)*t); }
+        public static bool operator ==(Color a, Color b) { return a.r==b.r && a.g==b.g && a.b==b.b && a.a==b.a; }
+        public static bool operator !=(Color a, Color b) { return !(a==b); }
         public override bool Equals(object other) { return other is Color && this==(Color)other; }
-        public override int GetHashCode() { return value; }
+        public override int GetHashCode() { return r.GetHashCode() ^ g.GetHashCode() ^ b.GetHashCode() ^ a.GetHashCode(); }
     }
     public class Shader : Object {}
     public class Material : Object
@@ -181,6 +183,15 @@ public class SongData { public PartialSongData PartialSongData; }
 public class PracticeOptionsUI : MonoBehaviour
 {
     public void Initialize(RhythmGameManager game, PianoMidiFeedback feedback) {}
+    public bool IsVisible => false;
+    public void Hide() {}
+    public void ShowPause() {}
+    public void SetSinglePlayer() {}
+    public void ShowPrepare() {}
+    public void RestorePreparation() {}
+    public void ShowSetupCapture(bool automatic) {}
+    public void ShowLibrary() {}
+    public void RestoreLegacy(GameObject menu) {}
 }
 // Audio synthesis has its own pure/Unity-stub suite. Here verify manager transport wiring.
 public class MidiReferenceAudio : MonoBehaviour
@@ -189,7 +200,8 @@ public class MidiReferenceAudio : MonoBehaviour
     public int Begun, Stopped;
     public double LastTime;
     public bool LastPlaying;
-    public void BeginSong(List<NoteEvent> notes, float speed) { Begun++; }
+    public int[] GuidePitches;
+    public void BeginSong(List<NoteEvent> notes, float speed) { Begun++; GuidePitches = notes.Select(n => n.keyIndex).ToArray(); }
     public void Sync(double time, bool playing) { LastTime = time; LastPlaying = playing; }
     public void Stop() { Stopped++; LastPlaying = false; }
 }
@@ -211,11 +223,11 @@ public static class UnityIntegrationTests
     private static object Field(object value, string name) { return value.GetType().GetField(name, BindingFlags.Instance|BindingFlags.NonPublic).GetValue(value); }
     private static void Set(object value, string name, object content) { value.GetType().GetField(name, BindingFlags.Instance|BindingFlags.NonPublic).SetValue(value, content); }
     private static void Call(object value, string name, params object[] args) { value.GetType().GetMethod(name, BindingFlags.Instance|BindingFlags.NonPublic).Invoke(value,args); }
-    private static void Send(PianoMidiFeedback feedback, string type, int note = 60, int channel = 0, bool on = true, int velocity = 100)
+    private static void Send(PianoMidiFeedback feedback, string type, int note = 60, int channel = 0, bool on = true, int velocity = 100, string status = null)
     {
         var eventType = typeof(PianoMidiFeedback).GetNestedType("MidiEvent", BindingFlags.NonPublic);
         var message = Activator.CreateInstance(eventType);
-        foreach (var entry in new Dictionary<string,object> { {"type",type},{"note",note},{"channel",channel},{"on",on},{"velocity",velocity} })
+        foreach (var entry in new Dictionary<string,object> { {"type",type},{"note",note},{"channel",channel},{"on",on},{"velocity",velocity},{"message",status} })
             eventType.GetField(entry.Key).SetValue(message,entry.Value);
         Call(feedback,"Receive",message);
     }
@@ -279,7 +291,7 @@ public static class UnityIntegrationTests
             Countdown.countdownCircle=new GameObject().AddComponent<UnityEngine.UI.Image>();
         }
         public void Calibrate()
-        { Call(Feedback,"BeginCalibration"); Send(Feedback,"note",36); Send(Feedback,"note",96); }
+        { Send(Feedback,"status",status:"Connected USB MIDI: Test piano"); Call(Feedback,"BeginCalibration"); Send(Feedback,"note",36); Send(Feedback,"note",96); }
         public void Load(params NoteEvent[] notes) { Set(Game,"loadedNotes",new List<NoteEvent>(notes)); }
         public PracticeMatcher Matcher { get { return (PracticeMatcher)Field(Feedback,"matcher"); } }
     }
@@ -470,11 +482,49 @@ public static class UnityIntegrationTests
         Time.time=10; f.Game.Play(); Call(f.Game,"Update");
         var cube=UnityEngine.Object.Components.OfType<CubeFallBehavior>().Single();
         Call(cube,"Start"); Time.time=12; Call(cube,"Update");
+        Check(!(bool)Field(cube,"done") && cube.transform.localScale.y > 0,
+            "Zero-duration MIDI strike has a short visible head at the exact onset");
+        Time.time=12.02f; Call(cube,"Update");
         Check((bool)Field(cube,"done"),"Zero-duration visual completes without division by zero");
         Check((int)Field(f.Game,"activeNoteCount")==0,"Completed zero-duration visual decrements active note count");
         Near(0,cube.transform.localScale.y,"Completed zero-duration visual collapses to zero height");
         Time.time=12.31f; Call(f.Game,"Update");
         Check(!f.Game.HasSession && f.Matcher.Misses==1,"Song completes and finalizes unmatched zero-duration event");
+    }
+
+    private static void RepeatedNoteVisuals()
+    {
+        var f = new Fixture(); f.Calibrate();
+        var first = new NoteEvent { midiNumber = 60, time = 0, duration = 2 };
+        var next = new NoteEvent { midiNumber = 60, time = 0.5f, duration = 1 };
+        f.Load(first, next); f.Game.gameSpeed = 2;
+        Time.time = 0; f.Game.Play(); Call(f.Game, "Update");
+        var cube = UnityEngine.Object.Components.OfType<CubeFallBehavior>().Single();
+        Call(cube, "Start");
+        Near(0.2325f, cube.duration, "Repeated bar has speed-scaled separation before the next onset");
+        Near(f.Plane.height / f.Piano.fallTime * cube.duration, cube.origBlockHeight,
+            "Visible height uses the shortened visual duration consistently");
+        Near(2, first.duration, "Visible separation never mutates the loaded MIDI sustain");
+        Time.time = 2.235f; Call(cube, "Update");
+        Check((bool)Field(cube, "done") && f.Game.SongTime < 0.25,
+            "First repeated bar disappears before the following press reaches the strike line");
+        Check(f.Game.playing && f.Matcher.Total == 2, "Both scheduled strikes remain in gameplay");
+        f.Game.Quit();
+
+        f = new Fixture(); f.Calibrate();
+        f.Load(new NoteEvent { midiNumber = 60, time = 0, duration = 4 },
+            new NoteEvent { midiNumber = 60, time = 1, duration = 0.1f });
+        Time.time = 0; f.Game.Play();
+        Time.time = 3.11f; Call(f.Game, "Update");
+        foreach (var bar in UnityEngine.Object.Components.OfType<CubeFallBehavior>().ToArray())
+        { Call(bar, "Start"); Call(bar, "Update"); }
+        Time.time = 3.31f; Call(f.Game, "Update");
+        Check((int)Field(f.Game, "activeNoteCount") == 0 && f.Game.playing,
+            "Both-hands guide outlives shortened repeat visuals");
+        Check(f.Game.GetComponent<MidiReferenceAudio>().LastPlaying,
+            "Guide remains audible for the original long note sustain");
+        Time.time = 6.31f; Call(f.Game, "Update");
+        Check(!f.Game.HasSession, "Both-hands session completes after the original guide tail");
     }
 
     private static void LifecycleAndCanonicalPitch()
@@ -761,6 +811,10 @@ public static class UnityIntegrationTests
         f.Load(new NoteEvent {midiNumber=60,time=1,duration=1});
         Check(f.Game.BeginCountdown(false)==-1, "Learning cannot enter multiplayer countdown");
         f.Game.Play(); Check(!f.Game.playing, "Learning cannot start multiplayer through direct Play");
+        f.Selector.selectPiano();
+        Check(!f.Game.LearningMode, "Selecting multiplayer piano clears the previous single-player learning mode");
+        Check(f.Game.BeginCountdown(false) >= 0, "Multiplayer piano can start after a prior single-player learning session");
+        f.Game.CancelCountdown();
         ProjectConfig.Settings.enableMultiplayer=ProjectConfig.Settings.useMultiplayer=false;
         f.Selector.selectBongos();
         Check(!f.Game.LearningMode && !f.Game.SetLearningMode(true), "Selecting bongos clears learning preference and rejects it");
@@ -830,6 +884,84 @@ public static class UnityIntegrationTests
         Time.time=101; Near(4,f.Game.SongTime,"Normal mode resume remains unchanged"); f.Game.Quit();
     }
 
+    private static void HandPractice()
+    {
+        var f = new Fixture(); f.Calibrate();
+        Check(f.Game.PracticeHand == HandSelection.Both && f.Game.SplitPitch == 60, "Both hands are the default with a middle C split");
+        var left = new NoteEvent { midiNumber = 55, time = 1, duration = 0.25f };
+        var middle = new NoteEvent { key = "C5", time = 1, duration = 1 }; // Legacy key name for canonical C4.
+        var crossing = new NoteEvent { midiNumber = 76, sourceHand = PianoHand.Left, time = 3, duration = 1 };
+        var outOfRange = new NoteEvent { midiNumber = 35, sourceHand = PianoHand.Left, time = 2, duration = 1 };
+        var accompaniment = new NoteEvent { midiNumber = 45, sourceHand = PianoHand.Right, time = 5, duration = 2 };
+        f.Load(left, middle, crossing, outOfRange, accompaniment);
+        Check(f.Game.SetHandSelection(HandSelection.Left) && f.Game.HasPlayableHandNotes(), "Idle single-player piano can choose the playable left-hand part");
+        Check(!f.Game.SetSplitPitch(-1) && !f.Game.SetSplitPitch(128) && !f.Game.SetHandSelection((HandSelection)99), "Invalid hand selection and split pitches are rejected");
+        Check(f.Game.SetLearningMode(true), "Learning can combine with hand practice");
+        int starting = f.Game.BeginCountdown(false);
+        Check(starting >= 0 && !f.Game.SetHandSelection(HandSelection.Right) && !f.Game.SetSplitPitch(64), "A pending countdown locks hand and split choices");
+        Check(f.Game.CompleteCountdown(starting, false) && f.Game.LearningTotalGroups == 2, "Single-hand learning excludes unselected and out-of-range notes");
+        var audio = f.Game.GetComponent<MidiReferenceAudio>();
+        Check(audio.GuidePitches.SequenceEqual(new[] { 55, 60, 76, 35, 45 }), "Guide receives the entire arrangement after legacy pitch conversion");
+        Time.time = 3; Call(f.Game, "Update");
+        Check(f.Game.WaitingForLearningNotes && f.Game.PendingNotes == "G3", "Only the left note in a chord that straddles middle C is required");
+        Check(UnityEngine.Object.Components.OfType<CubeFallBehavior>().Select(c => c.keyIndex).OrderBy(n => n)
+            .SequenceEqual(new[] { 55, 76 }), "Only selected, in-range falling notes spawn, including explicitly labelled crossover notes");
+        f.Game.ReceivePracticeNote(60, true);
+        Check(f.Game.LearningCompletedGroups == 0, "Playing the unselected chord pitch cannot satisfy the selected hand");
+        f.Game.ReceivePracticeNote(55, true);
+        Check(f.Game.LearningCompletedGroups == 1 && !f.Game.WaitingForLearningNotes, "Selected chord pitch releases the learning gate by itself");
+        Time.time = 5;
+        Check(f.Game.WaitingForLearningNotes && f.Game.PendingNotes == "E5", "Explicit left-hand labels take precedence over the pitch split");
+        f.Game.Pause();
+        Check(!f.Game.SetHandSelection(HandSelection.Right) && !f.Game.SetSplitPitch(65), "Paused practice retains the same hand selection and split");
+        f.Game.Quit();
+        Check(left.assignedHand == PianoHand.Unspecified && crossing.sourceHand == PianoHand.Left && middle.midiNumber == -1, "Playback leaves reusable source notes and hand labels intact");
+
+        Check(f.Game.SetLearningMode(false) && f.Game.SetHandSelection(HandSelection.Right) && f.Game.SetSplitPitch(55), "Idle replay can select the other hand and change the split");
+        f.Game.Play();
+        Check(f.Matcher.Total == 3, "Timing scores use the selected hand with adjusted split and explicit crossover labels");
+        f.Game.Quit();
+        Check(f.Game.SetHandSelection(HandSelection.Both), "Both-hands selection can be restored for replay");
+        f.Game.Play(); Check(f.Matcher.Total == 4, "Both hands restore all in-range timing targets"); f.Game.Quit();
+
+        f.Load(left);
+        f.Game.SetHandSelection(HandSelection.Right); f.Game.SetSplitPitch(60);
+        Check(f.Game.HasLoadedSong && !f.Game.HasPlayableHandNotes() && f.Game.BeginCountdown(false) < 0, "A loaded song with no selected pitches cannot begin countdown");
+        f.Game.Play(); Check(!f.Game.HasSession, "Direct Play also rejects an empty hand selection");
+        f.Load(outOfRange);
+        f.Game.SetHandSelection(HandSelection.Left);
+        Check(!f.Game.HasPlayableHandNotes() && f.Game.BeginCountdown(false) < 0, "A hand with only out-of-range notes cannot begin countdown");
+        Check(f.Game.SetHandSelection(HandSelection.Both) && !f.Game.HasPlayableHandNotes() &&
+            f.Game.BeginCountdown(false) < 0, "Both hands still require at least one in-range note");
+        f.Game.Play(); Check(!f.Game.HasSession, "Direct Play rejects a both-hands song with no in-range notes");
+        f.Game.SetHandSelection(HandSelection.Left);
+        f.Load(left);
+        starting = f.Game.BeginCountdown(false);
+        f.Plane.leftmostKey = "C4"; f.Plane.reInit();
+        Check(starting >= 0 && !f.Game.CompleteCountdown(starting, false), "Countdown completion rechecks hand availability if the layout changed");
+
+        f = new Fixture(); f.Calibrate();
+        f.Load(new NoteEvent { midiNumber = 55, time = 0, duration = 0 }, accompaniment);
+        f.Game.SetHandSelection(HandSelection.Left);
+        f.Game.gameSpeed = 2;
+        f.Game.Play(); Call(f.Game, "Update");
+        var cube = UnityEngine.Object.Components.OfType<CubeFallBehavior>().Single();
+        Call(cube, "Start"); Time.time = 2.02f; Call(cube, "Update");
+        Time.time = 5.7f; Call(f.Game, "Update");
+        Check(f.Game.playing && (int)Field(f.Game, "activeNoteCount") == 0 && f.Game.GetComponent<MidiReferenceAudio>().LastPlaying,
+            "Guide remains active through the trailing unselected note and release margin after selected visuals finish");
+        Time.time = 5.81f; Call(f.Game, "Update");
+        Check(!f.Game.HasSession && f.Game.GetComponent<MidiReferenceAudio>().Stopped == 1, "Single-hand song ends after the speed-adjusted full guide tail");
+
+        ProjectConfig.Settings.enableMultiplayer = ProjectConfig.Settings.useMultiplayer = true;
+        Check(!f.Game.CanConfigureHands && !f.Game.SetHandSelection(HandSelection.Right), "Hand controls are exclusive to single-player piano");
+        f.Game.Play(); Check(f.Matcher.Total == 2, "Multiplayer uses both parts despite a prior single-player selection"); f.Game.Quit();
+        ProjectConfig.Settings.enableMultiplayer = ProjectConfig.Settings.useMultiplayer = false;
+        f.Selector.selectBongos();
+        Check(!f.Game.CanConfigureHands && !f.Game.SetSplitPitch(65), "Bongos do not use piano hand practice settings");
+        f.Game.Play(); Check(((List<NoteEvent>)Field(f.Game, "notes")).Count == 2, "Bongos retain the complete arrangement"); f.Game.Quit();
+    }
+
     public static string RunBundled(NoteEvent[] source)
     {
         assertions=0; var f=new Fixture(); f.Calibrate(); f.Load(source); f.Game.Play();
@@ -844,17 +976,169 @@ public static class UnityIntegrationTests
         return "PASS: bundled Sandstorm integration: 12,537 source entries, 10,723 hits, 815 skipped, 0 misses, 0 extras (Unity stubs)";
     }
 
+    private static void ShutdownWithLearningActive()
+    {
+        var f = new Fixture(); f.Calibrate();
+        f.Load(new NoteEvent { midiNumber = 60, time = 0, duration = 1 });
+        f.Game.SetLearningMode(true); f.Game.Play();
+        // Simulate Unity destroying menu children before manager OnDisable.
+        f.Menu.mainMenu = null;
+        Call(f.Game, "OnApplicationQuit");
+        Call(f.Game, "OnDisable");
+        Check(!f.Game.InputAllowed && !f.Game.playing,
+            "Application shutdown stops playback/input without touching destroyed menus");
+        Call(f.Feedback, "OnDestroy");
+        Check(!f.Feedback.IsInitialized && Field(f.Feedback, "game") == null,
+            "MIDI teardown releases resources without requesting recovery UI");
+
+        // The feedback component can also be destroyed before the game manager.
+        f = new Fixture(); f.Calibrate();
+        f.Load(new NoteEvent { midiNumber = 60, time = 0, duration = 1 });
+        f.Game.SetLearningMode(true); f.Game.Play(); f.Menu.mainMenu = null;
+        Call(f.Feedback, "OnDestroy");
+        Check(!f.Feedback.IsInitialized && Field(f.Feedback, "game") == null,
+            "Feedback-first destruction does not call an otherwise live manager's menu");
+    }
+
+    private static void MidiMenuActionGates()
+    {
+        var f = new Fixture(withDefiner: true);
+        Check(!f.Feedback.IsConnected && !f.Feedback.RequestCalibration(),
+            "Initializing feedback alone does not permit MIDI calibration");
+        foreach (var status in new[] { "Waiting for a USB MIDI keyboard", "Opening USB MIDI: Test piano",
+            "Android MIDI service unavailable", "USB MIDI disconnected: Test piano" })
+        {
+            Send(f.Feedback, "status", status: status);
+            string message = f.Feedback.StatusMessage;
+            Check(!f.Feedback.IsConnected && !f.Feedback.RequestCalibration() &&
+                !f.Feedback.IsCalibrating && f.Feedback.StatusMessage == message,
+                "Unavailable transport preserves its useful status instead of requesting a key: " + status);
+        }
+        Send(f.Feedback, "status", status: "USB MIDI queue overflow; held notes cleared.");
+        Check(!f.Feedback.IsConnected && !f.Feedback.RequestCalibration(),
+            "An overflow status cannot invent a connected device");
+        Send(f.Feedback, "status", status: "Connected USB MIDI: Test piano");
+        Check(f.Feedback.RequestCalibration() && f.Feedback.IsCalibrating,
+            "Menu calibration starts after piano pose confirmation while idle");
+        Send(f.Feedback, "note", 36); Send(f.Feedback, "note", 96);
+        Check(f.Feedback.IsCalibrated && !f.Feedback.IsCalibrating,
+            "Menu calibration completes through real MIDI endpoint events");
+        Send(f.Feedback, "reset");
+        Send(f.Feedback, "status", status: "USB MIDI queue overflow; held notes cleared.");
+        Check(f.Feedback.IsConnected && !f.Feedback.IsCalibrated && f.Feedback.RequestCalibration(),
+            "An overflow preserves the open device and allows required recalibration");
+        Send(f.Feedback, "note", 36); Send(f.Feedback, "note", 96);
+        bool reverse = f.Plane.reverseHorizontal;
+        Check(f.Feedback.ReverseKeyboardAlignment() && f.Plane.reverseHorizontal != reverse,
+            "Menu alignment action reverses a completed range");
+        Check(f.Feedback.SetFeedbackEnabled(false) && !f.Feedback.FeedbackEnabled,
+            "Menu feedback setting changes while idle");
+        f.Load(new NoteEvent { midiNumber = 60, time = 0, duration = 1 }); f.Game.Play();
+        Check(!f.Feedback.RequestCalibration() && !f.Feedback.ReverseKeyboardAlignment() &&
+            !f.Feedback.SetFeedbackEnabled(true) && f.Feedback.IsCalibrated,
+            "Playback rejects all setup menu actions without losing the calibrated range");
+        f.Game.Pause();
+        Check(!f.Feedback.RequestCalibration(), "Paused sessions cannot reset the MIDI mapping");
+        f.Game.Quit(); f.Game.SetApplicationFocused(false);
+        Check(!f.Feedback.RequestCalibration(), "Unfocused menus cannot start MIDI calibration");
+        f.Game.SetApplicationFocused(true); f.Definer.Activate(false);
+        Check(!f.Feedback.RequestCalibration() && !f.Feedback.ReverseKeyboardAlignment(),
+            "Vision/manual setup retains exclusive ownership of calibration controls");
+    }
+
+    private static void MidiStatusLocalization()
+    {
+        var f = new Fixture();
+        var label = (TextMesh)Field(f.Feedback, "label");
+        try
+        {
+            Send(f.Feedback, "status", status: "Connected USB MIDI: Test piano (output port 0).");
+            Check(f.Feedback.StatusMessage == "MIDI connected · B to calibrate", "USB status defaults to compact English");
+            AppText.SetLanguage(AppLanguage.Spanish);
+            Call(f.Feedback, "Update");
+            Check(f.Feedback.StatusMessage == "MIDI conectado · B para calibrar" && label.text == f.Feedback.StatusMessage,
+                "A received USB status and the world label follow a language change without another device event");
+
+            foreach (var pair in new Dictionary<string, string>
+            {
+                {"Waiting for a USB MIDI keyboard. Connect its USB data cable to the headset.", "Conecta el cable USB del teclado"},
+                {"Opening USB MIDI: Test piano", "Conectando MIDI…"},
+                {"USB MIDI disconnected: Test piano", "MIDI desconectado"},
+                {"USB MIDI stopped.", "MIDI USB detenido"},
+                {"USB MIDI queue overflow; held notes cleared.", "MIDI interrumpido · Vuelve a calibrar"},
+                {"USB MIDI failed for Test piano: SecurityException. Reconnect the keyboard to retry.", "Vuelve a conectar el teclado MIDI"},
+                {"Android MIDI service unavailable on this headset.", "MIDI USB no disponible"},
+                {"UnexpectedNativeDiagnostic: Test piano", "Estado de MIDI USB desconocido"},
+            })
+            {
+                Send(f.Feedback, "status", status: pair.Key);
+                Check(f.Feedback.StatusMessage == pair.Value, "USB status has localized UI text for " + pair.Key);
+            }
+
+            f.Feedback.SuppressStatusLabel = true;
+            Check(!label.gameObject.activeSelf, "Showing the overlay hides the world label immediately");
+            Send(f.Feedback, "status", status: "Connected USB MIDI: Test piano");
+            Check(f.Feedback.RequestCalibration() && f.Feedback.StatusMessage.Contains("extremo izquierdo"),
+                "Menu calibration starts with the localized left endpoint instruction");
+            Call(f.Feedback, "Update");
+            Check(!label.gameObject.activeSelf, "Suppression persists while the menu owns the calibration prompt");
+            Send(f.Feedback, "note", 37);
+            Check(f.Feedback.StatusMessage.Contains("tecla blanca"), "A rejected black key yields a localized correction");
+            Send(f.Feedback, "note", 36);
+            Check(f.Feedback.StatusMessage.Contains("extremo derecho"), "Accepting the left key updates the endpoint prompt");
+            Send(f.Feedback, "note", 84);
+            Check(f.Feedback.StatusMessage.Contains("61 teclas"), "A mismatched span states the required number of keys");
+            AppText.SetLanguage(AppLanguage.English);
+            Check(f.Feedback.IsCalibrating && f.Feedback.StatusMessage.Contains("61 keys"),
+                "Changing language preserves a pending calibration correction and its input state");
+            Send(f.Feedback, "note", 96);
+            Check(f.Feedback.IsCalibrated && f.Feedback.StatusMessage.StartsWith("MIDI ready"), "A valid retry still completes calibration");
+
+            f.Feedback.SuppressStatusLabel = false;
+            f.Load(new NoteEvent { midiNumber = 60, time = 0, duration = 1 });
+            f.Game.Play(); Call(f.Feedback, "Update");
+            Check(!label.gameObject.activeSelf, "Ordinary play hides the label with a calibrated keyboard");
+            Send(f.Feedback, "reset"); Call(f.Feedback, "Update");
+            Check(!label.gameObject.activeSelf && f.Game.playing && f.Feedback.StatusMessage.StartsWith("MIDI reset"),
+                "Ordinary play stays unobstructed after a reset and can expose recovery status in the menu");
+            f.Game.Quit();
+
+            f.Calibrate(); f.Game.SetLearningMode(true);
+            f.Load(new NoteEvent { midiNumber = 60, time = 0, duration = 1 }, new NoteEvent { midiNumber = 64, time = 0, duration = 1 });
+            f.Game.Play(); Time.time = 2; Call(f.Feedback, "Update");
+            Check(label.gameObject.activeSelf && label.text == "Play C4 + E4", "Active learning displays the compact target chord");
+            AppText.SetLanguage(AppLanguage.Spanish);
+            Call(f.Feedback, "Update");
+            Check(label.text == "Toca C4 + E4", "The same pending chord prompt changes language");
+            f.Game.Pause(); Call(f.Feedback, "Update");
+            Check(!label.gameObject.activeSelf && f.Feedback.StatusMessage.StartsWith("MIDI listo"), "Paused learning hides the active prompt");
+            Send(f.Feedback, "reset");
+            Check(f.Feedback.StatusMessage.Contains("Sal de la canción") && !f.Feedback.IsCalibrated,
+                "The paused menu can show localized reset and recalibration guidance");
+            f.Game.Quit();
+
+            f = new Fixture("font");
+            Check(f.Feedback.StatusMessage == "MIDI USB no disponible" && Debug.Warnings[0].Contains("font"),
+                "Initialization failure shows a localized status and preserves diagnostic detail in logs");
+        }
+        finally { AppText.SetLanguage(AppLanguage.English); }
+    }
+
     public static string Run()
     {
         assertions=0; Application.streamingAssetsPath=System.IO.Path.GetTempPath();
         OptionalMidiInitializationFailure();
         MidiYieldsToPianoDefinition();
         CancelPianoDefinitionThroughMenu();
-        CalibrationAndHotplug(); PauseReplayAndTiming(); ZeroDurationCompletion(); LifecycleAndCanonicalPitch();
+        CalibrationAndHotplug(); PauseReplayAndTiming(); ZeroDurationCompletion(); RepeatedNoteVisuals(); LifecycleAndCanonicalPitch();
         InitialAndResumeCountdownSuspension(); CountdownInvalidation(); FocusAndInputGates(); RealSelectorAndMenu(); HeadsetFocusRecovery(); UnisonScoringIntegration();
         RejectedCountdownButtonFlows();
         MultiplayerLifecyclePolicy();
         LearningModeTransport();
+        HandPractice();
+        ShutdownWithLearningActive();
+        MidiMenuActionGates();
+        MidiStatusLocalization();
         return "PASS: " + assertions + " Unity integration assertions with stubs (not a real Unity build)";
     }
 }

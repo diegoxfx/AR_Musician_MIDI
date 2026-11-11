@@ -9,7 +9,9 @@ $sources = @(
     (Join-Path $scripts 'Piano\PlaneFinder\AbstractPlaneFinderGeneric.cs'),
     (Join-Path $scripts 'Piano\PlaneFinder\CVPlaneFinderGeneric.cs'),
     (Join-Path $scripts 'Piano\PlaneFinder\DefinedPlane.cs'),
+    (Join-Path $scripts 'Piano\PlaneFinder\PianoDetectionValidator.cs'),
     (Join-Path $scripts 'Piano\PianoManagerInstrumentDefiner.cs'),
+    (Join-Path $scripts 'UI\AppText.cs'),
     (Join-Path $PSScriptRoot 'csharp\PianoSetupTests.cs')
 )
 Add-Type -Path $sources -IgnoreWarnings -WarningAction SilentlyContinue

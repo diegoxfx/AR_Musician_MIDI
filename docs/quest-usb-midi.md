@@ -66,25 +66,32 @@ instrumentation. It does not send notes back to the keyboard or record audio.
 4. Build/install to Quest, then disconnect the computer and connect the keyboard.
    This is an Android standalone build, not a Windows/PCVR build. The Editor shows
    that USB input requires the Android player.
-5. Open **Configure Instrument**, enable **CV Detection**, and select piano.
+5. Open **Piano setup**, then choose **Automatic capture**.
    Allow both headset camera and spatial-data permissions. Look at the whole
-   keyboard and press **X on the left controller** to detect it; then press
-   **A on the right controller** to confirm the detected surface. Detection must
+   keyboard and choose **Capture keyboard** or press **X on the left controller**;
+   then choose **Confirm position** or press **A on the right controller**.
+   Detection must
    locate all three required corners in 3D before confirmation is possible.
    A camera preview alone is not a completed calibration. Retry with X if the
-   surface is incomplete, or disable CV Detection for manual setup.
+   surface is incomplete, or choose **Cancel**, then **Manual calibration**.
    The scene defaults to **61 keys, C2**. Detected corners must span the playable
    keyboard, not the outer case. MIDI calibration then verifies the actual range.
-6. Wait for the HUD to report the connected USB MIDI keyboard.
-7. While no song is active, press **B** on the right controller. Press and release
+6. Wait for the setup status to report the connected USB MIDI keyboard.
+7. While no song is active, choose **Calibrate MIDI** in Piano setup, or press
+   **B** on the right controller. Press and release
    the physical leftmost key, then the rightmost key. They must be white keys
    separated by 60 semitones. An invalid upper key can be retried; B restarts.
 8. Check a low, middle and high key. Each press should light the matching location.
    Press **X** on the left controller if the horizontal direction is reversed.
    If positions still disagree, redo the visual/manual plane setup.
-9. Open **Singleplayer > Piano**, choose a song with **< / >**, press **Select**,
-   then choose **Learning: ON/OFF** and **Piano guide sound: ON/OFF** before
-   **Start**. **Y** toggles MIDI feedback while idle. **A** retains
+9. Confirming the piano returns to preparation. Open **Browse songs** and select
+   a song row to return to preparation. Select **Left / Both / Right** and
+   **Learn / Play**, adjust speed, then press **Start practice**. **Settings**
+   contains **Guide sound**, **Key feedback** and the fallback hand split.
+   **EN / ES** changes the interface language and persists it between launches.
+   **Play** works without MIDI; **Learn** requires connected, calibrated MIDI.
+   The panel disappears during countdown and playback. **Y** toggles MIDI
+   feedback while idle. **A** retains
    the existing pause-menu action. Setup controls are disabled during an active
    song, including the start/resume countdowns and while paused.
 
@@ -106,21 +113,24 @@ loss gates MIDI input but does not pause only that peer's running song clock.
 Pending countdowns still cancel when interrupted. Networked recovery remains
 outside this extension's tested scope.
 
-## Learning and guide sound (1.2.0)
+## Learning, hand selection and guide sound
 
-After endpoint calibration, enable **Learning: ON** in the single-player start
-lobby. The timeline stops at each playable note/chord until all required pitches
+After endpoint calibration, select **Learn** in the single-player preparation
+panel. The timeline stops at each playable note/chord until all required pitches
 have been pressed. An already-held key does not count as a fresh press; release
 and press repeated notes again. Chord onsets within 20 ms are grouped, exact
 duplicate events count once, and presses up to 150 ms early may count. Out-of-range
 notes do not block progress. Learning mode shows progress instead of timing scores.
+The selected hand filters required notes and the falling display; the guide still
+plays the arrangement. Labeled MIDI tracks identify hands where available; other
+songs use the adjustable pitch split. See [hand selection](piano-hand-practice.md).
 
 Pause/focus loss clears partial chord credit. Returning to the app requires an
 explicit Resume; USB reset requires Quit, endpoint calibration and Start again.
 Replay starts with no previous progress. Mode changes are available only while
 idle, and learning requires calibrated MIDI input and single-player piano.
 
-**Piano guide sound** defaults to ON and can be changed before Start, including
+**Guide sound**, under **Settings**, defaults to ON and can be changed before Start, including
 without a MIDI keyboard. The local synthesizer follows song speed, pause, replay
 and learning stops. At a learning stop a reference note sounds once and decays;
 it does not repeatedly attack while waiting. Normal playback hides the compact
@@ -130,7 +140,7 @@ MIDI label; calibration, reset and learning prompts remain visible when useful.
 
 The editor entry point `QuestApkBuild.Build` builds `MainScene` as one ARM64/IL2CPP
 development APK with Android debug signing. It sets package `com.armusician.midi`,
-version 1.2.0 / code 5, minimum API 32 and target API 35. Install Unity 6000.2.8f1
+version 1.3.0 / code 6, minimum API 32 and target API 35. Install Unity 6000.2.8f1
 with Android Build Support, SDK/NDK tools and OpenJDK, and activate a Unity license.
 
 Download these files from the upstream README's public Polybox share into

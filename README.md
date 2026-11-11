@@ -33,9 +33,16 @@ This branch adds optional **standalone Quest USB-MIDI practice feedback**, targe
 the Casio CT-S200. It extends the original Unity app; its vision models and piano
 workflow are retained. See [connection, calibration, build and verification notes](docs/quest-usb-midi.md).
 It supports personal MIDI files on the headset, synthesized piano guide sound,
-and a learning mode that waits for the player's notes/chords. USB-MIDI input and
-piano detection were confirmed by the user on Quest 3 + CT-S200 with version 1.1.1;
-the new 1.2.0 learning/audio flow still needs a physical acceptance test.
+and a learning mode that waits for the player's notes/chords. The compact English/
+Spanish preparation panel includes [left, right and both-hand practice](docs/piano-hand-practice.md)
+and disappears during playback. A [Windows simulator](docs/desktop-simulator.md)
+runs the actual Unity scene with virtual MIDI for flow and rendering checks.
+USB-MIDI input and piano detection were confirmed by the user on Quest 3 + CT-S200
+with version 1.1.1; the redesigned 1.3.0 practice flow still needs headset acceptance.
+The production vision models remain unchanged. The separate
+[real-photo SAM-to-YOLO experiment](SynthesiaSet/piano_perception/keybed_yolo/README.md)
+targets the playable surface and individual keys; it has not produced a trained
+replacement. See [device evidence and detection limits](docs/quest-piano-detection.md).
 
 # Table of Contents
 

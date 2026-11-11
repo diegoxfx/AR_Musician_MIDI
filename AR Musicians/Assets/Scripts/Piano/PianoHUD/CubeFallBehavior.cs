@@ -3,6 +3,7 @@ using System;
 
 public class CubeFallBehavior : MonoBehaviour
 {
+    public const float WidthRatio = 0.86f;
     private PianoStrategy strategy;
     public PlaneController plane;
     public float fallTime;      // total seconds to reach plane
@@ -20,6 +21,7 @@ public class CubeFallBehavior : MonoBehaviour
 
     private bool done = false;
     private bool paused = false;
+    private bool struck;
 
     private Renderer rend;
     public void Configure(PianoStrategy strat, PlaneController p, NoteEvent note, float fall, float height, float depth, int keyIndex, Renderer rend, float gameSpeed, RhythmGameManager game)
@@ -27,7 +29,9 @@ public class CubeFallBehavior : MonoBehaviour
         this.strategy = strat;
         this.plane = p;
         this.startTime = note.time;
-        this.duration = note.duration;
+        // Keep a small gap before the next strike on this key. Only the bar is
+        // shortened; the synth and lesson retain the original MIDI duration.
+        this.duration = note.visualDuration >= 0 ? note.visualDuration / gameSpeed : note.duration;
         this.fallTime = fall;
         this.origBlockHeight = height;
         this.blockDepth = depth;
@@ -39,7 +43,7 @@ public class CubeFallBehavior : MonoBehaviour
 
     void Start()
     {
-        keyWidth = plane.GetLocalKeyWidth(keyIndex);
+        keyWidth = plane.GetLocalKeyWidth(keyIndex) * WidthRatio;
         spawnTime = Time.time;
     }
 
@@ -95,10 +99,11 @@ public class CubeFallBehavior : MonoBehaviour
 
     void Stretch()
     {
-        if (rend.material.color == Color.white)
-            rend.material.color = Color.cyan;
-        else if (rend.material.color == Color.black)
-            rend.material.color = Color.darkCyan;
+        if (!struck && rend != null)
+        {
+            rend.material.color = Color.Lerp(rend.material.color, Color.white, 0.28f);
+            struck = true;
+        }
 
         float timeSinceSpawn = ElapsedApproachTime();
         float timeSinceBottom = timeSinceSpawn - fallTime;
