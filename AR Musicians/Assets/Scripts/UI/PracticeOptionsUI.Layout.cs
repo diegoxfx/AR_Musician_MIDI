@@ -129,7 +129,7 @@ public sealed partial class PracticeOptionsUI
 
     private void BuildPrepare(RectTransform panel)
     {
-        Label(panel, "AppName", "AR-Musician", 29, 14, 237, 48, 32, bold: true);
+        Label(panel, "AppName", "Keytrail", 29, 14, 237, 48, 32, bold: true);
         english = ButtonWithLabel(panel, "LanguageEnglishButton", "EN", 273, 19, 56, 39, 22,
             () => SetLanguage(AppLanguage.English));
         Line(panel, 341, 28, 1, 21);

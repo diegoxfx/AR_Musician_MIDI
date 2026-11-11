@@ -226,6 +226,8 @@ def reviewed_labels(workspace):
         path = image_path(workspace, row)
         if review["image_sha256"] != row["image_sha256"]:
             raise ValueError(f"{key}: review does not match the image checksum")
+        if review.get("split", row["split"]) != row["split"]:
+            raise ValueError(f"{key}: review split differs from the source inventory")
         status = review.get("status")
         reviewer = review.get("reviewed_by")
         if status not in ("accepted", "negative", "rejected") or not isinstance(reviewer, str) or not reviewer.strip():

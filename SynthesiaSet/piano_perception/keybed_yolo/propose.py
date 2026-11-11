@@ -1,15 +1,77 @@
 """Create local SAM 3.1 label proposals for manual review."""
 
 import argparse
+from contextlib import nullcontext
 from math import dist
 from pathlib import Path
 import tempfile
+
+if __name__ == "__main__":
+    from resource_budget import constrain_cpu
+
+    constrain_cpu()
 
 import numpy as np
 from PIL import Image, ImageDraw
 
 from dataset import annotate, image_path, read_json, sha256_file, write_json
 from geometry import CLASSES, checked_polygon, checked_quad
+
+
+# Bound contour error in mask pixels: a long, narrow key must not lose its
+# stem or rounded lip merely because its perimeter is large.
+KEY_POLYGON_MAX_ERROR_PX = 0.75
+
+
+class Sam:
+    def __init__(self, checkpoint, device, edge, budget=None):
+        import torch
+        from transformers import Sam3Config, Sam3Model, Sam3Processor
+
+        self.device = device
+        self.dtype = torch.float16 if device.startswith("cuda") else torch.float32
+        self.budget = budget
+        self.processor = Sam3Processor.from_pretrained(checkpoint, local_files_only=True)
+        self.processor.image_processor.size = {"height": edge, "width": edge}
+        config = Sam3Config.from_pretrained(checkpoint, local_files_only=True)
+        config.vision_config.backbone_config.image_size = edge
+        with self.operation():
+            self.model = Sam3Model.from_pretrained(checkpoint, config=config, dtype=self.dtype,
+                                                   local_files_only=True).to(device).eval()
+
+    def operation(self):
+        return self.budget.operation() if self.budget else nullcontext()
+
+    def detections(self, image, prompts, threshold):
+        for class_name, prompt, scores, masks in self.detection_groups(image, prompts, threshold):
+            for score, mask in zip(scores, masks, strict=True):
+                yield class_name, prompt, score, mask
+
+    def detection_groups(self, image, prompts, threshold):
+        with self.operation():
+            yield from self.detect_crop(image, prompts, threshold)
+
+    def detect_crop(self, image, prompts, threshold):
+        pixels = self.processor.image_processor(images=image, return_tensors="pt").pixel_values
+        vision = self.model.get_vision_features(pixels.to(self.device, self.dtype))
+        for class_name, prompt, limit in prompts:
+            tokens = self.processor(text=prompt, return_tensors="pt").to(self.device)
+            outputs = self.model(vision_embeds=vision, input_ids=tokens.input_ids,
+                                 attention_mask=tokens.attention_mask)
+            scores = outputs.pred_logits.sigmoid() * outputs.presence_logits.sigmoid()
+            if int((scores > threshold).sum()) > limit:
+                # Exclude low-ranked queries before resizing masks to native resolution.
+                outputs.pred_logits = outputs.pred_logits.clone()
+                skip = scores.argsort(dim=-1)[..., :-limit]
+                outputs.pred_logits.scatter_(-1, skip, -float("inf"))
+            found = self.processor.post_process_instance_segmentation(
+                outputs, threshold=threshold, mask_threshold=0.5,
+                target_sizes=[(image.height, image.width)],
+            )[0]
+            order = found["scores"].argsort(descending=True)[:limit]
+            scores = found["scores"][order].tolist()
+            masks = found["masks"][order].cpu().numpy().astype(bool, copy=False)
+            yield class_name, prompt, scores, masks
 
 
 def quad_from_mask(mask):
@@ -57,7 +119,8 @@ def key_polygon(mask):
         raise ValueError("empty key mask")
     contour = max(contours, key=cv2.contourArea)
     perimeter = cv2.arcLength(contour, True)
-    polygon = cv2.approxPolyDP(contour, max(0.6, 0.005 * perimeter), True)[:, 0].tolist()
+    tolerance = min(KEY_POLYGON_MAX_ERROR_PX, max(0.6, 0.005 * perimeter))
+    polygon = cv2.approxPolyDP(contour, tolerance, True)[:, 0].tolist()
     polygon = checked_polygon(polygon, width, height)
     filled = np.zeros_like(mask, dtype=np.uint8)
     cv2.fillPoly(filled, [np.asarray(polygon, dtype=np.int32)], 1)
@@ -83,10 +146,9 @@ def save_overlay(image, overlay, candidates, prompt, path):
     banner.save(path)
 
 
-def propose(workspace, checkpoint, device, edge, bed_prompts, threshold, selected):
+def propose(workspace, checkpoint, device, edge, bed_prompts, threshold, selected, budget=None):
     import torch
     import transformers
-    from transformers import Sam3Config, Sam3Model, Sam3Processor
 
     output = workspace / "proposals"
     if output.exists():
@@ -98,12 +160,8 @@ def propose(workspace, checkpoint, device, edge, bed_prompts, threshold, selecte
         inventory = [row for row in inventory if row["id"] in selected]
     prompts = [(CLASSES[0], prompt) for prompt in bed_prompts]
     prompts.extend(zip(CLASSES[1:], ("white piano keys", "black piano keys")))
-    processor = Sam3Processor.from_pretrained(checkpoint, local_files_only=True)
-    processor.image_processor.size = {"height": edge, "width": edge}
-    config = Sam3Config.from_pretrained(checkpoint, local_files_only=True)
-    config.vision_config.backbone_config.image_size = edge
-    dtype = torch.float16 if device.startswith("cuda") else torch.float32
-    model = Sam3Model.from_pretrained(checkpoint, config=config, dtype=dtype, local_files_only=True).to(device).eval()
+    prompt_limits = [(class_name, prompt, 2 if class_name == CLASSES[0] else 96) for class_name, prompt in prompts]
+    sam = Sam(checkpoint, device, edge, budget)
     records = []
     with tempfile.TemporaryDirectory(dir=workspace) as staging, torch.inference_mode():
         target = Path(staging) / "proposals"
@@ -111,24 +169,15 @@ def propose(workspace, checkpoint, device, edge, bed_prompts, threshold, selecte
         for row in inventory:
             with Image.open(image_path(workspace, row)) as original:
                 image = original.convert("RGB")
-            initial = processor(images=image, text=prompts[0][1], return_tensors="pt").to(device, dtype)
-            vision = model.get_vision_features(initial.pixel_values)
             candidates = []
-            for prompt_index, (class_name, prompt) in enumerate(prompts, start=1):
-                inputs = processor(images=image, text=prompt, return_tensors="pt").to(device, dtype)
-                outputs = model(vision_embeds=vision, input_ids=inputs.input_ids, attention_mask=inputs.attention_mask)
-                detections = processor.post_process_instance_segmentation(
-                    outputs, threshold=threshold, mask_threshold=0.5, target_sizes=[(image.height, image.width)]
-                )[0]
-                limit = 2 if class_name == CLASSES[0] else 96
-                order = detections["scores"].argsort(descending=True)[:limit]
+            groups = sam.detection_groups(image, prompt_limits, threshold)
+            for prompt_index, (class_name, prompt, scores, masks) in enumerate(groups, start=1):
                 by_prompt = []
                 pixels = np.asarray(image).copy()
-                for rank, index in enumerate(order.tolist(), start=1):
-                    mask = detections["masks"][index].cpu().numpy().astype(bool)
+                for rank, (score, mask) in enumerate(zip(scores, masks, strict=True), start=1):
                     candidate_id = f"p{prompt_index}-{rank}"
                     candidate = {"id": candidate_id, "class": class_name, "prompt": prompt,
-                                 "score": detections["scores"][index].item()}
+                                 "score": score}
                     try:
                         if class_name == CLASSES[0]:
                             candidate["corners"], candidate["mask_shape_iou"] = quad_from_mask(mask)
@@ -150,11 +199,16 @@ def propose(workspace, checkpoint, device, edge, bed_prompts, threshold, selecte
                                            "checkpoint_sha256": {p.name: sha256_file(p) for p in checkpoint_files},
                                            "transformers": transformers.__version__, "torch": torch.__version__,
                                            "input_edge": edge, "threshold": threshold, "mask_threshold": 0.5,
+                                           "key_polygon_max_error_px": KEY_POLYGON_MAX_ERROR_PX,
                                            "prompts": prompts, "images": records})
         target.rename(output)
 
 
 def main():
+    import cv2
+
+    from resource_budget import ResourceBudget
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("workspace", type=Path)
     parser.add_argument("checkpoint", type=Path)
@@ -163,14 +217,18 @@ def main():
     parser.add_argument("--bed-prompt", action="append")
     parser.add_argument("--image-id", action="append")
     parser.add_argument("--threshold", type=float, default=0.35)
+    parser.add_argument("--budget-log", type=Path, help="Save resource-budget telemetry as JSON lines")
     args = parser.parse_args()
     if not args.checkpoint.is_dir():
         parser.error("checkpoint must be an existing local directory")
     if not 0 < args.threshold < 1:
         parser.error("threshold must be between 0 and 1")
     prompts = args.bed_prompt or ["piano keys", "piano keyboard keybed"]
+    budget = ResourceBudget(log_path=args.budget_log)
+    budget.configure_torch(args.device)
+    cv2.setNumThreads(2)
     propose(args.workspace, args.checkpoint.resolve(), args.device, args.edge, prompts, args.threshold,
-            set(args.image_id or ()))
+            set(args.image_id or ()), budget)
 
 
 if __name__ == "__main__":

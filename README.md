@@ -1,37 +1,8 @@
-<h1 align="center">AR-Musician<br><sub><sup>Playing Instruments the Futuristic Way</sup></sub></h1>
+<h1 align="center">Keytrail<br><sub><sup>Visual piano practice on standalone Quest</sup></sub></h1>
 
-<div align="center">
-
-[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-SynthesiaSet-yellow)](https://huggingface.co/datasets/gserifi/SynthesiaSet)&#160;
-[![Polybox Checkpoints](https://img.shields.io/badge/Polybox_Checkpoints-0063A6.svg?logo=icloud)](https://polybox.ethz.ch/index.php/s/RXfAobWzkpjRgzG)&#160;
-[![Technical Report](https://img.shields.io/badge/%F0%9F%93%84%20Technical_Report-rebeccapurple)](assets/report.pdf)&#160;
-[![Poster](https://img.shields.io/badge/%F0%9F%96%BC%20Poster-teal)](assets/poster.pdf)&#160;
-[![Demo Video](https://img.shields.io/badge/%F0%9F%8E%AC%20Demo_Video-crimson)](https://youtu.be/5JOPkejo6eE)
-</div>
-
-<div align="center">
-Matan Davidi*
-&nbsp;&nbsp;&nbsp;&nbsp;
-Cyril Moser*
-&nbsp;&nbsp;&nbsp;&nbsp;
-Gent Serifi*
-&nbsp;&nbsp;&nbsp;&nbsp;
-Nicola Studer*
-&nbsp;&nbsp;&nbsp;&nbsp;
-Ata Çelen
-&nbsp;&nbsp;&nbsp;&nbsp;
-
-ETH Zürich, Switzerland
-&nbsp;&nbsp;&nbsp;&nbsp;
-\*Equal contribution
-</div>
-
-Below are instructions to setup and run the [Unity App](#unity-app), as well as the [Synthetic Dataset + Perception Pipelines](#synthetic-dataset--perception-pipelines).
-This project was done as part of the [Mixed Reality](https://cvg.ethz.ch/lectures/Mixed-Reality/) course at ETH Zürich.
-
-This branch adds optional **standalone Quest USB-MIDI practice feedback**, targeting
-the Casio CT-S200. It extends the original Unity app; its vision models and piano
-workflow are retained. See [connection, calibration, build and verification notes](docs/quest-usb-midi.md).
+**Keytrail** is the provisional name of this independently maintained piano-practice
+project. It targets Quest 3 and the Casio CT-S200, with optional USB-MIDI input.
+See [connection, calibration, build and verification notes](docs/quest-usb-midi.md).
 It supports personal MIDI files on the headset, synthesized piano guide sound,
 and a learning mode that waits for the player's notes/chords. The compact English/
 Spanish preparation panel includes [left, right and both-hand practice](docs/piano-hand-practice.md)
@@ -41,8 +12,30 @@ USB-MIDI input and piano detection were confirmed by the user on Quest 3 + CT-S2
 with version 1.1.1; the redesigned 1.3.0 practice flow still needs headset acceptance.
 The production vision models remain unchanged. The separate
 [real-photo SAM-to-YOLO experiment](SynthesiaSet/piano_perception/keybed_yolo/README.md)
-targets the playable surface and individual keys; it has not produced a trained
-replacement. See [device evidence and detection limits](docs/quest-piano-detection.md).
+targets the playable surface and individual keys. Preliminary models have been
+trained, but no replacement has been validated on Quest or integrated into the
+app. See [device evidence and detection limits](docs/quest-piano-detection.md).
+
+## Origin and attribution
+
+Keytrail began as a fork of [AR-Musician](https://github.com/MixedRealityETHZ/AR_Musician)
+at `bce92f5` and still includes upstream code, scenes, assets and model integration.
+This repository develops the standalone MIDI, song library, learning, hand-selection,
+bilingual UI, simulator and real-photo perception workflows independently. It is
+a derived project, not a from-scratch reimplementation.
+
+The original AR-Musician project was created by Matan Davidi, Cyril Moser, Gent
+Serifi, Nicola Studer and Ata Çelen for the ETH Zürich Mixed Reality course.
+Their [MIT copyright and license](LICENSE), [author list](AUTHORS), Git history
+and research citation are retained. Bundled dependencies, model weights and
+training images retain their respective terms.
+
+Upstream research resources: [technical report](assets/report.pdf),
+[poster](assets/poster.pdf), [demo](https://youtu.be/5JOPkejo6eE),
+[original checkpoints](https://polybox.ethz.ch/index.php/s/RXfAobWzkpjRgzG), and
+[SynthesiaSet](https://huggingface.co/datasets/gserifi/SynthesiaSet).
+The synthetic pipeline documentation below is retained as upstream reference;
+the current YOLO pilot uses real photographs.
 
 # Table of Contents
 
@@ -77,7 +70,7 @@ replacement. See [device evidence and detection limits](docs/quest-piano-detecti
 ## Setup
 1. Clone the repository:
    ```bash
-   git clone git@github.com:MixedRealityETHZ/AR_Musician.git
+    git clone https://github.com/diegoxfx/AR_Musician_MIDI.git
    ```
 2. Open project in Unity `6000.2.8f1`
 3. Download the ONNX models from [Polybox](https://polybox.ethz.ch/index.php/s/RXfAobWzkpjRgzG) and put them in the scene tree.

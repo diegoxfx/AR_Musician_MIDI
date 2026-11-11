@@ -104,7 +104,7 @@ public static class QuestApkBuild
             Debug.Log("[QuestApkBuild] Saved scene model references and dependencies verified.");
 
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, PackageName);
-            PlayerSettings.productName = "AR-Musician MIDI";
+            PlayerSettings.productName = "Keytrail";
             PlayerSettings.bundleVersion = "1.3.0";
             PlayerSettings.Android.bundleVersionCode = 6;
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);

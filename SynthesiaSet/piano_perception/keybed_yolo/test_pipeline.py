@@ -1,6 +1,9 @@
+from contextlib import nullcontext
 import importlib.util
 from pathlib import Path
+import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock, patch
 
@@ -8,7 +11,7 @@ import numpy as np
 from PIL import Image
 
 from dataset import acquire, pack, read_json, resolve_instances, write_json
-from fit import SEGMENTATION_TRAINING, describe_output, train, verify_dataset
+from fit import SEGMENTATION_TRAINING, describe_output, main as fit_main, train, verify_dataset
 from geometry import checked_polygon, checked_quad, segment_rows
 from propose import key_polygon, quad_from_mask
 
@@ -115,6 +118,11 @@ class PipelineTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "review does not match"):
                 pack(workspace, root / "dataset")
             row["image_sha256"] = image_hash
+            row["split"] = "test"
+            write_json(review_path, reviews)
+            with self.assertRaisesRegex(ValueError, "review split differs"):
+                pack(workspace, root / "dataset")
+            row["split"] = "train"
             write_json(review_path, reviews)
             (workspace / "proposals").mkdir()
             write_json(workspace / "proposals/index.json", {"images": [
@@ -143,6 +151,7 @@ class PipelineTests(unittest.TestCase):
             cache = root / "labels/train.cache"
             cache.write_bytes(b"stale")
             model = Mock()
+            model._smart_load.return_value = object
 
             def check_training(**options):
                 self.assertFalse(cache.exists())
@@ -153,9 +162,31 @@ class PipelineTests(unittest.TestCase):
             weights = root / "stock.pt"
             weights.write_bytes(b"fixture")
             write_json(root / "provenance.json", {"images": []})
-            with patch("fit.verify_dataset"), patch("fit.yolo", return_value=lambda *_args, **_opts: model):
-                train(root, weights, root / "run", "cpu", 640, 1, 1, 42)
+            accepted = [(None, None, {"split": split, "group": split, "review": {"status": "accepted"}})
+                        for split in ("train", "val", "test")]
+            with (patch("fit.verify_dataset", return_value=accepted), patch("fit.ResourceBudget") as budget,
+                  patch("fit.yolo", return_value=lambda *_args, **_opts: model)):
+                budget.return_value.cpu = {"cpu_0_excluded": True}
+                budget.return_value.duty = 0.7
+                budget.return_value.gpu_target = 0.8
+                train(root, weights, root / "run", "cpu", 640, 1, 1, 42, minimum_positives=3)
             model.train.assert_called_once()
+            provenance = read_json(root / "run/training-provenance.json")
+            self.assertEqual(provenance["minimum_positive_images_requested"], 3)
+            self.assertEqual(provenance["verified_positive_images_by_split"], {"train": 1, "val": 1, "test": 1})
+
+    def test_export_cli_keeps_test_untouched_unless_explicitly_selected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            weights = root / "stock.pt"
+            weights.write_bytes(b"fixture")
+            command = ["fit.py", "export", str(root), str(weights), str(root / "export")]
+            with patch("sys.argv", command), patch("fit.export") as export:
+                fit_main()
+                self.assertEqual(export.call_args.args[-1], "val")
+            with patch("sys.argv", command + ["--smoke-split", "test"]), patch("fit.export") as export:
+                fit_main()
+                self.assertEqual(export.call_args.args[-1], "test")
 
     @unittest.skipUnless(importlib.util.find_spec("cv2"), "OpenCV is needed for mask conversion")
     def test_mask_quad_rejects_clipping(self):
@@ -168,6 +199,22 @@ class PipelineTests(unittest.TestCase):
         mask[10, 0] = True
         with self.assertRaisesRegex(ValueError, "touches an image edge"):
             quad_from_mask(mask)
+
+    @unittest.skipUnless(importlib.util.find_spec("cv2"), "OpenCV is needed for mask conversion")
+    def test_long_key_retains_narrow_stem_and_rounded_front_lip(self):
+        import cv2
+
+        mask = np.zeros((720, 120), dtype=np.uint8)
+        cv2.rectangle(mask, (38, 15), (53, 180), 1, -1)
+        cv2.rectangle(mask, (18, 175), (95, 685), 1, -1)
+        cv2.rectangle(mask, (22, 685), (91, 690), 1, -1)
+        cv2.circle(mask, (23, 684), 7, 1, -1)
+        cv2.circle(mask, (90, 684), 7, 1, -1)
+        polygon, iou = key_polygon(mask)
+        reconstructed = np.zeros_like(mask)
+        cv2.fillPoly(reconstructed, [np.asarray(polygon, dtype=np.int32)], 1)
+        self.assertGreater(iou, 0.995)
+        self.assertLessEqual(np.count_nonzero(mask & (1 - reconstructed)), 5)
 
     @unittest.skipUnless(importlib.util.find_spec("cv2"), "OpenCV is needed for mask conversion")
     def test_angled_keybed_uses_long_edges_instead_of_y_sorted_vertices(self):
@@ -190,6 +237,121 @@ class PipelineTests(unittest.TestCase):
         self.assertTrue(describe_output([prototype, raw]).startswith("raw_channels"))
         with self.assertRaisesRegex(ValueError, "expected detections and mask prototypes"):
             describe_output([end_to_end])
+
+    @unittest.skipUnless(importlib.util.find_spec("cv2"), "OpenCV is needed for key proposal assembly")
+    def test_tiled_dedup_preserves_evidence_and_reports_white_key_gaps(self):
+        from review import assemble_candidates
+        from tiled_proposals import project, rectify, tiles
+
+        image = Image.new("RGB", (100, 60))
+        corners = [[10, 10], [90, 10], [90, 40], [10, 40]]
+        rectified, forward, bounds = rectify(image, corners)
+        planned = list(tiles(rectified, bounds, count=3))
+        self.assertEqual(planned[0][0], 0)
+        self.assertEqual(planned[-1][0] + planned[-1][1].width, rectified.width)
+        self.assertGreater(planned[0][1].width, planned[1][0])
+        np.testing.assert_allclose(project(project(corners, forward), np.linalg.inv(forward)), corners)
+
+        candidates = [
+            {"id": f"white-{index}", "class": "white_key", "score": 0.9,
+             "polygon": [[x, 11], [x + 9, 11], [x + 9, 39], [x, 39]]}
+            for index, x in enumerate((11, 21, 31, 51, 61, 71, 80))
+        ]
+        candidates += [{**candidates[0], "id": "white-duplicate", "score": 0.6}]
+        keys, diagnostics = assemble_candidates(candidates, forward, bounds)
+        self.assertEqual([key["proposal"] for key in keys], [key["id"] for key in candidates[:-1]])
+        self.assertEqual(keys[0]["polygon"], candidates[0]["polygon"])
+        self.assertEqual(diagnostics["deduplicated"], 1)
+        self.assertTrue(any("typical spacings" in warning for warning in diagnostics["warnings"]))
+
+    @unittest.skipUnless(importlib.util.find_spec("cv2"), "OpenCV is needed for the review workflow")
+    def test_drafts_do_not_mark_images_reviewed_and_invalid_batch_is_atomic(self):
+        from review import apply_decisions, prepare
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            workspace = root / "inventory"
+            acquire(fixture(root, ["red", "green"], ["a", "b"], ["train", "val"]), workspace, 320)
+            review_path = workspace / "reviews.json"
+            pending = review_path.read_bytes()
+            pending_second = read_json(review_path)["images"][1]
+            rows = read_json(workspace / "inventory.json")["images"]
+            proposals = workspace / "proposals"
+            proposals.mkdir()
+            write_json(proposals / "index.json", {"schema": 1, "images": [
+                {"id": rows[0]["id"], "image_sha256": rows[0]["image_sha256"],
+                 "keybed_proposal": "bed", "candidates": [
+                     {"id": "bed", "class": "playable_keybed", "corners": QUAD},
+                     *[{**key, "id": f"key-{key['slot']}", "score": 0.95} for key in KEYS],
+                 ]},
+            ]})
+            prepare(workspace, proposals, root / "drafts", filled=True)
+            self.assertEqual(review_path.read_bytes(), pending)
+            self.assertTrue((root / "drafts" / f"{rows[0]['id']}.png").is_file())
+            first = {"id": rows[0]["id"], "image_sha256": rows[0]["image_sha256"], **positive_review()}
+            invalid = {"id": rows[1]["id"], "image_sha256": "stale", **positive_review()}
+            with self.assertRaisesRegex(ValueError, "does not match the image checksum"):
+                apply_decisions(workspace, [first, invalid])
+            self.assertEqual(review_path.read_bytes(), pending)
+            stale_split = {**invalid, "image_sha256": rows[1]["image_sha256"], "split": "test"}
+            with self.assertRaisesRegex(ValueError, "decision split differs"):
+                apply_decisions(workspace, [first, stale_split])
+            self.assertEqual(review_path.read_bytes(), pending)
+            apply_decisions(workspace, [first])
+            self.assertEqual(read_json(review_path)["images"], [first, pending_second])
+            corrected_split = {**stale_split, "split": rows[1]["split"]}
+            apply_decisions(workspace, [corrected_split])
+            self.assertEqual(read_json(review_path)["images"], [first, corrected_split])
+
+    @unittest.skipUnless(importlib.util.find_spec("cv2"), "OpenCV is needed for tiled proposals")
+    def test_tiled_proposals_resume_after_one_image_without_repeating_it(self):
+        from tiled_proposals import run
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            workspace = root / "inventory"
+            acquire(fixture(root, ["red", "green"], ["a", "b"], ["train", "val"]), workspace, 320)
+            checkpoint = root / "checkpoint"
+            checkpoint.mkdir()
+            (checkpoint / "config.json").write_text("{}", encoding="utf-8")
+            output, stop = root / "proposals", root / "stop"
+            mock_torch = SimpleNamespace(__version__="test", inference_mode=nullcontext)
+            options = (workspace, checkpoint, output, "cpu", 672, 0.25, 0.35, None, set(), None)
+
+            def pause_after_first(*_):
+                stop.touch()
+                return {"candidates": [], "tile_count": 0}
+
+            with (patch.dict(sys.modules, {"torch": mock_torch}),
+                  patch("tiled_proposals.version", return_value="test"),
+                  patch("tiled_proposals.Sam"),
+                  patch("tiled_proposals.propose_image", side_effect=pause_after_first) as propose):
+                run(*options, False, stop)
+                self.assertFalse(read_json(output / "index.json")["complete"])
+                self.assertEqual(propose.call_count, 1)
+                stop.unlink()
+                run(*options, True, stop)
+                index = read_json(output / "index.json")
+                self.assertTrue(index["complete"])
+                self.assertEqual([row["id"] for row in index["images"]], ["test-0", "test-1"])
+                self.assertEqual(propose.call_count, 2)
+                seeded = root / "seeded"
+                new_options = (workspace, checkpoint, seeded, *options[3:])
+                run(*new_options, False, stop, seeds=[output])
+                copied = read_json(seeded / "index.json")
+                self.assertTrue(copied["complete"])
+                self.assertTrue(all(row.get("seed_provenance") for row in copied["images"]))
+                self.assertEqual(propose.call_count, 2)
+                # An old contour policy cannot silently reuse cached masks.
+                settings = read_json(output / "settings.json")
+                del settings["key_polygon_max_error_px"]
+                write_json(output / "settings.json", settings)
+                with self.assertRaisesRegex(ValueError, "resume settings differ"):
+                    run(*options, True, stop)
+                other = (workspace, checkpoint, root / "old-seed", *options[3:])
+                with self.assertRaisesRegex(ValueError, "seed proposal settings do not match"):
+                    run(*other, False, stop, seeds=[output])
+                self.assertEqual(propose.call_count, 2)
 
 
 if __name__ == "__main__":
