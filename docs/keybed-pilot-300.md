@@ -2,6 +2,8 @@
 
 The 2026-11-11 pilot produced a trained YOLO26n-seg candidate for a playable keybed and individual white/black keys. **It is not ready to replace automatic piano calibration.** The held-out test has good aggregate instance detection, but only 2 of 28 photographs have every key matched without extra predictions. The production app still uses its existing detector and manual setup.
 
+A later [calibration improvement experiment](keybed-calibration-improvements.md) tests duplicate suppression and supported corner fitting with the same weights. Its separate report defines a proposed complete-calibration target and distinguishes tuning results from independent evidence. The baseline results below remain unchanged.
+
 ## Data and training
 
 500 distinct real Commons photographs were collected with source/license provenance. SAM proposals were corrected against the photographs and independently reviewed. Exactly 300 positive photographs were approved; 175 pending and 25 rejected candidates were excluded, never treated as background negatives. No synthetic piano images were used for training.

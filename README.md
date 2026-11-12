@@ -17,6 +17,12 @@ has been trained and evaluated: only 2 of 28 test photographs matched every key
 without extra predictions, so it is not ready for automatic calibration. The
 export passed desktop parity and Unity import; Quest execution and integration
 remain pending. See [device evidence and detection limits](docs/quest-piano-detection.md).
+A separate [calibration improvement candidate](docs/keybed-calibration-improvements.md)
+adds duplicate-mask suppression and supported corner fitting. Its joint validation
+result is 17/27 complete, ordered keyboards with all four corners within a quarter
+of a mean white-key width. However, only **1/11 new evaluable photos** passed that
+same joint check after freezing the adjustments. The proposed 90% capture target
+has not been met; the new candidate is not ready for automatic calibration.
 
 ## Origin and attribution
 

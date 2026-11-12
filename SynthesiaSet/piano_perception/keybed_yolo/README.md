@@ -102,6 +102,13 @@ A separate blind trial gave `gpt-6.1-terra` at `xhigh` eight fixed annotation ve
 
 ### Train, select and export
 
+The later [calibration candidate report](../../../docs/keybed-calibration-improvements.md)
+documents `postprocess.py`, `keybed_geometry.py`, the prediction-only
+`calibration.py` API and `evaluate_calibration.py` validation-cache replay. It
+tests exact key coverage, all four corner errors and physical slot order jointly;
+neither a high detection mAP nor a returned quadrilateral establishes usable
+calibration. This candidate is separate from the production Unity detector.
+
 Download a local [official YOLO26n-seg checkpoint](https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n-seg.pt). COCO weights provide transfer learning, and the three classes are learned from the reviewed dataset. Run training only after enough complete labels are available to compare on holdout.
 
 ```powershell
