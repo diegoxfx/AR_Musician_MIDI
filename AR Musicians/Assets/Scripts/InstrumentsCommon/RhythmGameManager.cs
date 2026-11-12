@@ -5,6 +5,7 @@ using System.IO;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
 using System;
+using ARMusician.Midi;
 
 public class RhythmGameManager : MonoBehaviour
 {
@@ -19,8 +20,144 @@ public class RhythmGameManager : MonoBehaviour
     public float gameSpeed = 1f;
 
     private List<NoteEvent> notes = new List<NoteEvent>();
+    private List<NoteEvent> loadedNotes = new List<NoteEvent>();
+    private bool loadedSongIsExternal;
+    private bool Multiplayer => ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer;
+    private bool LoadedSongAllowed => !loadedSongIsExternal || !Multiplayer;
+    public bool HasLoadedSong => loadedNotes.Count > 0;
+    public bool IsSongLoading { get; private set; }
+    public SongData LoadedSong { get; private set; }
+    // Changes when a load begins and when the current load completes, even on failure.
+    public int SongLoadVersion { get; private set; }
+    private int loadGeneration;
+    private int playbackGeneration;
+    private bool applicationPaused;
+    private bool applicationFocused = true;
+    private bool headsetFocused = true;
+    private bool applicationQuitting;
+    public enum PlaybackState { Idle, Starting, Playing, Paused, Resuming }
+    public PlaybackState State { get; private set; }
+    public bool InputAllowed { get { return !applicationQuitting && !applicationPaused && applicationFocused && headsetFocused; } }
+    public bool CanSelectInstrument { get { return State == PlaybackState.Idle && InputAllowed; } }
+    public bool IsPiano { get { return currentStrategy is PianoStrategy; } }
+    public bool CanConfigureHands => CanSelectInstrument && IsPiano && !Multiplayer;
+    public HandSelection PracticeHand { get; private set; } = HandSelection.Both;
+    public int SplitPitch { get; private set; } = PianoHandPartition.DefaultSplitPitch;
+    private bool UsesSingleHandPractice => IsPiano && !Multiplayer && PracticeHand != HandSelection.Both;
+    public bool HasSession { get { return State == PlaybackState.Playing || State == PlaybackState.Paused || State == PlaybackState.Resuming; } }
+    private float lastNoteTime;
+    public double SongTime { get { return HasSession && learningPractice != null
+        ? learningPractice.Advance(Time.time, playing)
+        : (HasSession && !playing ? pauseBegin : Time.time) - songStartTime - totalPauseTime; } }
+    private LearningPractice learningPractice;
+    private MidiReferenceAudio referenceAudio;
+    public bool LearningMode { get; private set; }
+    public bool ReferenceSoundEnabled { get; private set; } = true;
+    public bool WaitingForLearningNotes
+    {
+        get
+        {
+            if (learningPractice == null) return false;
+            learningPractice.Advance(Time.time, playing);
+            return learningPractice.Waiting;
+        }
+    }
+    public int LearningCompletedGroups { get { return learningPractice == null ? 0 : learningPractice.CompletedGroups; } }
+    public int LearningTotalGroups { get { return learningPractice == null ? 0 : learningPractice.TotalGroups; } }
+    public string PendingNotes
+    {
+        get
+        {
+            if (learningPractice == null) return "";
+            return String.Join(" + ", Array.ConvertAll(learningPractice.PendingPitches, MidiNotes.Format));
+        }
+    }
+    private bool LearningReady
+    {
+        get
+        {
+            var piano = currentStrategy as PianoStrategy;
+            return piano != null && !(ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer) &&
+                piano.MidiFeedback != null && piano.MidiFeedback.IsCalibrated;
+        }
+    }
+
+    public bool SetLearningMode(bool enabled)
+    {
+        if (!CanSelectInstrument || (enabled && !LearningReady)) return false;
+        LearningMode = enabled;
+        learningPractice = null;
+        return true;
+    }
+
+    public bool SetHandSelection(HandSelection selection)
+    {
+        if (!CanConfigureHands || !Enum.IsDefined(typeof(HandSelection), selection)) return false;
+        PracticeHand = selection;
+        return true;
+    }
+
+    public bool SetSplitPitch(int pitch)
+    {
+        if (!CanConfigureHands || pitch < 0 || pitch > 127) return false;
+        SplitPitch = pitch;
+        return true;
+    }
+
+    /// <summary>Resolve a note after the piano strategy has set its canonical key index.</summary>
+    public PianoHand GetAssignedHand(NoteEvent note)
+    {
+        return PianoHandPartition.Assign(note.keyIndex, note.sourceHand, SplitPitch);
+    }
+
+    public bool HasPlayableHandNotes()
+    {
+        if (!IsPiano || Multiplayer) return HasLoadedSong;
+        var piano = (PianoStrategy)currentStrategy;
+        if (piano.plane == null) return false;
+        var candidate = new NoteEvent();
+        foreach (var note in loadedNotes)
+        {
+            candidate.key = note.key;
+            candidate.midiNumber = note.midiNumber;
+            candidate.sourceHand = note.sourceHand;
+            piano.PreprocessNote(candidate);
+            candidate.assignedHand = GetAssignedHand(candidate);
+            if (IsSelectedPianoNote(piano, candidate)) return true;
+        }
+        return false;
+    }
+
+    private bool IsSelectedPianoNote(PianoStrategy piano, NoteEvent note)
+    {
+        if (!PianoHandPartition.Includes(PracticeHand, note.assignedHand) ||
+            piano.plane.GetLocalKeyWidth(note.keyIndex) <= 0) return false;
+        var midi = piano.MidiFeedback;
+        return midi == null || !midi.IsCalibrated || (note.keyIndex >= midi.FirstNote && note.keyIndex <= midi.LastNote);
+    }
+
+    public void SetReferenceSoundEnabled(bool enabled)
+    {
+        ReferenceSoundEnabled = enabled;
+        if (referenceAudio != null) referenceAudio.SoundEnabled = enabled;
+    }
+
+    public void ReceivePracticeNote(int pitch, bool on)
+    {
+        if (!LearningMode || learningPractice == null || !InputAllowed || !LearningReady) return;
+        learningPractice.Receive(pitch, on, Time.time, playing);
+    }
+
+    public void OnPracticeInputReset()
+    {
+        if (!LearningMode) return;
+        if (learningPractice != null) learningPractice.ResetInput();
+        CancelCountdown();
+        Pause();
+        RestorePlaybackMenu();
+    }
     private float songStartTime;
-    public bool playing = false;
+    public bool playing { get { return State == PlaybackState.Playing; } }
     public bool quit = false;
     private float totalPauseTime = 0; // seconds we spent paused
 
@@ -29,6 +166,8 @@ public class RhythmGameManager : MonoBehaviour
     public static event Action<float> OnResume;
     public static event Action OnPause;
     public static event Action OnQuit;
+    public event Action CountdownCancelled;
+    public event Action InputInterrupted;
 
 
     // We count active notes to know when the song is truly "done" visually
@@ -37,6 +176,7 @@ public class RhythmGameManager : MonoBehaviour
     // Call this from MenuController when selecting the instrument
     public void SetStrategy(IGameplayStrategy strategy)
     {
+        if (!CanSelectInstrument || strategy == null) return;
         // Unsubscribe from old strategy if exists
         if (currentStrategy != null)
         {
@@ -44,6 +184,8 @@ public class RhythmGameManager : MonoBehaviour
         }
 
         currentStrategy = strategy;
+        if (!(strategy is PianoStrategy) || Multiplayer) { LearningMode = false; learningPractice = null; }
+        ProjectConfig.Settings.instrument = strategy is PianoStrategy ? "piano" : "bongos";
 
         if (currentStrategy != null)
         {
@@ -58,44 +200,209 @@ public class RhythmGameManager : MonoBehaviour
 
     public void Play()
     {
+        if (State != PlaybackState.Idle || !InputAllowed || !LoadedSongAllowed || loadedNotes.Count == 0 || gameSpeed <= 0 ||
+            (LearningMode && !LearningReady)) return;
         if (currentStrategy == null || !currentStrategy.IsInstrumentReady())
         {
             Debug.LogError("Cannot play: Instrument not defined or Strategy missing.");
             return;
         }
+        if (!HasPlayableHandNotes()) return;
+
+        var songNotes = loadedNotes.ConvertAll(n => new NoteEvent { key = n.key, midiNumber = n.midiNumber,
+            sourceHand = n.sourceHand, time = n.time, duration = n.duration });
+        var piano = currentStrategy as PianoStrategy;
+        foreach (var n in songNotes)
+        {
+            currentStrategy.PreprocessNote(n);
+            if (piano != null) n.assignedHand = GetAssignedHand(n);
+        }
+        bool singleHand = UsesSingleHandPractice;
+        var practiceNotes = singleHand ? songNotes.FindAll(n => IsSelectedPianoNote(piano, n)) : songNotes;
+        if (practiceNotes.Count == 0) return;
+        if (piano != null) PianoRollLayout.Prepare(practiceNotes);
 
         // Use the strategy's specific lookahead time (FallTime or ApproachTime)
         songStartTime = Time.time + currentStrategy.ApproachTime;
-        playing = true;
+        State = PlaybackState.Playing;
         ProjectConfig.Settings.playing = true;
         totalPauseTime = 0;
         quit = false;
+        notes = practiceNotes;
+        learningPractice = null;
+        if (LearningMode)
+        {
+            var pianoInput = piano.MidiFeedback;
+            var strikes = notes.ConvertAll(n => new LearningPractice.Strike(n.keyIndex, n.time / gameSpeed));
+            learningPractice = new LearningPractice(strikes, pianoInput.FirstNote, pianoInput.LastNote,
+                -currentStrategy.ApproachTime, Time.time);
+        }
+        if (piano != null)
+        {
+            if (referenceAudio == null) referenceAudio = GetComponent<MidiReferenceAudio>();
+            if (referenceAudio == null) referenceAudio = gameObject.AddComponent<MidiReferenceAudio>();
+            referenceAudio.SoundEnabled = ReferenceSoundEnabled;
+            referenceAudio.BeginSong(songNotes, gameSpeed);
+            referenceAudio.Sync(SongTime, true);
+        }
+        // A song may be loaded before the user changes instruments.
+        if (currentStrategy is BongoStrategy bongos && notes.Count > 0)
+        {
+            int average = 0;
+            foreach (var n in notes) average += n.keyIndex;
+            bongos.average_key = average / notes.Count;
+        }
+        lastNoteTime = 0;
+        // All piano modes keep the full guide tail, even if a repeated visual was shortened.
+        foreach (var n in songNotes)
+            lastNoteTime = Mathf.Max(lastNoteTime, (n.time + (piano != null ? n.duration : 0)) / gameSpeed);
+        activeNoteCount = 0;
+        if (piano != null && piano.MidiFeedback != null)
+            piano.MidiFeedback.BeginSong(notes, gameSpeed);
 
         //StartCoroutine(PlayAudioWithDelay(currentStrategy.ApproachTime));
     }
 
     public void Pause()
     {
+        if (!HasSession || !playing) return;
+        if (learningPractice != null) { learningPractice.Advance(Time.time, true); learningPractice.ResetInput(); }
         ProjectConfig.Settings.playing = false;
-        playing = false;
+        State = PlaybackState.Paused;
         pauseBegin = Time.time;
+        if (referenceAudio != null) referenceAudio.Sync(SongTime, false);
         OnPause?.Invoke();
     }
 
     public void Resume()
     {
+        if (State != PlaybackState.Paused || !InputAllowed || !LoadedSongAllowed || (LearningMode && !LearningReady)) return;
+        if (learningPractice != null) learningPractice.Advance(Time.time, false);
         ProjectConfig.Settings.playing = true;
-        playing = true;
+        State = PlaybackState.Playing;
         float curPauseTime = Time.time - pauseBegin;
         totalPauseTime += curPauseTime;
+        if (referenceAudio != null) referenceAudio.Sync(SongTime, true);
         OnResume?.Invoke(curPauseTime);
     }
 
     public void Quit()
     {
+        CancelCountdown();
         quit = true;
         OnQuit?.Invoke();
         OnFinished();
+    }
+
+    public int BeginCountdown(bool resume)
+    {
+        if (!InputAllowed || !LoadedSongAllowed || (LearningMode && !LearningReady)) return -1;
+        if (resume)
+        {
+            if (State != PlaybackState.Paused) return -1;
+            State = PlaybackState.Resuming;
+        }
+        else
+        {
+            if (State != PlaybackState.Idle || loadedNotes.Count == 0 || gameSpeed <= 0 ||
+                currentStrategy == null || !currentStrategy.IsInstrumentReady() || !HasPlayableHandNotes()) return -1;
+            State = PlaybackState.Starting;
+        }
+        return ++playbackGeneration;
+    }
+
+    public bool CompleteCountdown(int generation, bool resume)
+    {
+        if (generation != playbackGeneration || !InputAllowed ||
+            State != (resume ? PlaybackState.Resuming : PlaybackState.Starting)) return false;
+        State = resume ? PlaybackState.Paused : PlaybackState.Idle;
+        if (resume) Resume(); else Play();
+        return playing;
+    }
+
+    public void CancelCountdown()
+    {
+        if (State != PlaybackState.Starting && State != PlaybackState.Resuming) return;
+        State = State == PlaybackState.Resuming ? PlaybackState.Paused : PlaybackState.Idle;
+        ++playbackGeneration;
+        CountdownCancelled?.Invoke();
+        RestorePlaybackMenu();
+    }
+
+    private void OnEnable()
+    {
+        OVRManager.InputFocusLost += HandleHeadsetFocusLost;
+        OVRManager.InputFocusAcquired += HandleHeadsetFocusAcquired;
+    }
+
+    private void OnDisable()
+    {
+        OVRManager.InputFocusLost -= HandleHeadsetFocusLost;
+        OVRManager.InputFocusAcquired -= HandleHeadsetFocusAcquired;
+        InterruptPlayback();
+    }
+
+    private void OnApplicationQuit()
+    {
+        // Unity may destroy menu children before this manager or MIDI input.
+        // Teardown must still release input/audio, but must not reopen a menu.
+        applicationQuitting = true;
+    }
+
+    private void HandleHeadsetFocusLost() { SetHeadsetFocused(false); }
+    private void HandleHeadsetFocusAcquired() { SetHeadsetFocused(true); }
+    private void OnApplicationPause(bool paused) { SetApplicationPaused(paused); }
+    private void OnApplicationFocus(bool focused) { SetApplicationFocused(focused); }
+
+    public void SetApplicationPaused(bool paused)
+    {
+        if (applicationPaused == paused) return;
+        applicationPaused = paused;
+        if (paused) InterruptPlayback();
+    }
+
+    public void SetApplicationFocused(bool focused)
+    {
+        if (applicationFocused == focused) return;
+        applicationFocused = focused;
+        if (!focused) InterruptPlayback();
+    }
+
+    public void SetHeadsetFocused(bool focused)
+    {
+        if (headsetFocused == focused) return;
+        headsetFocused = focused;
+        if (!focused) InterruptPlayback();
+    }
+
+    private void InterruptPlayback()
+    {
+        bool hadPlayback = State != PlaybackState.Idle;
+        CancelCountdown();
+        InputInterrupted?.Invoke();
+        // Multiplayer pause/resume is coordinated through RPCs. A local focus
+        // callback must not freeze only this peer's song clock.
+        bool multiplayer = ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer;
+        if (multiplayer) return;
+        Pause();
+        if (hadPlayback) RestorePlaybackMenu();
+    }
+
+    public void RestorePlaybackMenu()
+    {
+        if (applicationQuitting || menucontroller == null) return;
+        if (State != PlaybackState.Idle && State != PlaybackState.Paused) return;
+        bool multiplayer = ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer;
+        if (HasSession)
+        {
+            if (multiplayer) menucontroller.ShowMultiplayerPauseMenu(ProjectConfig.Settings.master);
+            else menucontroller.ShowSingleplayerPauseMenu();
+        }
+        else
+        {
+            if (multiplayer) menucontroller.ShowMultiplayerLobbyMenu();
+            else menucontroller.ShowSinglePlayerLobbyMenu();
+        }
     }
 
     IEnumerator PlayAudioWithDelay(float delay)
@@ -114,58 +421,74 @@ public class RhythmGameManager : MonoBehaviour
 
     public IEnumerator updateSongRoutine(SongData songdata)
     {
-        Debug.Log("Processing song: " + songdata.PartialSongData.JsonPath);
-        string fullPath = Path.Combine(Application.streamingAssetsPath, songdata.PartialSongData.JsonPath);
-        string jsonContent = null;
-
-        // Android/Desktop compatible loading
-#if UNITY_ANDROID && !UNITY_EDITOR
-        using (UnityWebRequest www = UnityWebRequest.Get(fullPath))
+        if (songdata == null || songdata.PartialSongData == null) yield break;
+        if (songdata.PartialSongData.IsExternal && ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer)
         {
-            yield return www.SendWebRequest();
-            if (www.result == UnityWebRequest.Result.Success) jsonContent = www.downloadHandler.text;
+            Debug.LogWarning("Personal MIDI songs are only available in single-player.");
+            yield break;
         }
-#else
-        if (File.Exists(fullPath)) jsonContent = File.ReadAllText(fullPath);
-        yield return null;
-#endif
+        int generation = ++loadGeneration;
+        IsSongLoading = true;
+        ++SongLoadVersion;
+        CancelCountdown();
+        if (HasSession) Quit();
+        loadedNotes.Clear();
+        LoadedSong = null;
+        loadedSongIsExternal = false;
+        Debug.Log("Processing song: " + songdata.PartialSongData.JsonPath);
+        string jsonContent = songdata.PartialSongData.InlineJson;
 
+        if (!songdata.PartialSongData.IsExternal)
+        {
+            string fullPath = Path.Combine(Application.streamingAssetsPath, songdata.PartialSongData.JsonPath);
+            // Android/Desktop compatible bundled loading. External data is a startup snapshot.
+#if UNITY_ANDROID && !UNITY_EDITOR
+            using (UnityWebRequest www = UnityWebRequest.Get(fullPath))
+            {
+                yield return www.SendWebRequest();
+                if (www.result == UnityWebRequest.Result.Success) jsonContent = www.downloadHandler.text;
+            }
+#else
+            try { if (File.Exists(fullPath)) jsonContent = File.ReadAllText(fullPath); }
+            catch (Exception e) { Debug.LogWarning("Could not read song: " + e.Message); }
+#endif
+        }
+        yield return null;
+
+        if (generation != loadGeneration) yield break;
+        IsSongLoading = false;
+        ++SongLoadVersion;
+        if (songdata.PartialSongData.IsExternal && ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer)
+            yield break;
         if (!string.IsNullOrEmpty(jsonContent))
         {
-            notes = JsonConvert.DeserializeObject<List<NoteEvent>>(jsonContent);
-
-            // DELEGATE: Ask the strategy to interpret the notes (Piano keys vs Bongo sides)
-            foreach (var n in notes)
+            try
             {
-                if (currentStrategy != null)
-                    currentStrategy.PreprocessNote(n);
+                var parsed = JsonConvert.DeserializeObject<List<NoteEvent>>(jsonContent);
+                if (parsed == null || parsed.Exists(n => n == null || float.IsNaN(n.time) || float.IsInfinity(n.time) ||
+                    float.IsNaN(n.duration) || float.IsInfinity(n.duration) || n.time < 0 || n.duration < 0))
+                    throw new FormatException("Invalid note data.");
+                loadedNotes = parsed;
+                LoadedSong = songdata;
+                loadedSongIsExternal = songdata.PartialSongData.IsExternal;
             }
-            if (currentStrategy is BongoStrategy)
-            {
-                int average_key = 0;
-                foreach (var n in notes)
-                {
-                    average_key += n.keyIndex;
-                }
-                average_key /= notes.Count;
-                BongoStrategy strat = (BongoStrategy)currentStrategy;
-                strat.average_key = average_key;
-            }
+            catch (Exception e) { Debug.LogWarning("Could not load song: " + e.Message); }
         }
     }
 
     void Update()
     {
+        if (referenceAudio != null) referenceAudio.Sync(SongTime, playing);
         if (!playing) return;
 
         // Check if song is over
-        if (notes.Count == 0 && activeNoteCount <= 0)
+        if (notes.Count == 0 && activeNoteCount <= 0 && SongTime >= lastNoteTime + 0.30)
         {
             OnFinished();
             return;
         }
 
-        float elapsed = Time.time - songStartTime - totalPauseTime;
+        double elapsed = SongTime;
 
         foreach (var note in notes.ToArray())
         {
@@ -185,7 +508,12 @@ public class RhythmGameManager : MonoBehaviour
 
     public void OnFinished()
     {
-        playing = false;
+        CancelCountdown();
+        if (referenceAudio != null) referenceAudio.Stop();
+        if (currentStrategy is PianoStrategy piano && piano.MidiFeedback != null)
+            piano.MidiFeedback.EndSong(!quit);
+        State = PlaybackState.Idle;
+        learningPractice = null;
         ProjectConfig.Settings.playing = false;
         totalPauseTime = 0;
         menucontroller.ShowSongMenu();

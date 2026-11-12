@@ -39,7 +39,14 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
 
     // State variables
     private bool inCorrectionMode = false; // New state: after 3 points, before final confirm
+    private bool automaticMode;
+    private bool definitionActive;
+    private bool acceptingDetectedPoints;
     private float sideLength = 0.0f;
+
+    public bool CanConfirm => definitionActive && inCorrectionMode && !isDefined && capturedPoints.Count == 3;
+    public bool IsDefining => definitionActive;
+    public int CapturedPointCount => capturedPoints.Count;
 
 
     // Piano specific arrays that the correctors need
@@ -79,7 +86,11 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
 
     public void Activate(bool automatic)
     {
-        IsActive = true;
+        automaticMode = automatic;
+        definitionActive = true;
+        // IsActive is the generic manual input listener gate. CV supplies its own
+        // complete batch and must never accept right-controller point input.
+        IsActive = !automatic;
         // Reset local piano state
         ResetDefinition();
 
@@ -96,6 +107,7 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
         }
         else
         {
+            if (cvPlaneFinder != null) cvPlaneFinder.Deactivate();
             // If Manual, we activate the base class logic.
             // This sets IsActive = true, allowing RayCastInputProvider to call RegisterPoint.
             base.Activate();
@@ -109,6 +121,11 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
         if (leftCornerCorrecorNode != null) leftCornerCorrecorNode.SetActive(false);
         if (rightCornerCorrectorNode != null) rightCornerCorrectorNode.SetActive(false);
         IsActive = false;
+        definitionActive = false;
+        inCorrectionMode = false;
+        // Leaving setup cancels unfinished points/correctors. The confirmed
+        // surface remains visible when the confirmation event changes menus.
+        if (!isDefined) ResetDefinition();
     }
 
     private void Update()
@@ -116,13 +133,51 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
         // Specific Piano Logic:
         // After defining the 3 points, we enter "Correction Mode".
         // The user must press "A" (Button One) to confirm the final shape.
-        if (inCorrectionMode && OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.RTouch))
+        if (CanConfirm && OVRInput.GetDown(OVRInput.Button.One, OVRInput.Controller.RTouch))
         {
             ConfirmFinalPlane();
         }
     }
 
     // --- INSTRUMENT DEFINER OVERRIDES ---
+
+    public override void RegisterPoint(Vector3 worldPosition)
+    {
+        if (!definitionActive || isDefined || inCorrectionMode) return;
+        if (automaticMode ? !acceptingDetectedPoints : !IsActive) return;
+        base.RegisterPoint(worldPosition);
+    }
+
+    // The CV finder calls this only after all three spatial rays have hit.
+    public bool TryRegisterDetectedPoints(Vector3[] points)
+    {
+        if (!definitionActive || !automaticMode || isDefined) return false;
+        ResetDefinition();
+        if (points == null || points.Length != 3) return false;
+        foreach (Vector3 point in points)
+        {
+            if (float.IsNaN(point.x) || float.IsInfinity(point.x)
+                || float.IsNaN(point.y) || float.IsInfinity(point.y)
+                || float.IsNaN(point.z) || float.IsInfinity(point.z)) return false;
+        }
+        Vector3 topEdge = points[1] - points[0];
+        // The existing horizontal-plane construction needs a real top edge and
+        // third corner. Reject collapsed hits rather than inventing a surface.
+        if (new Vector3(topEdge.x, 0, topEdge.z).magnitude < 0.001f
+            || (points[2] - points[1]).magnitude < 0.001f
+            || Vector3.Cross(topEdge, points[2] - points[1]).magnitude < 0.000001f) return false;
+
+        acceptingDetectedPoints = true;
+        try
+        {
+            foreach (Vector3 point in points) RegisterPoint(point);
+        }
+        finally
+        {
+            acceptingDetectedPoints = false;
+        }
+        return CanConfirm;
+    }
 
     protected override void UpdateDrawing()
     {
@@ -142,6 +197,7 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
     /// </summary>
     protected override void FinalizeDefinition()
     {
+        if (capturedPoints.Count != 3 || inCorrectionMode || isDefined) return;
         Debug.Log("3 Points Captured. Calculating 4th point and entering Correction Mode.");
 
         // 1. Map captured points to the internal anchor logic
@@ -299,14 +355,15 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
     /// <summary>
     /// The final step: "Printing" the plane after correction is done.
     /// </summary>
-    private void ConfirmFinalPlane()
+    public void ConfirmFinalPlane()
     {
+        if (!CanConfirm) return;
         // --- Calculate the mathematical plane ---
         Plane initialPlane = new Plane(planeAnchors[0], planeAnchors[1], planeAnchors[2]);
 
         // --- Ensure the plane's normal is oriented towards the player ---
         Vector3 planeCenter = (planeAnchors[0] + planeAnchors[1] + planeAnchors[2] + planeAnchors[3]) / 4f;
-        Vector3 directionToPlayer = Camera.main.transform.position - planeCenter;
+        Vector3 directionToPlayer = Camera.main != null ? Camera.main.transform.position - planeCenter : Vector3.up;
 
         if (Vector3.Dot(initialPlane.normal, directionToPlayer) < 0)
         {
@@ -316,9 +373,15 @@ public class PianoManagerInstrumentDefiner : InstrumentDefiner
         DefinedPlane finalPlane = new DefinedPlane(initialPlane, planeAnchors[0], planeAnchors[1], planeAnchors[2], planeAnchors[3]);
 
         DrawFinalPlaneVisuals(finalPlane);
-        OnPlaneDefined?.Invoke(finalPlane);
-
+        // Finish state before notifying listeners, which may switch menus/modes.
+        isDefined = true;
         inCorrectionMode = false;
+        definitionActive = false;
+        IsActive = false;
+        if (leftCornerCorrecorNode != null) leftCornerCorrecorNode.SetActive(false);
+        if (rightCornerCorrectorNode != null) rightCornerCorrectorNode.SetActive(false);
+        if (cvPlaneFinder != null) cvPlaneFinder.Deactivate();
+        OnPlaneDefined?.Invoke(finalPlane);
         Debug.Log("Piano Plane Confirmed.");
     }
 

@@ -1,0 +1,7 @@
+# Piano hand practice
+
+The preparation panel exposes **Both**, **Left**, and **Right** through `RhythmGameManager.SetHandSelection`, with a configurable split in **Settings** via `SetSplitPitch`. Both is the default. One-hand practice shows and scores the selected part within the displayed keyboard range. With Learning on, only that part can pause the song for a required note or chord. The optional piano guide follows the whole arrangement, including accompaniment after the final playable note. **Play** works without MIDI; **Learn** currently requires a connected, calibrated MIDI input. Finger-based note input is not implemented.
+
+MIDI notes on tracks named **Left Hand**, **Right Hand**, **LH**, or **RH** use that hand even when they cross the split. The importer accepts these labels with an optional **Piano** prefix or suffix, regardless of case or common punctuation. For unnamed, ambiguous, or conflicting tracks and older bundled songs, the split assigns pitches below it to the left hand and pitches at or above it to the right. The default split is **C4** (MIDI 60). Adjust it before starting when the default grouping fits poorly. The split is a pitch-based estimate of the part each hand plays.
+
+If the selected hand has no notes in the displayed range, choose Both or change the hand or split before starting. Hand and split settings are locked during countdown, playback, and pause. Multiplayer piano and bongos play the full arrangement.

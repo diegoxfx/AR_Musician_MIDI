@@ -12,6 +12,7 @@ namespace Assets.Scripts.Songs
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SongDifficulty
     {
+        Unknown = -1,
         Beginner,
         Easy,
         Medium,

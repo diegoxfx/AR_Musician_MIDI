@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,6 +28,11 @@ public class PartialSongData
     /// found within the same directory
     /// </summary>
     public bool HasCorrespondingMetadata { get; private set; }
+    // External songs are immutable startup snapshots, never StreamingAssets URLs.
+    public string InlineJson { get; private set; }
+    public string InlineMetadataJson { get; private set; }
+    public double ImportedDurationSeconds { get; private set; }
+    public bool IsExternal { get { return InlineJson != null; } }
 
     public PartialSongData(string jsonPath, string metadataPath, bool hasCorrespondingMetadata)
     {
@@ -37,7 +41,21 @@ public class PartialSongData
         HasCorrespondingMetadata = hasCorrespondingMetadata;
     }
 
-    public PartialSongData(PartialSongData source) : this(source.JsonPath, source.MetadataPath, source.HasCorrespondingMetadata) { }
+    public PartialSongData(string fileName, string json, string metadataJson, double durationSeconds)
+        : this("user-midi:" + fileName, null, false)
+    {
+        if (string.IsNullOrEmpty(json)) throw new ArgumentException("Imported song has no note data.");
+        InlineJson = json;
+        InlineMetadataJson = metadataJson;
+        ImportedDurationSeconds = durationSeconds;
+    }
+
+    public PartialSongData(PartialSongData source) : this(source.JsonPath, source.MetadataPath, source.HasCorrespondingMetadata)
+    {
+        InlineJson = source.InlineJson;
+        InlineMetadataJson = source.InlineMetadataJson;
+        ImportedDurationSeconds = source.ImportedDurationSeconds;
+    }
 }
 
 public class SongsFinder : MonoBehaviour
@@ -65,13 +83,12 @@ public class SongsFinder : MonoBehaviour
             FileList manifest = JsonUtility.FromJson<FileList>(json);
 
             // Create a fast lookup set for all files in the build
-            var allPaths = new HashSet<string>(manifest.paths);
+            var allPaths = new HashSet<string>(manifest?.paths ?? new List<string>());
 
             // Filter specifically for your song JSONs
-            foreach (string filePath in allPaths)
+            foreach (string filePath in allPaths.Where(path => path != null).OrderBy(path => path, StringComparer.Ordinal))
             {
-                if (!filePath.EndsWith(".json")) continue;
-                if (filePath.Contains("file_manifest") || filePath.Contains(METADATA_SUFFIX)) continue;
+                if (!IsSongJson(filePath)) continue;
 
                 // We assume the manifest paths are relative to StreamingAssets (e.g. "Music/Song.json")
                 string relativeJsonPath = filePath;
@@ -108,10 +125,12 @@ public class SongsFinder : MonoBehaviour
     {
         // If you're wondering why the `.Where` clause is necessary, see https://learn.microsoft.com/en-us/dotnet/api/system.io.directory.getfiles?view=net-9.0 and its remarks
         // Basically, calling `Directory.GetFiles` with searchPattern `*.abc` returns both `*.abc` files, as well as `*.abc*` files.
-        string[] jsonFiles = Directory.GetFiles(streamingAssetsPath, "*.json", SearchOption.AllDirectories).Where(file => file.EndsWith(".json") || file.EndsWith(".midi")).ToArray();
+        string[] jsonFiles = Directory.Exists(streamingAssetsPath)
+            ? Directory.GetFiles(streamingAssetsPath, "*.json", SearchOption.AllDirectories).OrderBy(path => path, StringComparer.Ordinal).ToArray()
+            : new string[0];
         foreach (string jsonFilePath in jsonFiles)
         {
-            if (jsonFilePath.Contains("metadata") || jsonFilePath.Contains("file_manifest"))
+            if (!IsSongJson(jsonFilePath))
                 continue;
 
             string fileNameWithoutExt = Path.GetFileNameWithoutExtension(jsonFilePath);
@@ -134,6 +153,17 @@ public class SongsFinder : MonoBehaviour
         }
 
         yield return null; // Yield once to maintain coroutine structure.
+    }
+
+    private static bool IsSongJson(string path)
+    {
+        string name = Path.GetFileName(path.Replace('\\', '/'));
+        // Unity's OpenXR build adds this configuration to StreamingAssets.
+        // It is not note data and must not become a fallback-title song.
+        return name.EndsWith(".json", StringComparison.OrdinalIgnoreCase) &&
+            !name.EndsWith(METADATA_SUFFIX + ".json", StringComparison.OrdinalIgnoreCase) &&
+            !name.Equals("file_manifest.json", StringComparison.OrdinalIgnoreCase) &&
+            !name.Equals("RuntimeActionBindings.json", StringComparison.OrdinalIgnoreCase);
     }
 
     public IEnumerator LoadJsonFile(string relativePath, Action<string> callback)
@@ -171,7 +201,7 @@ public class SongsFinder : MonoBehaviour
     /// Looks through the `StreamingAssets` folder to find all .json files.
     /// Delegates to platform-specific methods.
     /// </summary>
-    public IEnumerator FindJsons(System.Action<LinkedList<PartialSongData>> callback)
+    public virtual IEnumerator FindJsons(System.Action<LinkedList<PartialSongData>> callback)
     {
         var foundSongs = new LinkedList<PartialSongData>();
         string streamingAssetsPath = Application.streamingAssetsPath;

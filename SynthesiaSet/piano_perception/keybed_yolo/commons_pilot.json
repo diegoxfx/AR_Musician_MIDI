@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "images": [
+    {
+      "id": "casio-ctk2200-195650",
+      "group": "casio-ctk2200-rameshng",
+      "split": "train",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Casio_CTK_2200_Electronic_piano_keyboard_195650.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Casio_CTK_2200_Electronic_piano_keyboard_195650.jpg",
+      "author": "Rameshng",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "source_sha256": "f00df9ea6cab28aef480d46138508b13fac9748f1c69421cbd01a3bffd54b549"
+    },
+    {
+      "id": "casio-ctk2200-221320",
+      "group": "casio-ctk2200-rameshng",
+      "split": "train",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Casio_CTK_2200_Electronic_piano_keyboard_221320.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Casio_CTK_2200_Electronic_piano_keyboard_221320.jpg",
+      "author": "Rameshng",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "source_sha256": "a9719ae8c11e0d152842136490bebf3865c0f0fc22a0b04315dd2957e98be680"
+    },
+    {
+      "id": "casio-ctk496",
+      "group": "casio-ctk496",
+      "split": "train",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Casio_CTK-496_keyboard.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/1/1c/Casio_CTK-496_keyboard.jpg",
+      "author": "Ananas96",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "source_sha256": "b9f660b3101e773ff4ae10ba30237adefa62b4290c2a02d52c1599c908db8129"
+    },
+    {
+      "id": "casio-ctk519",
+      "group": "casio-ctk519",
+      "split": "train",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Keyboard519.JPG",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Keyboard519.JPG",
+      "author": "Opersing2688",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "source_sha256": "581b079319cb1872379cdced56d8166ddb97828176a3b986afc50289171576fe"
+    },
+    {
+      "id": "yamaha-psr290",
+      "group": "yamaha-psr290",
+      "split": "train",
+      "source_url": "https://commons.wikimedia.org/wiki/File:YamahaKeyboard.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/2/22/YamahaKeyboard.jpg",
+      "author": "Moribunt",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "source_sha256": "a43c4e8896f761f8dde6ca4f04eab78b2431afd637ca95f39eef4699352524e7"
+    },
+    {
+      "id": "casio-ctk530",
+      "group": "casio-ctk530",
+      "split": "val",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Casio_CTK-530_Portable_Keyboard.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Casio_CTK-530_Portable_Keyboard.jpg",
+      "author": "Emmanuel Chrysis",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "source_sha256": "110254a4d13c71cf8956c1b47308e3c5c24d8c3b81674afb4ef022e8a12cf23e"
+    },
+    {
+      "id": "yamaha-psr240",
+      "group": "yamaha-psr240",
+      "split": "val",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Teclado_long.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Teclado_long.jpg",
+      "author": "Leonardo Santolin",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "source_sha256": "bbdb3d253fe60c753bed4d95eca0a7321e9d18994fc93b71b8025c15f9c40d69"
+    },
+    {
+      "id": "casio-ctk531",
+      "group": "casio-ctk531",
+      "split": "test",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Casio_CTK-531.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Casio_CTK-531.jpg",
+      "author": "jaqian",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/",
+      "source_sha256": "61fc15550a49c2bb3f86cc315608a81cd70b1c3e072895e39b4253d3615d06e1"
+    },
+    {
+      "id": "yamaha-psr73",
+      "group": "yamaha-psr73",
+      "split": "test",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Yamaha_PSR-73.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/8/86/Yamaha_PSR-73.jpg",
+      "author": "Edwin33 at English Wikipedia",
+      "license": "Public domain (released by author)",
+      "license_url": "https://commons.wikimedia.org/wiki/File:Yamaha_PSR-73.jpg#Licensing",
+      "source_sha256": "3e75eae47439810b917faffaf7d65fbe9d68b805f38140ce7e0012286c6e53c8"
+    },
+    {
+      "id": "roland-ep95",
+      "group": "roland-ep95",
+      "split": "test",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Roland_EP-95_Digital_Piano_-_Many_keys.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Roland_EP-95_Digital_Piano_-_Many_keys.jpg",
+      "author": "James Niland",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/",
+      "source_sha256": "5d9403015b313c1006c6cfdc0046586902b2e3600ebebe82e3b0e4b230589d5e"
+    },
+    {
+      "id": "yamaha-psr220",
+      "group": "yamaha-psr220",
+      "split": "val",
+      "author": "Cjp24",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Yamaha_PSR-220_%281%29.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/8/84/Yamaha_PSR-220_%281%29.jpg",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "source_sha256": "8c4e3060506a3f6dd5c3461ecbdb2fe972ad50881088697fb56a8d528b112aca"
+    },
+    {
+      "id": "yamaha-psr-e333",
+      "group": "yamaha-psr-e333",
+      "split": "val",
+      "author": "Pravito",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Yamaha_PSR-E333.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Yamaha_PSR-E333.jpg",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "source_sha256": "522eb5337b5abbe581b1ee2c90afc790c497532032738395296b3cb9d980cd06"
+    }
+  ]
+}

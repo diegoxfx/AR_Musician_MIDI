@@ -63,7 +63,8 @@ public class BongoStrategy : MonoBehaviour, IGameplayStrategy
     {
         // Map Keys to Drums (Simple split)
         // You can make this smarter (e.g., specific track names in MIDI)
-        note.keyIndex = NoteNameToMidi(note.key); // 0 = Left, 1 = Right
+        note.keyIndex = note.midiNumber >= 0 && note.midiNumber <= 127
+            ? note.midiNumber : NoteNameToMidi(note.key);
     }
 
     public void SpawnNote(NoteEvent note, float gameSpeed)

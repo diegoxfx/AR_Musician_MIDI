@@ -5509,16 +5509,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Press (A) on the left controller in order to run the automatic detection.
+  m_text: 'Press X on the left controller to detect the keyboard. Allow camera and spatial data access when prompted.
 
-
-    You
-    can repreat this process until you are satisfied.
-
-
-    Once you are satisfied
-    with the defined keyboard surface, press the A button on your right controller
-    once more to confirm your selection.'
+    Detection needs three surface corners. Press X (left) to retry. Once a complete surface is shown, press A on the right controller to confirm.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -8310,6 +8303,7 @@ MonoBehaviour:
   cameraAccess: {fileID: 270708750}
   quadRenderer: {fileID: 992843786}
   modelManager: {fileID: 725473862}
+  statusText: {fileID: 434299167}
 --- !u!1 &547457156
 GameObject:
   m_ObjectHideFlags: 0
@@ -11652,9 +11646,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1460171759}
-        m_TargetAssemblyTypeName: CountdownUIGeneric, Assembly-CSharp
-        m_MethodName: ResumeCountdown
+      - m_Target: {fileID: 1637867630}
+        m_TargetAssemblyTypeName: MenuControllerGeneric, Assembly-CSharp
+        m_MethodName: HideAllMenus
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -11664,9 +11658,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1637867630}
-        m_TargetAssemblyTypeName: MenuControllerGeneric, Assembly-CSharp
-        m_MethodName: HideAllMenus
+      - m_Target: {fileID: 1460171759}
+        m_TargetAssemblyTypeName: CountdownUIGeneric, Assembly-CSharp
+        m_MethodName: ResumeCountdown
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16249,9 +16243,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1460171759}
-        m_TargetAssemblyTypeName: CountdownUIGeneric, Assembly-CSharp
-        m_MethodName: StartCountdown
+      - m_Target: {fileID: 1637867630}
+        m_TargetAssemblyTypeName: MenuControllerGeneric, Assembly-CSharp
+        m_MethodName: HideAllMenus
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16261,9 +16255,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1637867630}
-        m_TargetAssemblyTypeName: MenuControllerGeneric, Assembly-CSharp
-        m_MethodName: HideAllMenus
+      - m_Target: {fileID: 1460171759}
+        m_TargetAssemblyTypeName: CountdownUIGeneric, Assembly-CSharp
+        m_MethodName: StartCountdown
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -19029,8 +19023,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlaneController
   width: 10
   height: 1
-  totalKeys: 32
-  leftmostKey: F4
+  totalKeys: 61
+  leftmostKey: C2
   whiteToBlackRatio: 1.66
 --- !u!1 &1111381226
 GameObject:
@@ -24453,7 +24447,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1525985361}
         m_TargetAssemblyTypeName: InstrumentSelectorController, Assembly-CSharp
-        m_MethodName: selectPiano
+        m_MethodName: selectBongos
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -25790,6 +25784,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InstrumentSelectorController
   pianoButton: {fileID: 707807398}
   bongosButton: {fileID: 1468774897}
+  rhythmGameManager: {fileID: 721301431}
+  pianoStrategy: {fileID: 721301430}
+  bongoStrategy: {fileID: 721301429}
 --- !u!1 &1531796505
 GameObject:
   m_ObjectHideFlags: 0
@@ -32812,18 +32809,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1637867630}
-        m_TargetAssemblyTypeName: MenuControllerGeneric, Assembly-CSharp
-        m_MethodName: postSongChoiceMenu
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 601591330}
         m_TargetAssemblyTypeName: SongsUIHandlerGeneric, Assembly-CSharp
         m_MethodName: OnSongSelected
