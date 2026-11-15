@@ -137,3 +137,13 @@ A provisional 2026-11-11 run trained the three classes for 50 epochs on a frozen
 On the five validation photos, mask mAP50–95 was 0.791 at 960 × 960 and 0.710 at 480 × 640. The selected thresholds were 0.30 and 0.10 respectively; the smaller input produced 46 extra white-key detections versus 11 at 960. No validation photo had every key correct and physically ordered. These few photos do not establish generalization to a headset camera. The 480 × 640 ONNX passed PyTorch–ONNX Runtime parity on 283 nonempty mask pairs and imported into Inference Engine 2.4.1 with FP32 weights. Unity import is not device execution: actual Quest timing, memory, mask parity and camera-to-world alignment remain unverified for this model.
 
 Image terms remain attached to the photos and derivatives. Ultralytics supplies the pretrained models and resulting fine-tuned models under AGPL-3.0 by default or an Enterprise license. Check distribution obligations before bundling weights with an APK. [Commons reuse terms](https://commons.wikimedia.org/wiki/Commons:Reusing_content_outside_Wikimedia), [Ultralytics licensing](https://www.ultralytics.com/license)
+
+## Sparse reconstruction preview
+
+`keybed_layout.py` adds a prediction-only, perspective-corrected layout preview
+from a supported outline, sparse key anchors and an explicitly configured
+instrument profile. The CT-S200 profile works without receiving MIDI input.
+Missing positions are marked as estimated; every returned preview requires
+confirmation. See the [experiment, metrics and limits](../../../docs/sparse-keyboard-reconstruction.md).
+`evaluate_layout.py` compares guide positions against reviewed references;
+supplied profile metadata is declared separately from visual inference accuracy.

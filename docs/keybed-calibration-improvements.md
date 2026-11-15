@@ -2,6 +2,8 @@
 
 The existing YOLO26n-seg weights now have a separately tested key-filtering and corner-fitting candidate. **The strong validation improvement did not transfer adequately to new photos: only 1 of 11 evaluable prospective photos passed complete calibration.** This is a Python evaluation implementation, not a replacement detector in the Quest practice APK. The earlier [300-photo pilot](keybed-pilot-300.md) remains the baseline record.
 
+The later [sparse reconstruction experiment](sparse-keyboard-reconstruction.md) follows the revised initial requirement: estimate missing positions from a complete outline, a configured instrument profile and reliable key anchors. Its guide-position metric supersedes the all-key-mask requirement for that first milestone. The historical results and original criteria below remain unchanged.
+
 ## Proposed reliability target
 
 For the next pilot milestone, at least **90% of independently sampled, complete-keyboard captures** should pass all three conditions together:

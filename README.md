@@ -23,6 +23,11 @@ result is 17/27 complete, ordered keyboards with all four corners within a quart
 of a mean white-key width. However, only **1/11 new evaluable photos** passed that
 same joint check after freezing the adjustments. The proposed 90% capture target
 has not been met; the new candidate is not ready for automatic calibration.
+The next [sparse-key reconstruction experiment](docs/sparse-keyboard-reconstruction.md)
+uses a configured instrument profile and a few reliable key anchors to estimate
+the remaining positions. It returns a preview requiring confirmation; the
+complete outline remains the main accuracy limitation. This Python experiment
+does not change the practice APK.
 
 ## Origin and attribution
 
