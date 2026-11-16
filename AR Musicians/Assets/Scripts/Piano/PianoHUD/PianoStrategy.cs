@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using ARMusician.Midi;
 
 public class PianoStrategy : MonoBehaviour, IGameplayStrategy
 {
@@ -8,6 +9,11 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
     public GameObject noteCubePrefab;
     public float fallTime = 2f;
     public float blockDepth = 0.001f;
+    [Tooltip("Original bundled JSON used C0 = MIDI 0. New exports carry midiNumber and ignore this offset.")]
+    public int legacySongOctaveOffset = -12;
+    public bool HasCalibration { get; private set; }
+    public PianoMidiFeedback MidiFeedback { get; private set; }
+    private RhythmGameManager game;
 
     public event Action OnNoteFinished;
 
@@ -15,6 +21,10 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
     {
         // Listen for plane definition (moved from Manager)
         PianoManagerInstrumentDefiner.OnPlaneDefined += UpdatePlaneVisuals;
+        game = FindFirstObjectByType<RhythmGameManager>();
+        MidiFeedback = gameObject.AddComponent<PianoMidiFeedback>();
+        MidiFeedback.Initialize(this);
+        gameObject.AddComponent<PracticeOptionsUI>().Initialize(game, MidiFeedback);
     }
 
     private void OnDestroy()
@@ -28,12 +38,13 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
     public bool IsInstrumentReady()
     {
         // Basic check: has the plane been resized/positioned?
-        return plane != null && plane.width > 0;
+        return plane != null && plane.width > 0 && HasCalibration;
     }
 
     public void PreprocessNote(NoteEvent note)
     {
-        note.keyIndex = plane.NoteNameToKeyIndex(note.key);
+        note.keyIndex = note.midiNumber >= 0 && note.midiNumber <= 127
+            ? note.midiNumber : plane.NoteNameToKeyIndex(note.key) + legacySongOctaveOffset;
     }
 
     public void SpawnNote(NoteEvent note, float gameSpeed)
@@ -46,7 +57,8 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
         }
         // --- Exact Logic from original SpawnCube ---
         float velocity = plane.height / fallTime;
-        float blockHeight = velocity * note.duration;
+        float visibleDuration = note.visualDuration >= 0 ? note.visualDuration / gameSpeed : note.duration;
+        float blockHeight = velocity * visibleDuration;
 
         GameObject cube = Instantiate(noteCubePrefab);
 
@@ -58,16 +70,23 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
         cube.transform.rotation = plane.transform.rotation;
 
         // Scale logic
-        cube.transform.localScale = new Vector3(keyWidth * plane.width, blockHeight, blockDepth);
+        cube.transform.localScale = new Vector3(keyWidth * plane.width * CubeFallBehavior.WidthRatio, blockHeight, blockDepth);
 
         // Color logic
         Renderer rend = cube.GetComponent<Renderer>();
         if (rend != null)
-            rend.material.color = plane.IsWhiteKey(note.keyIndex) ? Color.white : Color.black;
+        {
+            PianoHand hand = note.assignedHand != PianoHand.Unspecified ? note.assignedHand
+                : PianoHandPartition.Assign(note.keyIndex, note.sourceHand, game != null ? game.SplitPitch : PianoHandPartition.DefaultSplitPitch);
+            // Color denotes the hand, including accidentals. Black-key notes must
+            // remain visible against dark rooms and the keyboard itself.
+            rend.material.color = hand == PianoHand.Left
+                ? new Color(1f, 0.64f, 0.25f, 1f) : new Color(0.65f, 0.43f, 1f, 1f);
+        }
 
         // Behavior
         var fall = cube.AddComponent<CubeFallBehavior>(); // Renamed from CubeFall to be generic
-        fall.Configure(this, plane, note, fallTime, blockHeight, blockDepth, note.keyIndex, rend);
+        fall.Configure(this, plane, note, fallTime, blockHeight, blockDepth, note.keyIndex, rend, gameSpeed, game);
         RhythmGameManager.OnPause += fall.OnPause;
         RhythmGameManager.OnResume += fall.OnResume;
         RhythmGameManager.OnQuit += fall.OnQuit;
@@ -140,5 +159,6 @@ public class PianoStrategy : MonoBehaviour, IGameplayStrategy
         plane.height = planeHeight;
         plane.transform.SetPositionAndRotation(position, rotation);
         plane.reInit();
+        HasCalibration = true;
     }
 }

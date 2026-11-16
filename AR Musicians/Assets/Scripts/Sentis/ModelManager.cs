@@ -54,6 +54,16 @@ public class ModelManager : MonoBehaviour
     /// <returns>Array of keypoints (Vector2)</returns>
     public Vector2[] RunInference(Texture targetTexture, int n_kpts)
     {
+        return RunInference(targetTexture, n_kpts, false, out _);
+    }
+
+    public Vector2[] RunInference(Texture targetTexture, int n_kpts, out float[] confidences)
+    {
+        return RunInference(targetTexture, n_kpts, true, out confidences);
+    }
+
+    private Vector2[] RunInference(Texture targetTexture, int n_kpts, bool readConfidence, out float[] confidences)
+    {
         TensorShape inputShape = new TensorShape(1, 3, targetTexture.height, targetTexture.width);
         Tensor<float> input = new Tensor<float>(inputShape);
         TextureConverter.ToTensor(targetTexture, input);
@@ -76,6 +86,13 @@ public class ModelManager : MonoBehaviour
 
         SaveTensorForPyTorch(cpuTensor, "kpts.tensor");
         Vector2[] kpts = parseKeyPoints(cpuTensor, n_kpts);
+        confidences = null;
+        if (readConfidence && cpuTensor.shape.rank == 3 && cpuTensor.shape[2] >= 3)
+        {
+            confidences = new float[n_kpts];
+            for (int i = 0; i < n_kpts; i++)
+                confidences[i] = cpuTensor[0, i, 2];
+        }
 
         foreach (Vector2 kpt in kpts)
         {

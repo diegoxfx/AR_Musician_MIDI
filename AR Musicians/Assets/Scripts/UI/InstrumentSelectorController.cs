@@ -7,6 +7,10 @@ public class InstrumentSelectorController : MonoBehaviour
     public Button pianoButton;
     public Button bongosButton;
 
+    [SerializeField] private RhythmGameManager rhythmGameManager;
+    [SerializeField] private PianoStrategy pianoStrategy;
+    [SerializeField] private BongoStrategy bongoStrategy;
+
     #region Private fields
     private const string PIANO_NAME = "piano";
     private const string BONGOS_NAME = "bongos";
@@ -14,12 +18,12 @@ public class InstrumentSelectorController : MonoBehaviour
 
     public void selectPiano()
     {
-        ProjectConfig.Settings.instrument = PIANO_NAME;
+        rhythmGameManager.SetStrategy(pianoStrategy);
     }
 
     public void selectBongos()
     {
-        ProjectConfig.Settings.instrument = BONGOS_NAME;
+        rhythmGameManager.SetStrategy(bongoStrategy);
     }
 
     public void onConfiguredNewInstrument()

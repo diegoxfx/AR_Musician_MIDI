@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keybed label review</title>
+<style>
+  :root { color-scheme: dark; font: 15px system-ui, sans-serif; }
+  body { margin: 0 auto; max-width: 1320px; padding: 20px; background: #191d22; color: #e9edf0; }
+  h1 { margin: 0 0 12px; font-size: 22px; }
+  p { margin: 8px 0; }
+  input, button, select { font: inherit; padding: 6px 8px; }
+  button, select { cursor: pointer; }
+  button:disabled { cursor: default; }
+  input[type=number] { width: 5ch; }
+  a { color: #a2d7ff; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin: 10px 0; }
+  .viewport { background: #111519; overflow: auto; max-height: 65vh; }
+  canvas { display: block; touch-action: none; }
+  #sheet { display: block; max-width: 100%; margin: auto; }
+  #diagnostics { color: #ffc884; }
+  #message { min-height: 1.5em; }
+  #reason { flex: 1 1 310px; }
+  #image-list { max-width: min(52vw, 480px); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<h1>Keybed label review</h1>
+<div class="row">
+  <button id="previous" type="button">Previous</button>
+  <label>Image <select id="image-list"></select></label>
+  <button id="next" type="button">Next</button>
+  <button id="pending" type="button">Next pending</button>
+  <span id="progress"></span>
+  <a id="source" target="_blank" rel="noreferrer">Source photo</a>
+</div>
+<div class="row">
+  <label>Zoom <select id="zoom"><option value="1">Fit width</option><option value="2">2×</option><option value="3">3×</option><option value="5">5×</option></select></label>
+  <label><input id="overlay" type="checkbox" checked> Masks</label>
+  <button id="compare" type="button">Rectified comparison</button>
+  <button id="bed" type="button">Select keybed</button>
+  <button id="white" type="button">Add white key</button>
+  <button id="black" type="button">Add black key</button>
+  <button id="finish" type="button" disabled>Finish polygon</button>
+  <button id="cancel" type="button" disabled>Cancel polygon</button>
+  <button id="flip" type="button" disabled>Change key class</button>
+  <button id="remove" type="button" disabled>Delete selected</button>
+</div>
+<div class="viewport" id="viewport">
+  <canvas id="canvas" aria-label="Photo with editable keybed and key polygons"></canvas>
+  <img id="sheet" alt="Rectified original and proposal comparison" hidden>
+</div>
+<p id="selection">Select a polygon and drag its vertices to match visible boundaries.</p>
+<p id="diagnostics"></p>
+<div class="row">
+  <label>Reviewer <input id="reviewer" autocomplete="name" required></label>
+  <label>Verified total <input id="total" type="number" min="2" max="128"></label>
+  <label>Verified white <input id="white-count" type="number" min="1" max="127"></label>
+  <input id="reason" aria-label="Review reason" placeholder="Review reason or correction notes">
+</div>
+<div class="row">
+  <button id="accept" type="button">Accept complete keyboard</button>
+  <button id="reject" type="button">Reject image</button>
+  <button id="negative" type="button">Confirm no visible keys</button>
+</div>
+<p id="message" role="status" aria-live="polite"></p>
+<script type="module">
+  const $ = id => document.getElementById(id);
+  const canvas = $("canvas");
+  const context = canvas.getContext("2d");
+  const colors = {playable_keybed: "#40ffd0", white_key: "#ffd65a", black_key: "#ff78b4"};
+  const unsaved = new Map();
+  let rows = [];
+  let image, current, work, selected, addition, drag;
+  let loading = 0;
+
+  async function request(url, options) {
+    const response = await fetch(url, options);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || response.statusText);
+    return data;
+  }
+
+  function message(text) {
+    $("message").textContent = text;
+  }
+
+  function updateList() {
+    $("image-list").replaceChildren(...rows.map(row => new Option(
+      `${row.id} · ${row.split} · ${row.status}`, row.id, false, row.id === current?.id
+    )));
+    $("progress").textContent = `${rows.filter(row => row.status !== "pending").length} / ${rows.length} reviewed`;
+  }
+
+  async function selectImage(id) {
+    if (!id) return;
+    const generation = ++loading;
+    const row = rows.find(entry => entry.id === id);
+    const original = new Image();
+    original.src = `/image/${id}`;
+    const [data] = await Promise.all([request(`/record/${id}`), original.decode()]);
+    if (generation !== loading) return;
+    const labels = data.review.status === "accepted" ? data.review : data.draft;
+    current = row;
+    image = original;
+    work = unsaved.get(id) || {
+      hash: data.draft.image_sha256,
+      keybed: labels.keybed,
+      keys: labels.keys || [],
+      total: data.review.expected_key_count || "",
+      whites: data.review.expected_white_count || "",
+      reason: data.review.reason || "",
+    };
+    unsaved.set(id, work);
+    selected = addition = drag = undefined;
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    $("source").hidden = !/^https?:\/\//i.test(row.source_url);
+    if (!$("source").hidden) $("source").href = row.source_url;
+    $("total").value = work.total;
+    $("white-count").value = work.whites;
+    $("reason").value = work.reason;
+    $("compare").disabled = !data.draft.keybed;
+    $("compare").textContent = "Rectified comparison";
+    $("sheet").hidden = true;
+    canvas.hidden = false;
+    $("diagnostics").textContent = (data.draft.diagnostics?.warnings || []).join(" · ");
+    updateList();
+    resize();
+    message("");
+  }
+
+  function resize() {
+    canvas.style.width = `${$("viewport").clientWidth * Number($("zoom").value)}px`;
+    redraw();
+  }
+
+  function trace(points, close) {
+    context.beginPath();
+    for (const [index, [x, y]] of points.entries()) {
+      if (index === 0) context.moveTo(x, y);
+      else context.lineTo(x, y);
+    }
+    if (close) context.closePath();
+  }
+
+  function shapes() {
+    const list = [];
+    if (work.keybed) list.push({item: work.keybed, points: work.keybed.corners, color: colors.playable_keybed});
+    for (const key of work.keys) list.push({item: key, points: key.polygon, color: colors[key.class]});
+    return list;
+  }
+
+  function redraw() {
+    if (!image) return;
+    context.drawImage(image, 0, 0);
+    const scale = canvas.clientWidth / canvas.width || 1;
+    if ($("overlay").checked) {
+      for (const {item, points, color} of shapes()) {
+        trace(points, true);
+        context.lineWidth = (item === selected ? 3 : 1.25) / scale;
+        context.strokeStyle = color;
+        context.stroke();
+        if (item === selected) {
+          for (const [x, y] of points) {
+            context.beginPath();
+            context.arc(x, y, 4 / scale, 0, 2 * Math.PI);
+            context.fillStyle = color;
+            context.fill();
+          }
+        }
+      }
+    }
+    if (addition) {
+      trace(addition.points, false);
+      context.strokeStyle = colors[addition.class];
+      context.lineWidth = 2 / scale;
+      context.stroke();
+    }
+    const whiteCount = work.keys.filter(key => key.class === "white_key").length;
+    const picked = selected === work.keybed && selected ? "Keybed selected" :
+      selected ? `Selected ${selected.class.replace("_", " ")}` : "Select a polygon to move its vertices";
+    $("selection").textContent = `${addition ? "Click each visible vertex in order" : picked}. Draft has ${whiteCount} white and ${work.keys.length - whiteCount} black keys.`;
+    $("finish").disabled = !addition || addition.points.length < (addition.class === "playable_keybed" ? 4 : 3);
+    $("cancel").disabled = !addition;
+    $("flip").disabled = !selected?.class;
+    $("remove").disabled = !selected?.class;
+  }
+
+  function coordinate(event) {
+    const rect = canvas.getBoundingClientRect();
+    return [Math.max(0, Math.min(canvas.width - 1, (event.clientX - rect.left) * canvas.width / rect.width)),
+      Math.max(0, Math.min(canvas.height - 1, (event.clientY - rect.top) * canvas.height / rect.height))];
+  }
+
+  function canvasMode() {
+    $("sheet").hidden = false;
+    toggleComparison();
+    $("overlay").checked = true;
+  }
+
+  function begin(className) {
+    if (!work) return;
+    canvasMode();
+    addition = {class: className, points: []};
+    redraw();
+  }
+
+  function toggleComparison() {
+    if (!current) return;
+    const show = $("sheet").hidden;
+    $("sheet").hidden = !show;
+    canvas.hidden = show;
+    if (show) $("sheet").src = `/sheet/${current.id}`;
+    $("compare").textContent = show ? "Return to editor" : "Rectified comparison";
+    if (!show) redraw();
+  }
+
+  function finish() {
+    if (!addition || $("finish").disabled) return;
+    if (addition.class === "playable_keybed") {
+      work.keybed = {corners: addition.points};
+      selected = work.keybed;
+    } else {
+      selected = {class: addition.class, polygon: addition.points};
+      work.keys.push(selected);
+    }
+    addition = undefined;
+    redraw();
+  }
+
+  canvas.addEventListener("pointerdown", event => {
+    if (!work || !$("overlay").checked) return;
+    const point = coordinate(event);
+    if (addition) {
+      if (addition.class !== "playable_keybed" || addition.points.length < 4) addition.points.push(point);
+      redraw();
+      return;
+    }
+    const polygons = shapes();
+    const active = polygons.find(shape => shape.item === selected);
+    if (active) {
+      const radius = 9 * canvas.width / canvas.clientWidth;
+      const vertex = active.points.findIndex(([x, y]) => Math.hypot(point[0] - x, point[1] - y) < radius);
+      if (vertex >= 0) {
+        drag = {points: active.points, vertex};
+        canvas.setPointerCapture(event.pointerId);
+        return;
+      }
+    }
+    selected = undefined;
+    for (const {item, points} of polygons.reverse()) {
+      trace(points, true);
+      if (context.isPointInPath(...point)) {
+        selected = item;
+        break;
+      }
+    }
+    redraw();
+  });
+  canvas.addEventListener("pointermove", event => {
+    if (!drag) return;
+    drag.points[drag.vertex] = coordinate(event);
+    redraw();
+  });
+  canvas.addEventListener("lostpointercapture", () => { drag = undefined; });
+
+  async function save(status) {
+    if (!work || addition) throw new Error("Finish or cancel the current polygon first.");
+    const reviewedBy = $("reviewer").value.trim();
+    const note = work.reason.trim();
+    if (!reviewedBy) throw new Error("Enter the reviewer’s name.");
+    if (status === "rejected" && !note) throw new Error("Enter the reason for rejecting this image.");
+    const decision = {
+      id: current.id, image_sha256: work.hash, status, reviewed_by: reviewedBy,
+      reason: note || (status === "negative" ? "Visually confirmed zero visible target objects." :
+        "Visually verified the complete keybed, all visible key boundaries and physical counts."),
+    };
+    if (status === "accepted") {
+      if (!work.keybed) throw new Error("Add four keybed corners.");
+      if (!$("total").checkValidity() || !$("white-count").checkValidity() || !work.total || !work.whites) {
+        throw new Error("Enter the verified total and white key counts.");
+      }
+      Object.assign(decision, {keybed: work.keybed, keys: work.keys,
+        expected_key_count: Number(work.total), expected_white_count: Number(work.whites)});
+    } else if (status === "negative") {
+      decision.contains_visible_target = false;
+    }
+    const row = current;
+    await request("/decision", {method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(decision)});
+    row.status = status;
+    unsaved.delete(row.id);
+    updateList();
+    message(`${row.id} saved as ${status}.`);
+  }
+
+  const report = error => message(error.message);
+  const load = id => selectImage(id).catch(report);
+  const step = delta => load(rows[rows.indexOf(current) + delta]?.id);
+  $("image-list").addEventListener("change", event => load(event.target.value));
+  $("previous").addEventListener("click", () => step(-1));
+  $("next").addEventListener("click", () => step(1));
+  $("pending").addEventListener("click", () => {
+    const index = rows.indexOf(current) + 1;
+    const next = [...rows.slice(index), ...rows.slice(0, index)].find(row => row.status === "pending");
+    if (next) load(next.id);
+    else message("All images have a review decision.");
+  });
+  $("zoom").addEventListener("change", resize);
+  $("overlay").addEventListener("change", redraw);
+  $("compare").addEventListener("click", toggleComparison);
+  $("white").addEventListener("click", () => begin("white_key"));
+  $("black").addEventListener("click", () => begin("black_key"));
+  $("bed").addEventListener("click", () => {
+    if (!work) return;
+    if (!work.keybed) {
+      begin("playable_keybed");
+      message("Click back-left, back-right, front-right and front-left in order.");
+      return;
+    }
+    canvasMode();
+    selected = work.keybed;
+    redraw();
+  });
+  $("finish").addEventListener("click", finish);
+  $("cancel").addEventListener("click", () => { addition = undefined; redraw(); });
+  $("remove").addEventListener("click", () => {
+    work.keys = work.keys.filter(key => key !== selected);
+    selected = undefined;
+    redraw();
+  });
+  $("flip").addEventListener("click", () => {
+    selected.class = selected.class === "white_key" ? "black_key" : "white_key";
+    delete selected.proposal;
+    delete selected.proposal_score;
+    redraw();
+  });
+  for (const [id, field] of [["total", "total"], ["white-count", "whites"], ["reason", "reason"]]) {
+    $(id).addEventListener("input", event => { if (work) work[field] = event.target.value; });
+  }
+  for (const [id, status] of [["accept", "accepted"], ["reject", "rejected"], ["negative", "negative"]]) {
+    $(id).addEventListener("click", () => save(status).catch(report));
+  }
+  $("reviewer").value = localStorage.getItem("keybed-reviewer") || "";
+  $("reviewer").addEventListener("change", () => localStorage.setItem("keybed-reviewer", $("reviewer").value));
+  window.addEventListener("resize", resize);
+  request("/inventory").then(result => {
+    rows = result;
+    return load(rows.find(row => row.status === "pending")?.id || rows[0]?.id);
+  }).catch(report);
+</script>
+</body>
+</html>

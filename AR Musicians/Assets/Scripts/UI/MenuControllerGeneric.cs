@@ -51,6 +51,18 @@ public class MenuControllerGeneric : MonoBehaviour
 
     #endregion
 
+    private PracticeOptionsUI practiceShell;
+    private bool IsMultiplayer => ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer;
+    private bool PreparationAllowed => practiceShell == null || rhythmGameManager.State == RhythmGameManager.PlaybackState.Idle;
+    public bool PracticeShellVisible => practiceShell != null && practiceShell.IsVisible;
+    internal PianoManagerInstrumentDefiner PianoDefiner => pianoManager;
+    internal bool PianoReady => pianoStrategy != null && pianoStrategy.IsInstrumentReady();
+    internal bool BongosReady => bongoStrategy != null && bongoStrategy.IsInstrumentReady();
+
+    internal void RegisterPracticeShell(PracticeOptionsUI shell) => practiceShell = shell;
+    internal void SelectPianoForPractice() => rhythmGameManager.SetStrategy(pianoStrategy);
+    internal void SelectBongosForPractice() => rhythmGameManager.SetStrategy(bongoStrategy);
+
     public void Start()
     {
         multiplayerButton.interactable = false;
@@ -82,6 +94,8 @@ public class MenuControllerGeneric : MonoBehaviour
 
     public void HideAllMenus()
     {
+        if (practiceShell != null) practiceShell.Hide();
+        if (pianoManager != null && pianoManager.IsDefining) pianoManager.Deactivate();
         mainMenu.SetActive(false);
         songMenu.SetActive(false);
         instrumentSelectorMenu.SetActive(false);
@@ -106,12 +120,24 @@ public class MenuControllerGeneric : MonoBehaviour
     }
     public void ShowSingleplayerPauseMenu()
     {
+        if (practiceShell != null)
+        {
+            practiceShell.ShowPause();
+            return;
+        }
         HideAllMenus();
         singleplayerPauseMenu.SetActive(true);
     }
 
     public void ShowMainMenu()
     {
+        if (practiceShell != null)
+        {
+            if (!PreparationAllowed) return;
+            practiceShell.SetSinglePlayer();
+            practiceShell.ShowPrepare();
+            return;
+        }
         HideAllMenus();
         singleplayerButton.interactable = instrumentDefined;
         multiplayerButton.interactable = instrumentDefined && ProjectConfig.Settings.enableMultiplayer;
@@ -123,21 +149,22 @@ public class MenuControllerGeneric : MonoBehaviour
     /// </summary>
     public void StartPianoSetup()
     {
-        HideAllMenus();
-        manualPlaneDefinitionMenu.SetActive(true); // Keep existing UI
-
-        // 1. Activate the Manager
-        pianoManager.Activate(false); // false = manual mode
-
-        // 2. Tell the Raycaster to talk to the PianoManager
-        // (Assuming RayCastInputProvider has a SetListener method as discussed previously)
-        // Note: PianoManager needs to implement IPointInputListener, or you keep the old logic for Piano specifically.
-        // If PianoManager is NOT updated to IPointInputListener yet, we rely on its internal update loop.
-        // But for consistency with the new architecture:
-        if (inputProvider != null && pianoManager is IPointInputListener listener)
+        if (!PreparationAllowed) return;
+        if (practiceShell != null && !IsMultiplayer)
         {
-            inputProvider.SetListener(listener);
+            practiceShell.ShowSetupCapture(false);
+            return;
         }
+        HideAllMenus();
+        manualPlaneDefinitionMenu.SetActive(true);
+        ActivatePianoDefinition(false);
+    }
+
+    internal void ActivatePianoDefinition(bool automatic)
+    {
+        if (pianoManager == null) return;
+        pianoManager.Activate(automatic);
+        if (inputProvider != null) inputProvider.SetListener(pianoManager);
     }
 
     /// <summary>
@@ -145,6 +172,7 @@ public class MenuControllerGeneric : MonoBehaviour
     /// </summary>
     public void StartBongoSetup()
     {
+        if (!PreparationAllowed) return;
         HideAllMenus();
         // You might want to duplicate the manualPlaneDefinitionMenu and rename it for Bongos, 
         // or just reuse it if the text is generic enough.
@@ -199,18 +227,21 @@ public class MenuControllerGeneric : MonoBehaviour
 
     public void ShowMultiplayerMenu()
     {
+        if (!PreparationAllowed) return;
         HideAllMenus();
         multiplayerMenu.SetActive(true);
     }
 
     public void ShowInstrumentDetectorMenu()
     {
+        if (!PreparationAllowed) return;
         HideAllMenus();
         instrumentDetectorMenu.SetActive(true);
     }
 
     public void HideInstrumentDetectorMenu()
     {
+        if (!PreparationAllowed) return;
         HideAllMenus();
         manualPlaneDefinitionMenu.SetActive(true);
     }
@@ -223,14 +254,20 @@ public class MenuControllerGeneric : MonoBehaviour
 
     public void ShowCVPlaneDefinitionMenu()
     {
+        if (!PreparationAllowed) return;
+        if (practiceShell != null && !IsMultiplayer)
+        {
+            practiceShell.ShowSetupCapture(true);
+            return;
+        }
         HideAllMenus();
         cvPlaneDefinitionMenu.SetActive(true);
-        // CV Logic usually specific to Piano for now
-        pianoManager.Activate(true);
+        ActivatePianoDefinition(true);
     }
 
     public void ShowCVCircleDefinitionMenu()
     {
+        if (!PreparationAllowed) return;
         HideAllMenus();
         cvCircleDefinitionMenu.SetActive(true);
         BongosManager.Activate(true);
@@ -238,25 +275,35 @@ public class MenuControllerGeneric : MonoBehaviour
 
     public void ShowCreateRoomMenu()
     {
+        if (!PreparationAllowed) return;
         HideAllMenus();
         createRoomMenu.SetActive(true);
     }
 
     public void ShowJoinRoomMenu()
     {
+        if (!PreparationAllowed) return;
         HideAllMenus();
         joinRoomMenu.SetActive(true);
     }
 
     public void ShowInstrumentSelectorMenu()
     {
+        if (!PreparationAllowed) return;
         HideAllMenus();
         instrumentSelectorMenu.SetActive(true);
     }
 
     public void ShowSongMenu()
     {
+        if (!PreparationAllowed) return;
+        if (practiceShell != null && !IsMultiplayer)
+        {
+            practiceShell.ShowLibrary();
+            return;
+        }
         HideAllMenus();
+        if (practiceShell != null) practiceShell.RestoreLegacy(songMenu);
         songMenu.SetActive(true);
         foreach (Button button in songSelectionButtons)
         {
@@ -266,13 +313,21 @@ public class MenuControllerGeneric : MonoBehaviour
 
     public void ShowSinglePlayerLobbyMenu()
     {
+        if (!PreparationAllowed) return;
+        if (practiceShell != null && !IsMultiplayer)
+        {
+            practiceShell.RestorePreparation();
+            return;
+        }
         HideAllMenus();
+        if (practiceShell != null) practiceShell.RestoreLegacy(singlePlayerLobbyMenu);
         Debug.Log("Go to singleplayer lobby");
         singlePlayerLobbyMenu.SetActive(true);
     }
 
     public void postInstrumentSelectedMenu()
     {
+        if (rhythmGameManager == null || !rhythmGameManager.CanSelectInstrument) return;
         bool multiplayer = ProjectConfig.Settings.enableMultiplayer && ProjectConfig.Settings.useMultiplayer;
         if (multiplayer) ShowMultiplayerMenu();
         else ShowSongMenu();
@@ -295,6 +350,7 @@ public class MenuControllerGeneric : MonoBehaviour
 
     public void ShowMultiplayerLobbyMenu()
     {
+        if (!PreparationAllowed) return;
         HideAllMenus();
         multiplayerLobbyMenu.SetActive(true);
     }

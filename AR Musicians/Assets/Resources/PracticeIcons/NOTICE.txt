@@ -1,0 +1,13 @@
+Google Material Symbols Outlined
+Copyright Google LLC. Apache License 2.0 (see LICENSE.txt).
+
+Official 24px SVGs rasterized to white 96x96 PNGs with resvg 2.6.2.
+Shape geometry is unchanged; transparency is preserved.
+
+book.png: https://raw.githubusercontent.com/google/material-design-icons/master/symbols/web/menu_book/materialsymbolsoutlined/menu_book_24px.svg
+piano.png: https://raw.githubusercontent.com/google/material-design-icons/master/symbols/web/piano/materialsymbolsoutlined/piano_24px.svg
+settings.png: https://raw.githubusercontent.com/google/material-design-icons/master/symbols/web/settings/materialsymbolsoutlined/settings_24px.svg
+chevron.png: https://raw.githubusercontent.com/google/material-design-icons/master/symbols/web/chevron_right/materialsymbolsoutlined/chevron_right_24px.svg
+plus.png: https://raw.githubusercontent.com/google/material-design-icons/master/symbols/web/add/materialsymbolsoutlined/add_24px.svg
+minus.png: https://raw.githubusercontent.com/google/material-design-icons/master/symbols/web/remove/materialsymbolsoutlined/remove_24px.svg
+back.png: https://raw.githubusercontent.com/google/material-design-icons/master/symbols/web/arrow_back/materialsymbolsoutlined/arrow_back_24px.svg
