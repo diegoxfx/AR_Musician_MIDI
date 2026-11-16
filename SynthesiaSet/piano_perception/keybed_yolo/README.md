@@ -147,3 +147,17 @@ Missing positions are marked as estimated; every returned preview requires
 confirmation. See the [experiment, metrics and limits](../../../docs/sparse-keyboard-reconstruction.md).
 `evaluate_layout.py` compares guide positions against reviewed references;
 supplied profile metadata is declared separately from visual inference accuracy.
+
+## Four-corner refinement experiment
+
+`corner_pose.py` trains a four-keypoint YOLO26n-pose proposal model;
+`corner_pose_data.py` adds independently approved, training-only corner references.
+`corner_refiner.py` trains a 94k-parameter RGB heatmap model around predicted
+corners, and `corner_refiner_evaluate.py` freezes and compares both detectors and
+the globally selected refinement pipeline. The additional real-photo sources,
+reviewed corners and explicit exclusions are in `corners_v4_reviewed.json`.
+
+The [experiment and reproduction notes](../../../docs/keybed-corner-refinement.md)
+report 23/27 strict validation corner passes, 5/11 on reused difficult diagnostics,
+and 0/8 on newly reserved difficult photos. The last result prevents any claim of
+automatic-calibration readiness. Production Unity detection remains unchanged.

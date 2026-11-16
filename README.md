@@ -28,6 +28,12 @@ uses a configured instrument profile and a few reliable key anchors to estimate
 the remaining positions. It returns a preview requiring confirmation; the
 complete outline remains the main accuracy limitation. This Python experiment
 does not change the practice APK.
+A later [four-corner refinement experiment](docs/keybed-corner-refinement.md) adds
+seven reviewed training photos and a compact local RGB model. Strict corner passes
+rise from 18/27 to 23/27 on validation and from 1/11 to 5/11 on reused difficult
+diagnostics. However, a newly reserved eight-photo cohort scores **0/8**, exposing
+continued full-outline localization failures. It remains experimental; neither
+automatic-calibration readiness nor the 90% capture target has been established.
 
 ## Origin and attribution
 

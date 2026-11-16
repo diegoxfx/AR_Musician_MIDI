@@ -1,0 +1,689 @@
+{
+  "schema": 1,
+  "purpose": "Real-photo corner-only additions; excluded sources are not negatives. Preserve splits.",
+  "normalization": "Pillow ImageOps.exif_transpose(original).convert(RGB); thumbnail((2048,2048), LANCZOS); lossless PNG. Coordinates refer to that normalized full frame.",
+  "corner_order": [
+    "back-left",
+    "back-right",
+    "front-right",
+    "front-left"
+  ],
+  "source_manifest_sha256": "fe3a42fcbd9cdc8fac4b5deb0e0488cde14f3eee9670571bdd0196630d9222a9",
+  "training_approvals_sha256": "485eeb1de1819be8894edf7f88e51714d0d8716e6843e4fc437f9af2e326293e",
+  "heldout_reference_sha256": "0346552e35baa44836b789854da6d18c99bc1c1892334328456ed483e1b2d0b8",
+  "source_and_train_qa_sha256": "01a25f38c5e1a9a377936a6e21bdbd4e0a2731d00f834e41b0a4d5979b118522",
+  "heldout_label_qa_sha256": "9b63fc3b0e4ba00714837c4a25f9641cdf9ea37a369dfb358d078a7133027961",
+  "images": [
+    {
+      "id": "wc-41355786",
+      "group": "commons-author-haruq",
+      "split": "train",
+      "title": "Music corner - Yamaha CP-80 Electric Grand Piano, Wood bass, Classic Pro CSP10 speakers x2, microphones (2015-03-21 15.55.48 by haru＿q).jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Music_corner_-_Yamaha_CP-80_Electric_Grand_Piano,_Wood_bass,_Classic_Pro_CSP10_speakers_x2,_microphones_(2015-03-21_15.55.48_by_haru%EF%BC%BFq).jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Music_corner_-_Yamaha_CP-80_Electric_Grand_Piano%2C_Wood_bass%2C_Classic_Pro_CSP10_speakers_x2%2C_microphones_%282015-03-21_15.55.48_by_haru%EF%BC%BFq%29.jpg",
+      "author": "haru__q",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+      "source_sha256": "3cf63e15336563a4b52b3095277ad13bded2997bf656f6362e0de3f9636605fe",
+      "commons_sha1": "4c23d042826c4b4e84a60022c24df200369551e0",
+      "image_sha256": "5d0547141d905bebf35e22ea25774209095f940c5e670e353d7257a127c3bf4a",
+      "width": 2048,
+      "height": 1365,
+      "corners": [
+        [
+          434.0,
+          1251.0
+        ],
+        [
+          1308.0,
+          1110.0
+        ],
+        [
+          1378.0,
+          1129.0
+        ],
+        [
+          458.0,
+          1286.0
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval"
+    },
+    {
+      "id": "wc-148347114",
+      "group": "commons-author-steveknight",
+      "split": "train",
+      "title": "Rhodes electric piano (53719506642).jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Rhodes_electric_piano_(53719506642).jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/5/56/Rhodes_electric_piano_%2853719506642%29.jpg",
+      "author": "Steve Knight from Halstead, United Kingdom",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0",
+      "source_sha256": "da0486f3deb05ee3ad1959df3bb030c59d83ac6f3d727e4b96a76de10b39b0b4",
+      "commons_sha1": "3dbe5b3d2941531b2e2e09950a8e5618345e35a3",
+      "image_sha256": "0b56d2892ff772c6486dfe9479102e582d516f5a68d94aa20c4330df94f03e94",
+      "width": 2048,
+      "height": 2029,
+      "corners": [
+        [
+          257.0,
+          1388.0
+        ],
+        [
+          1859.0,
+          1470.0
+        ],
+        [
+          1848.0,
+          1560.0
+        ],
+        [
+          122.0,
+          1463.0
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval"
+    },
+    {
+      "id": "wc-56382881",
+      "group": "commons-author-marine6971",
+      "split": "train",
+      "title": "Phoenix-Musical Instrument Museum-Miodel C Parlor Grand Piano-1886.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Phoenix-Musical_Instrument_Museum-Miodel_C_Parlor_Grand_Piano-1886.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/3/37/Phoenix-Musical_Instrument_Museum-Miodel_C_Parlor_Grand_Piano-1886.jpg",
+      "author": "Marine 69-71",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source_sha256": "f19b01e99982b00ba8f9134bd21e77137c7755a7fcaead69915b9c0abca27824",
+      "commons_sha1": "01b4784143a1e59f400a277e325784b307f8e9b0",
+      "image_sha256": "54bbef0da203e1c6a09503489bf0c5e9b64b2d9452ce55d45971d2aa4b083505",
+      "width": 2048,
+      "height": 1536,
+      "status": "excluded",
+      "reason": "Native QA: true rear-left playable-plane intersection is hidden in fallboard shadow. Retained as ungradable, not a negative."
+    },
+    {
+      "id": "wc-21396207",
+      "group": "commons-author-joemabel",
+      "split": "train",
+      "title": "Centralia, WA - old upright piano 01.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Centralia,_WA_-_old_upright_piano_01.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/3/32/Centralia%2C_WA_-_old_upright_piano_01.jpg",
+      "author": "Joe Mabel",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+      "source_sha256": "86bbc3433092c7d20bce9c8536e279195c02f6f7946957b5f9911228c8f923e2",
+      "commons_sha1": "8087af4559543810aea3fd0bafb8911d9a23adfd",
+      "image_sha256": "82e32b3d47d7c2a64d542c36970d9c56c2edf88577d67454fb387869cced1966",
+      "width": 2048,
+      "height": 1360,
+      "status": "excluded",
+      "reason": "Disassembled mechanism exposes long key tails; rear playable-surface boundary is ambiguous under shadow. Source retained, not a negative."
+    },
+    {
+      "id": "wc-82573980",
+      "group": "commons-author-boaventuravinicius",
+      "split": "train",
+      "title": "Piano no Palácio Cruz e Souza.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Piano_no_Pal%C3%A1cio_Cruz_e_Souza.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Piano_no_Pal%C3%A1cio_Cruz_e_Souza.jpg",
+      "author": "Boaventuravinicius",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source_sha256": "ef3ad21a34cf15235c980cc87bc68898ac455aea607ef92da28b07ef4bde86b2",
+      "commons_sha1": "80815ac409510f9df4c8071c2d5d175e7d3e76f3",
+      "image_sha256": "c3500f395ed22963840e90be225434181013279301afcaf772835d73c411be1f",
+      "width": 2048,
+      "height": 1229,
+      "status": "excluded",
+      "reason": "Far rear-right intersection is too blurred for a reliable upper-plane corner; source retained, not a negative."
+    },
+    {
+      "id": "wc-84724977",
+      "group": "commons-author-daderot",
+      "split": "train",
+      "title": "Piano by Antonio Jose Pedrosa, Portugal, 1800s - Museu Nacional de Soares dos Reis - Porto, Portugal - DSC00594.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Piano_by_Antonio_Jose_Pedrosa,_Portugal,_1800s_-_Museu_Nacional_de_Soares_dos_Reis_-_Porto,_Portugal_-_DSC00594.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/9/96/Piano_by_Antonio_Jose_Pedrosa%2C_Portugal%2C_1800s_-_Museu_Nacional_de_Soares_dos_Reis_-_Porto%2C_Portugal_-_DSC00594.jpg",
+      "author": "Daderot",
+      "license": "Public domain",
+      "license_url": "https://commons.wikimedia.org/wiki/File:Piano_by_Antonio_Jose_Pedrosa,_Portugal,_1800s_-_Museu_Nacional_de_Soares_dos_Reis_-_Porto,_Portugal_-_DSC00594.jpg",
+      "source_sha256": "4101c9b11e9246c34e9df62a808a2e508c71c56a63dbc0d4ed8800fb784cde7c",
+      "commons_sha1": "b1ab95b43e01fcce7e7d3d01964e5c18509e1dee",
+      "image_sha256": "94e718f2b0e525c14ec03660db8e78f5f9e94cd8d42c409b2edea36b2f31424d",
+      "width": 2048,
+      "height": 1365,
+      "status": "excluded",
+      "reason": "Native QA: rounded case occludes both rear intersections. Retained as ungradable, not a negative."
+    },
+    {
+      "id": "wc-97100843",
+      "group": "commons-author-salvadorcalyso",
+      "split": "train",
+      "title": "Casiotone 1000p (1982).jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Casiotone_1000p_(1982).jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/1/17/Casiotone_1000p_%281982%29.jpg",
+      "author": "Salvador Calyso",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source_sha256": "3a7d95254cd546d36e643c99f97715ae669d16fbdd7ea537d45cb0d89ea6ac4f",
+      "commons_sha1": "eb0c68e84a34bf699f3021b0c74ad307f85e9f90",
+      "image_sha256": "a32a37ead0b68d8505b1371333000dedcc1534b3a037c3fe8734a09bd82cd063",
+      "width": 2048,
+      "height": 782,
+      "corners": [
+        [
+          91.0,
+          435.0
+        ],
+        [
+          1957.0,
+          437.0
+        ],
+        [
+          1963.0,
+          745.0
+        ],
+        [
+          85.0,
+          744.0
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval"
+    },
+    {
+      "id": "wc-129933057",
+      "group": "commons-author-alison",
+      "split": "train",
+      "title": "Elka Rhapsody 490.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Elka_Rhapsody_490.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Elka_Rhapsody_490.jpg",
+      "author": "Alison Cassidy",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source_sha256": "ef386f94e63381788721fbe6df0ecc960ff9f39d4f99cc8e084f92c5f59d9b87",
+      "commons_sha1": "10554651083a7c1a83ee5971570eb6df720025b4",
+      "image_sha256": "c30ba80544d88fc2a7fb82c881e0a9c5b5c6dbcd7d9fc3231bd7a3680cea0741",
+      "width": 2048,
+      "height": 750,
+      "corners": [
+        [
+          453.0,
+          271.0
+        ],
+        [
+          1838.0,
+          274.0
+        ],
+        [
+          1924.0,
+          553.0
+        ],
+        [
+          400.0,
+          552.0
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval"
+    },
+    {
+      "id": "wc-180797519",
+      "group": "commons-author-mostafameraji",
+      "split": "train",
+      "title": "Keyboard player in Iran - Iranian musicians - Persian music band, depressed rock 09.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Keyboard_player_in_Iran_-_Iranian_musicians_-_Persian_music_band,_depressed_rock_09.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/0/02/Keyboard_player_in_Iran_-_Iranian_musicians_-_Persian_music_band%2C_depressed_rock_09.jpg",
+      "author": "Mostafameraji",
+      "license": "CC0",
+      "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "source_sha256": "f2c8aa8e2ede812c66a65648098e2928989adba43b47f16758c31e47387d2e18",
+      "commons_sha1": "58bf1f10af4cc91222e24f04f7a88c20264cf863",
+      "image_sha256": "e241b9e1e9b8ce0dc353a0ad542c83bac956382ab56f3f1b0e1abcfe2a828b33",
+      "width": 2048,
+      "height": 1365,
+      "status": "excluded",
+      "reason": "Nearly vertical long axis outside current image-order contract; far endpoint low contrast beneath wrist. Unsupported/uncertain source retained, not a negative."
+    },
+    {
+      "id": "wc-148606546",
+      "group": "commons-author-gysmwoyaosrhoo",
+      "split": "train",
+      "title": "HK TWD 荃灣西 Tsuen Wan west Nina Mall shop 柏斯音樂 Parsons Music grand piano n seat May 2024 R12S 06.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:HK_TWD_%E8%8D%83%E7%81%A3%E8%A5%BF_Tsuen_Wan_west_Nina_Mall_shop_%E6%9F%8F%E6%96%AF%E9%9F%B3%E6%A8%82_Parsons_Music_grand_piano_n_seat_May_2024_R12S_06.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/HK_TWD_%E8%8D%83%E7%81%A3%E8%A5%BF_Tsuen_Wan_west_Nina_Mall_shop_%E6%9F%8F%E6%96%AF%E9%9F%B3%E6%A8%82_Parsons_Music_grand_piano_n_seat_May_2024_R12S_06.jpg",
+      "author": "GYSMwo Yao srhoo",
+      "license": "CC0",
+      "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "source_sha256": "4775ae6425f437a06776e54f3a77d9b891e34dd83d380ce66220d9a841491a97",
+      "commons_sha1": "077d3aada97546634b7ab8dc03303b79b530d2a0",
+      "image_sha256": "8c7a6a38df19a678d1b2a4e6dcbb79adec0ec08150e05a80461ea5d0ad3d03e0",
+      "width": 1536,
+      "height": 2048,
+      "corners": [
+        [
+          290.0,
+          1311.0
+        ],
+        [
+          1111.0,
+          960.0
+        ],
+        [
+          1212.0,
+          987.0
+        ],
+        [
+          387.0,
+          1389.0
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval"
+    },
+    {
+      "id": "wc-113544658",
+      "group": "commons-author-sirmorosus",
+      "split": "train",
+      "title": "F. Robert Reinhold baby grand piano 3.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:F._Robert_Reinhold_baby_grand_piano_3.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/a/a4/F._Robert_Reinhold_baby_grand_piano_3.jpg",
+      "author": "Sir Morosus",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source_sha256": "821db56d26cc75564add1486f54e3b524bc3558a99072488418e4c5f61781751",
+      "commons_sha1": "77e34c76ea49aed5a2897149ac4a5fc05832b6a9",
+      "image_sha256": "19df32c3d2d255d8b3bb5fee433b1e03ccb2aec9d8bc18bb91b95b2ac5b1506e",
+      "width": 2048,
+      "height": 761,
+      "corners": [
+        [
+          302.0,
+          456.0
+        ],
+        [
+          1743.0,
+          407.0
+        ],
+        [
+          1838.0,
+          493.0
+        ],
+        [
+          227.0,
+          554.0
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval"
+    },
+    {
+      "id": "wc-28169975",
+      "group": "commons-author-agnieszkam",
+      "split": "train",
+      "title": "Zabytkowe pianino dzieciece znajdujace sie w Starym Palacu w Ostromecku.JPG",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Zabytkowe_pianino_dzieciece_znajdujace_sie_w_Starym_Palacu_w_Ostromecku.JPG",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Zabytkowe_pianino_dzieciece_znajdujace_sie_w_Starym_Palacu_w_Ostromecku.JPG",
+      "author": "Agnieszka M",
+      "license": "CC BY-SA 3.0 pl",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0/pl/deed.en",
+      "source_sha256": "ffa3c8a03ec72111a776bd0d451e61396a74b1ee07d02c714202c2f0000400dd",
+      "commons_sha1": "a64d5db3b9fa03e9107706c3c8fda329ce3ca303",
+      "image_sha256": "b61d75173456a3cec2a87a9ca54723f4589f787be1bd3eacbad905239dcd68e3",
+      "width": 2048,
+      "height": 1329,
+      "corners": [
+        [
+          482.0,
+          624.0
+        ],
+        [
+          1588.0,
+          622.0
+        ],
+        [
+          1683.0,
+          696.0
+        ],
+        [
+          440.0,
+          708.0
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval"
+    },
+    {
+      "id": "wc-119714124",
+      "group": "commons-author-valerieeverett",
+      "split": "train",
+      "title": "Square grand piano - Rosedown Plantation St Francisville, Louisina.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Square_grand_piano_-_Rosedown_Plantation_St_Francisville,_Louisina.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Square_grand_piano_-_Rosedown_Plantation_St_Francisville%2C_Louisina.jpg",
+      "author": "Valerie Everett",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+      "source_sha256": "02927efa9c84c899bc26325936ff165fcd9468932e0ab31d41009ae83fa6861e",
+      "commons_sha1": "f9655acfb2a961fdc43a3f62b610e92c8a9b75ad",
+      "image_sha256": "2ce8a31b69debed0535ef6509e04bbabde0b882c89a78d9cfafc94c238bdb41b",
+      "width": 2048,
+      "height": 1365,
+      "status": "excluded",
+      "reason": "Native QA: rear intersections too blurred/shadowed for precise reference. Retained as ungradable, not a negative."
+    },
+    {
+      "id": "wc-85126715",
+      "group": "commons-author-albertogrovi",
+      "split": "test",
+      "title": "Museo del Romanticismo (14).jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Museo_del_Romanticismo_(14).jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Museo_del_Romanticismo_%2814%29.jpg",
+      "author": "Alberto-g-rovi",
+      "license": "CC BY 3.0",
+      "license_url": "https://creativecommons.org/licenses/by/3.0",
+      "source_sha256": "498828c56189144ee828ddde0a4e4e2757a843f310edc95f43ffef732112c4ee",
+      "commons_sha1": "36732da406b73757fafd93b3512cd98f6df0529d",
+      "image_sha256": "94b2c7a7e338a7b6b1088a1e0069af2876db897ec4d7aa15bdd4c882715d30c6",
+      "width": 2048,
+      "height": 1536,
+      "corners": [
+        [
+          852.48,
+          1171.46
+        ],
+        [
+          1561.09,
+          1331.2
+        ],
+        [
+          1541.12,
+          1368.58
+        ],
+        [
+          798.72,
+          1192.45
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval",
+      "expected_white_count": 52
+    },
+    {
+      "id": "wc-197013891",
+      "group": "commons-author-山田晴通",
+      "split": "test",
+      "title": "Early 20th century J.Becker grand piano in Anjo, Aichi, Japan, 2026-08-05.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Early_20th_century_J.Becker_grand_piano_in_Anjo,_Aichi,_Japan,_2026-08-05.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/1/17/Early_20th_century_J.Becker_grand_piano_in_Anjo%2C_Aichi%2C_Japan%2C_2026-08-05.jpg",
+      "author": "山田晴通",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source_sha256": "2ea0fada6468366c5e14b5bd2b5c93f3ce14ccb47c90ef6d18bafc193d058811",
+      "commons_sha1": "c9874cb5d20c1c124446ee5a67d2e2cdf9328f24",
+      "image_sha256": "169abd7696fc3533d9d722f3426bc7d3b8b8c6f3e2a1cc642ef385b9c840bd49",
+      "width": 2048,
+      "height": 1536,
+      "corners": [
+        [
+          471.37,
+          814.22
+        ],
+        [
+          1399.87,
+          847.24
+        ],
+        [
+          1380.57,
+          871.62
+        ],
+        [
+          437.33,
+          825.4
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval",
+      "expected_white_count": 52
+    },
+    {
+      "id": "wc-140840460",
+      "group": "commons-author-anuprightpianoatstantonlacychurchbydylanmusto14",
+      "split": "test",
+      "title": "An upright piano at Stanton Lacy Church - geograph.org.uk - 5738050.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:An_upright_piano_at_Stanton_Lacy_Church_-_geograph.org.uk_-_5738050.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/d/d6/An_upright_piano_at_Stanton_Lacy_Church_-_geograph.org.uk_-_5738050.jpg",
+      "author": "DylanMusto14",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+      "source_sha256": "720e5f83ffb4407dce12824860d9aac28c74e9ba07133b225e40a7b5155d6148",
+      "commons_sha1": "5fcd668f5f2f3565d1e47bb0fe1528529079144d",
+      "image_sha256": "4df71ab612454b064c8843fa701546733016a1226645b0df92f6c5f9a95ae0ba",
+      "width": 2048,
+      "height": 1155,
+      "corners": [
+        [
+          622.43,
+          647.8
+        ],
+        [
+          1388.55,
+          554.27
+        ],
+        [
+          1418.67,
+          563.69
+        ],
+        [
+          648.78,
+          675.42
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval",
+      "expected_white_count": 50
+    },
+    {
+      "id": "wc-53745075",
+      "group": "commons-author-catatine",
+      "split": "test",
+      "title": "Halle-WFBachHs3-pianino.JPG",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Halle-WFBachHs3-pianino.JPG",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/0/01/Halle-WFBachHs3-pianino.JPG",
+      "author": "Catatine",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source_sha256": "2516000c220dbf6a8d6b459d8ff8698488da1d1e52735b3a4fce587b8a5f8e15",
+      "commons_sha1": "4021467c51381909cb58c9f8ae56b325ff5c2b51",
+      "image_sha256": "7a227c9c64346438a2f24aac391e96b892f56814c667be2b69f1ffef9c5d6d9c",
+      "width": 2048,
+      "height": 1536,
+      "corners": [
+        [
+          476.67,
+          837.12
+        ],
+        [
+          1698.82,
+          833.54
+        ],
+        [
+          1797.12,
+          892.93
+        ],
+        [
+          414.72,
+          895.49
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval",
+      "expected_white_count": 50
+    },
+    {
+      "id": "wc-152985203",
+      "group": "commons-author-joseprenaliaslohen11",
+      "split": "test",
+      "title": "Museu George Enescu a Dorohoi - Piano.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Museu_George_Enescu_a_Dorohoi_-_Piano.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Museu_George_Enescu_a_Dorohoi_-_Piano.jpg",
+      "author": "Josep Renalias Lohen11",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0",
+      "source_sha256": "88e2ee362aa392a5a8d275b718e44c106e0e2ea02166b0aa9ad5d53994d75107",
+      "commons_sha1": "dbf7b86c93812512081799358bcecb3a41042520",
+      "image_sha256": "337a24d33aa4d63d3e9753e646f960a70b98897177cd019cfd8ebc8a090df766",
+      "width": 2048,
+      "height": 1536,
+      "corners": [
+        [
+          684.7,
+          1138.79
+        ],
+        [
+          1662.48,
+          1366.86
+        ],
+        [
+          1655.87,
+          1446.6
+        ],
+        [
+          616.63,
+          1182.48
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval",
+      "expected_white_count": 50
+    },
+    {
+      "id": "wc-73814404",
+      "group": "commons-author-robertdemeester",
+      "split": "test",
+      "title": "Aelita synthesizer.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Aelita_synthesizer.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/8/81/Aelita_synthesizer.jpg",
+      "author": "Robertdemeester",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source_sha256": "72700dd2c2c00b65af70937706682d31fdede0c5593aa69445197564dee132cd",
+      "commons_sha1": "9fe78defed462a26859214e30ee9caf815e8222c",
+      "image_sha256": "409fb6800ead9282b6f178d31362bba7b55bcda5775481bdcb6829269d642718",
+      "width": 2048,
+      "height": 1536,
+      "corners": [
+        [
+          566.46,
+          569.82
+        ],
+        [
+          1597.75,
+          1033.54
+        ],
+        [
+          1288.98,
+          1176.7
+        ],
+        [
+          296.98,
+          649.54
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval",
+      "expected_white_count": 26
+    },
+    {
+      "id": "wc-61262842",
+      "group": "commons-author-rodrigofernandez",
+      "split": "test",
+      "title": "Nueva Braunau -Museo Antonio Felmer f43 -piano vertical 1809.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Nueva_Braunau_-Museo_Antonio_Felmer_f43_-piano_vertical_1809.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/3/31/Nueva_Braunau_-Museo_Antonio_Felmer_f43_-piano_vertical_1809.jpg",
+      "author": "Rodrigo Fernández",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source_sha256": "bfd243c7a523003126b1dec4fe8459f759b6fe40e089dbd4160c5c8a13d734a4",
+      "commons_sha1": "ce3c4feb204a1cddbbbd410332861848d08c5eed",
+      "image_sha256": "125159fb2f70cf77557e15741e8fd6652e391ccbe89a08e4831881c510040b41",
+      "width": 2048,
+      "height": 1526,
+      "corners": [
+        [
+          318.14,
+          890.8
+        ],
+        [
+          1497.73,
+          877.51
+        ],
+        [
+          1549.6,
+          928.76
+        ],
+        [
+          247.94,
+          943.31
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval",
+      "expected_white_count": 50
+    },
+    {
+      "id": "wc-102974623",
+      "group": "commons-author-johnrobertmcpherson",
+      "split": "test",
+      "title": "Brisbane City Hall Windsor Room foyer baby grand piano first floor Brisbane P1320957.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Brisbane_City_Hall_Windsor_Room_foyer_baby_grand_piano_first_floor_Brisbane_P1320957.jpg",
+      "retrieval_url": "https://upload.wikimedia.org/wikipedia/commons/9/98/Brisbane_City_Hall_Windsor_Room_foyer_baby_grand_piano_first_floor_Brisbane_P1320957.jpg",
+      "author": "John Robert McPherson",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source_sha256": "925894f68c85d13a973d9989791231dcc0998850945735c188ef104fec6369a4",
+      "commons_sha1": "ae82cd0ff9ffbbbae4d40b8372f5376a33a87fa3",
+      "image_sha256": "7505d8ff6e9ff3d2f20b5a13900ff36c4d15bc54dbac85b12646e76f3b14d996",
+      "width": 2048,
+      "height": 1536,
+      "corners": [
+        [
+          650.75,
+          805.38
+        ],
+        [
+          1250.3,
+          715.78
+        ],
+        [
+          1292.29,
+          717.82
+        ],
+        [
+          653.31,
+          813.57
+        ]
+      ],
+      "status": "approved",
+      "label_scope": "playable_keybed_corners_only",
+      "label_method": "manual native-photo annotation with independent visual correction and approval",
+      "expected_white_count": 52
+    }
+  ]
+}
